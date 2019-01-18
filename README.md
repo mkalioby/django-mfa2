@@ -1,5 +1,5 @@
 # django-mfa2
-A Django app that handles MFA, it supports OTOP, U2F, FIDO2 U2F, and Trusted Devices
+A Django app that handles MFA, it supports OTOP, U2F, FIDO2 U2F (Web Authn), and Trusted Devices
 
 
 For FIDO2, both security keys and android-safetynet are supported.
