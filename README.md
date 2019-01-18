@@ -64,5 +64,14 @@ Depends on
             return log_user_in(request,username=user.username) 
             #log_user_in is a function that handles creatung user session, it should be in the setting file as MFA_CALLBACK
      ```
-1. Provide `mfa_auth_base.html` in your templaes
-    The template will be included for the user login
+1. Add mfa to urls.py
+   ```python 
+   import mfa
+   urls_patterns= [
+   '...',
+   url(r'^mfa/', include(mfa.urls)),
+   '....',
+    ]
+    ```
+1. Provide `mfa_auth_base.html` in your templaes with block called 'head' and 'content'
+    The template will be included during the user login
