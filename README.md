@@ -49,7 +49,7 @@ Depends on
    Usually your login function will check for username and password, log the user in if the username and password are correct and create the user session, to support mfa, this has to change
    
       * authenticate the user
-      * if username and password are correct , check the user has mfa or not
+      * if username and password are correct , check if the user has mfa or not
           * if user has mfa then redirect to mfa page
           * if user doesn't have mfa then call your function to create the user session
 
