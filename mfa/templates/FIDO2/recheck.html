@@ -1,4 +1,5 @@
-<script type="application/javascript" src="{{ STATIC_URL }}js/cbor.js"></script>
+{%  load static %}
+<script type="application/javascript" src="{% static 'mfa/js/cbor.js' %}"></script>
 <div class="row">
 
 <div class="col-sm-10 col-sm-offset-1 col-xs-12 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
@@ -11,7 +12,7 @@
               <div class="row">
             <div style="padding-left: 15px" class="col-md-10 col-md-offset-1" id="main_paragraph" align="center">
                 {% if mode == "auth" %}
-                   Welcome back <img src="{% url 'getUserImage' request.session.base_username  %}" title="{{ request.session.base_username }}" style="padding: 3px;height: 50px" class="img-circle"/> {{ request.session.base_username }}<br/>
+                   Welcome back {% comment %}<img src="{% url 'getUserImage' request.session.base_username  %}" title="{{ request.session.base_username }}" style="padding: 3px;height: 50px" class="img-circle"/>{% endcomment %} {{ request.session.base_username }}<br/>
                     <a href="{% url 'mfa_reset_cookie' %}">Not me</a>
                     <br/>
 

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
+{% load static %}
 {% block head %}
-    <script src="{{ STATIC_URL }}js/qrious.min.js" type="text/javascript"></script>
     <script type="text/javascript">
     function confirmDel(id) {
         $.ajax({
@@ -34,10 +34,12 @@
         })
     }
     </script>
-    <link href="{{ STATIC_URL }}css/bootstrap-toggle.min.css" rel="stylesheet">
-    <script src="{{ STATIC_URL }}js/bootstrap-toggle.min.js"></script>
+    <link href="{% static  'mfa/css/bootstrap-toggle.min.css' %}" rel="stylesheet">
+    <script src="{% static 'mfa/js/bootstrap-toggle.min.js'%}"></script>
 {% endblock %}
 {% block content %}
+    <br/>
+    <br/>
     <div class="container">
     <div class="row">
         <div align="center">

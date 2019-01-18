@@ -1,6 +1,7 @@
 {% extends "base.html" %}
+{% load static %}
 {% block head %}
-    <script type="application/javascript" src="{{ STATIC_URL }}js/cbor.js"></script>
+    <script type="application/javascript" src="{% static 'mfa/js/cbor.js'%}"></script>
     <script type="application/javascript">
     function begin_reg(){
     fetch('{% url 'fido2_begin_reg' %}',{}).then(function(response) {
@@ -44,6 +45,8 @@
 
 {% endblock %}
 {% block content %}
+      <br/>
+    <br/>
      <div class="container">
      <div class="panel panel-default">
       <div class="panel-heading">

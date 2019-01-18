@@ -1,4 +1,4 @@
-{% extends "login_base.html" %}
+{% extends "mfa_auth_base.html" %}
 {% block head %}
     <style>
     .row{
@@ -6,8 +6,9 @@
     }
     </style>
 {% endblock %}
-{% block form %}
-
+{% block content %}
+<br/>
+<br/>
 {% include "TOTP/recheck.html" with mode='auth' %}
 
   {% endblock %}

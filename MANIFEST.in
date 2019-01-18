@@ -1,0 +1,2 @@
+recursive-include mfa/templates *
+recursive-include mfa/static *

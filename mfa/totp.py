@@ -41,7 +41,7 @@ def auth(request):
         if verify_login(request,request.session["base_username"],token = request.POST["otp"]):
             return login(request)
         context["invalid"]=True
-    return render_to_response("TOTP/verify.html", context, context_instance = RequestContext(request))
+    return render_to_response("TOTP/Auth.html", context, context_instance = RequestContext(request))
 
 
 
