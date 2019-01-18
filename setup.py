@@ -4,7 +4,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='django-mfa2',
-    version='0.8',
+    version='0.8.5',
     description='Allows user to add 2FA to their accounts',
     author='Mohamed El-Kalioby',
     author_email = 'mkalioby@mkalioby.com',
