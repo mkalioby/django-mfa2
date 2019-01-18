@@ -67,9 +67,11 @@ Depends on
 1. Add mfa to urls.py
    ```python 
    import mfa
+   import mfa.TrustedDevice
    urls_patterns= [
    '...',
    url(r'^mfa/', include(mfa.urls)),
+   url(r'devices/add$', mfa.TrustedDevice.add,name="mfa_add_new_trusted_device"), # This short link to add new trusted device
    '....',
     ]
     ```
