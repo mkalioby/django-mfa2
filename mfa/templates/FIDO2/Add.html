@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block head %}
+    <script type="application/javascript" src="{{ STATIC_URL }}js/cbor.js"></script>
+    <script type="application/javascript">
+    function begin_reg(){
+    fetch('{% url 'fido2_begin_reg' %}',{}).then(function(response) {
+      if(response.ok)
+      {
+          return response.arrayBuffer();
+      }
+      throw new Error('Error getting registration data!');
+    }).then(CBOR.decode).then(function(options) {
+        options.publicKey.attestation="direct"
+        console.log(options)
+
+      return navigator.credentials.create(options);
+    }).then(function(attestation) {
+      return fetch('{% url 'fido2_complete_reg' %}', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/cbor'},
+        body: CBOR.encode({
+          "attestationObject": new Uint8Array(attestation.response.attestationObject),
+          "clientDataJSON": new Uint8Array(attestation.response.clientDataJSON),
+        })
+      });
+    }).then(function(response) {
+
+        var stat = response.ok ? 'successful' : 'unsuccessful';
+        return response.json()
+    }).then(function (res)
+        {
+      if (res["status"] =='OK')
+            $("#res").html("<div class='alert alert-success'>Registered Successfully, <a href='{% url 'mfa_home' %}'> Go to Security Home</a></div>")
+        else
+            $("#res").html("<div class='alert alert-danger'>Registeration Failed as " + res["message"] + ", <a href='javascript:void(0)' onclick='begin_reg()'> try again or <a href='{% url 'mfa_home' %}'> Go to Security Home</a></div>")
+
+
+    }, function(reason) {
+       $("#res").html("<div class='alert alert-danger'>Registeration Failed as " +reason +", <a href='javascript:void(0)' onclick='begin_reg()'> try again </a> or <a href='{% url 'mfa_home' %}'> Go to Security Home</a></div>")
+    })
+    }
+    $(document).ready(setTimeout(begin_reg,500))
+    </script>
+
+{% endblock %}
+{% block content %}
+     <div class="container">
+     <div class="panel panel-default">
+      <div class="panel-heading">
+	      <strong> FIDO2 Security Key</strong>
+      </div>
+      <div class="panel-body">
+
+
+    <div class="row alert alert-pr" id="res">
+    <p style="color: green">Your broswer should ask you to confirm you indentity.</p>
+
+    </div>
+        </div>
+    </div>
+    {% include "modal.html" %}
+{% endblock %}

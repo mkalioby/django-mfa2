@@ -1,0 +1,97 @@
+<div class="row">
+
+<div class="col-sm-10 col-sm-offset-1 col-xs-12 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
+<div class="panel panel-default">
+      <div class="panel-heading">
+	      <strong> Security Key</strong>
+      </div>
+      <div class="panel-body">
+
+              <div class="row">
+            <div style="padding-left: 15px" class="col-md-10 col-md-offset-1" id="main_paragraph" align="center">
+                <p style="color: green">Your key should be flashing now, please press the button.</p>
+                {% if mode == "auth" %}
+                    <form id="u2f_login" action="{% url 'u2f_verify' %}" method="post">
+                {% elif mode == "recheck" %}
+                    <form id="u2f_login" action="{% url 'u2f_recheck' %}" method="post">
+                {% endif %}
+              {% csrf_token %}
+              <input type="hidden" name="response" id="response" value=""/>
+          </form>
+      </div>
+                  </div>
+          </div>
+
+          <div class="row">
+          <div style="padding-left: 15px">
+
+            {% if request.session.mfa_methods|length > 1 %}
+                <a href="{%  url 'mfa_methods_list' %}">Select Another Method</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+</div>
+</div>
+</div>
+    <script src="{{ STATIC_URL }}js/u2f-api.js" type="text/javascript"></script>
+
+    <script type="text/javascript">
+    $(document).ready(function () {
+        if (location.protocol != 'https:')
+        {
+            $("#main_paragraph").addClass("alert alert-danger")
+            $("#main_paragraph").html("U2F must work under secure context")
+        }
+        else {
+
+
+            data = JSON.parse('{{ token|safe }}')
+            console.log(data)
+            u2f.sign(data.appId, data.challenge, data.registeredKeys, function (response) {
+                console.log(response)
+                if (response.hasOwnProperty("errorCode") && response.errorCode != 0  )
+                {
+                 if (response.errorCode == 4)
+                 {
+                     alert("Invalid Security Key, this security isn't linked to your account")
+                 }
+                 else if (response.errorCode == 5)
+                 {
+                     alert("Verification Timeout, please refresh the page to try again")
+                 }
+                 else
+                 {
+                     alert("Unspecified error, please try again later or try another browser.")
+                 }
+                }
+                {% if mode == "auth" %}
+                else {
+                    $("#response").val(JSON.stringify(response))
+                    $("#u2f_login").submit();
+                }
+                {% elif mode == "recheck" %}
+                else {
+                    $.ajax({
+                        "url":"{% url 'u2f_recheck' %}",
+                        method: "POST",
+                        data: {"csrfmiddlewaretoken":"{{ csrf_token }}","response":JSON.stringify(response)},
+                        success:function (data) {
+                            if (data["recheck"]) {
+                                mfa_success_function();
+                            }
+                            else {
+                                mfa_failed_function();
+                            }
+                        }
+
+                    })
+
+                }
+                {% endif %}
+            }, 5000)
+        }
+        })
+
+
+    </script>

@@ -1,0 +1,4 @@
+{% extends "login_base.html" %}
+{% block form %}
+{% include 'U2F/recheck.html' with mode='auth' %}
+{% endblock %}

@@ -1,0 +1,4 @@
+{% extends "login_base.html" %}
+{% block form %}
+{% include 'FIDO2/recheck.html' with mode='auth' %}
+{% endblock %}

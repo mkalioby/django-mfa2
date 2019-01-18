@@ -1,0 +1,103 @@
+<script type="application/javascript" src="{{ STATIC_URL }}js/cbor.js"></script>
+<div class="row">
+
+<div class="col-sm-10 col-sm-offset-1 col-xs-12 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
+<div class="panel panel-default">
+      <div class="panel-heading">
+	      <strong> Security Key</strong>
+      </div>
+      <div class="panel-body">
+
+              <div class="row">
+            <div style="padding-left: 15px" class="col-md-10 col-md-offset-1" id="main_paragraph" align="center">
+                {% if mode == "auth" %}
+                   Welcome back <img src="{% url 'getUserImage' request.session.base_username  %}" title="{{ request.session.base_username }}" style="padding: 3px;height: 50px" class="img-circle"/> {{ request.session.base_username }}<br/>
+                    <a href="{% url 'mfa_reset_cookie' %}">Not me</a>
+                    <br/>
+
+            {% endif %}
+                <p style="color: green">please press the button on your security key to prove it is you.</p>
+                {% if mode == "auth" %}
+                    <form id="u2f_login" action="{% url 'fido2_complete_auth' %}" method="post" enctype="multipart/form-data">
+                {% elif mode == "recheck" %}
+                    <form id="u2f_login" action="{% url 'u2f_recheck' %}" method="post">
+                {% endif %}
+              {% csrf_token %}
+              <input type="hidden" name="response" id="response" value=""/>
+          </form>
+      </div>
+                  </div>
+          </div>
+
+          <div class="row">
+          <div style="padding-left: 15px">
+
+            {% if request.session.mfa_methods|length > 1 %}
+                <a href="{%  url 'mfa_methods_list' %}">Select Another Method</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+</div>
+</div>
+</div>
+
+    <script type="text/javascript">
+        function authen()
+        {
+                         fetch('{% url 'fido2_begin_auth' %}', {
+      method: 'GET',
+    }).then(function(response) {
+      if(response.ok) return response.arrayBuffer();
+      throw new Error('No credential available to authenticate!');
+    }).then(CBOR.decode).then(function(options) {
+        console.log(options)
+      return navigator.credentials.get(options);
+    }).then(function(assertion) {
+        res=CBOR.encode({
+          "credentialId": new Uint8Array(assertion.rawId),
+          "authenticatorData": new Uint8Array(assertion.response.authenticatorData),
+          "clientDataJSON": new Uint8Array(assertion.response.clientDataJSON),
+          "signature": new Uint8Array(assertion.response.signature)
+        });
+
+      return fetch('{% url 'fido2_complete_auth' %}', {
+
+        method: 'POST',
+        headers: {'Content-Type': 'application/cbor'},
+        body:res,
+
+      }).then(function (response) {if (response.ok) return res = response.json()}).then(function (res) {
+          if (res.status=="OK")
+          {
+          {%  if mode == "auth" %}
+          window.location.href=res.redirect;
+          {% elif mode == "recheck" %}
+           mfa_success_function();
+          {% endif %}
+          }
+          else {
+              {%  if mode == "auth" %}
+                alert("Error occured, please try again")
+                login()
+              {% elif mode == "recheck" %}
+                mfa_failed_function();
+              {% endif %}
+          }
+      })
+
+                 })
+
+        }
+    $(document).ready(function () {
+        if (location.protocol != 'https:') {
+            $("#main_paragraph").addClass("alert alert-danger")
+            $("#main_paragraph").html("FIDO2 must work under secure context")
+        } else {
+            authen()
+        }
+    });
+
+
+
+    </script>

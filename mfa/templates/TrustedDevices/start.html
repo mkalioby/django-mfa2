@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block head %}
+    <style>
+    #two-factor-steps {
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	padding: 15px;
+}
+    .row{
+        margin: 0px;
+    }
+    </style>
+
+    <script type="text/javascript">
+    function sendEmail() {
+        $("#modal-title").html("Send Link")
+        $("#modal-body").html("Sending Email, Please wait....");
+        $("#popUpModal").modal();
+        $.ajax({
+            "url":"{% url 'td_sendemail' %}",
+            success:function (data) {
+                alert(data);
+                $("#popUpModal").modal('toggle')
+
+            }
+        })
+    }
+    function failedMFA() {
+        $("#modal-body").html("<div class='alert alert-danger'>Failed to validate you, please <a href='javascript:void(0)' onclick='getUserAgent()'>try again</a></div>")
+    }
+    function checkMFA() {
+        recheck_mfa(trustDevice,failedMFA,true)
+    }
+    function trustDevice() {
+
+        $.ajax(
+            {
+
+                "url":"{% url 'td_trust_device' %}",
+                success: function (data) {
+                    if (data == "OK")
+                    {
+                        alert("Your are done, your device should show final confirmation")
+                        window.location.href="{% url 'mfa_home' %}"
+
+                    }
+                }
+            }
+        )
+    }
+    function getUserAgent() {
+        $.ajax({
+            "url":"{% url 'td_get_useragent' %}",success: function(data)
+            {
+                if (data == "")
+                    setTimeout('getUserAgent()',5000)
+                else
+                {
+                    $("#modal-title").html("Confirm Trusted Device")
+                    $("#actionBtn").remove();
+                    $("#modal-footer").prepend("<button id='actionBtn' class='btn btn-success' onclick='checkMFA()'>Trust Device</button>")
+                    $("#modal-body").html(data)
+                    $("#popUpModal").modal()
+                }
+            }
+        })
+
+    }
+    $(document).ready(getUserAgent())
+    </script>
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="col-md-6 col-md-offset-3" id="two-factor-steps">
+            <div class="row" align="center">
+                <h4>Add Trusted Device</h4>
+            </div>
+
+    <div class="row" >
+        {%  if not_allowed %}
+            <div class="alert alert-danger">You can't add any more devices, you need to remove previously trusted devices first.</div>
+        {% else %}
+    <p style="color: green">Allow access from mobile phone and tables.</p>
+    <h5>Steps:</h5>
+        <ol>
+            <li>Using your mobile/table, open Chrome/Firefox.</li>
+            <li>Go to <b>{{ HOST }}{{ BASE_URL }}devices/add</b>&nbsp;&nbsp;<a href="javascript:void(0)" onclick="sendEmail()" title="Send to my email"><i class="fas fa-paper-plane"></i></a></li>
+            <li>Enter your username & following 6 digits<br/>
+                <span style="font-size: 16px;font-weight: bold; margin-left: 50px">{{ key|slice:":3" }} - {{ key|slice:"3:" }}</span>
+            </li>
+            <li>This window will ask to confirm the device.</li>
+
+        </ol>
+    {% endif %}
+    </div>
+        </div>
+    </div>
+    {% include "modal.html" %}
+    {% include 'mfa_check.html' %}
+{% endblock %}

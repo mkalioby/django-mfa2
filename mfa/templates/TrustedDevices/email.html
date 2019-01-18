@@ -1,0 +1,4 @@
+<p>Dear {{ request.user.last_name }}, {{ request.user.first_name }}</p>
+<p>You requested the link to add a new trusted device, please follow the link below<br/>
+<a href="{{ HOST }}{% url 'mfa_add_new_trusted_device' %}">{{ HOST }}{% url 'mfa_add_new_trusted_device' %}</a>
+</p>
