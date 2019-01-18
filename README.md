@@ -77,6 +77,8 @@ Depends on
     ```
 1. Provide `mfa_auth_base.html` in your templaes with block called 'head' and 'content'
     The template will be included during the user login.
-1. To match the look and feel of your project, MFA includes base.html but it need a block named content to added its content in it.
+1. To match the look and feel of your project, MFA includes `base.html` but it needs blocks named `head` & `content` to added its content to it.
 1. Somewhere in your app, add a link to 'mfa_home'
 ```<l><a href="{% url 'mfa_home' %}">Security</a> </l>```
+
+For Example, See https://github.com/mkalioby/AutoDeploy/commit/5f1d94b1804e0aa33c79e9e8530ce849d9eb78cc in AutDeploy Project
