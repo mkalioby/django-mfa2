@@ -16,12 +16,6 @@ def verify_login(request,username,token):
         if  totp.verify(token,valid_window = 30):
             key.last_used=timezone.now()
             key.save()
-            mfa = {"verified": True, "method": "TOTP"}
-            if getattr(settings, "MFA_RECHECK", False):
-                mfa["next_check"] = int((datetime.datetime.now()
-                                         + datetime.timedelta(
-                            seconds=random.randint(settings.MFA_RECHECK_MIN, settings.MFA_RECHECK_MAX))).strftime("%s"))
-            request.session["mfa"] = mfa
             return True
     return False
 
@@ -39,6 +33,12 @@ def auth(request):
     context=csrf(request)
     if request.method=="POST":
         if verify_login(request,request.session["base_username"],token = request.POST["otp"]):
+            mfa = {"verified": True, "method": "TOTP"}
+            if getattr(settings, "MFA_RECHECK", False):
+                mfa["next_check"] = int((datetime.datetime.now()
+                                         + datetime.timedelta(
+                            seconds=random.randint(settings.MFA_RECHECK_MIN, settings.MFA_RECHECK_MAX))).strftime("%s"))
+            request.session["mfa"] = mfa
             return login(request)
         context["invalid"]=True
     return render_to_response("TOTP/Auth.html", context, context_instance = RequestContext(request))
@@ -48,7 +48,6 @@ def auth(request):
 def getToken(request):
     secret_key=pyotp.random_base32()
     totp = pyotp.TOTP(secret_key)
-    print "Answer is", totp.now()
     request.session["new_mfa_answer"]=totp.now()
     return HttpResponse(simplejson.dumps({"qr":pyotp.totp.TOTP(secret_key).provisioning_uri(str(request.user.username), issuer_name = settings.TOKEN_ISSUER_NAME),
                          "secret_key": secret_key}))

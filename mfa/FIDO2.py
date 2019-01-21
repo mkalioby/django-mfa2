@@ -48,7 +48,6 @@ def complete_reg(request):
             client_data,
             att_obj
         )
-        print att_obj.fmt
         encoded = websafe_encode(auth_data.credential_data)
         uk=User_Keys()
         uk.username = request.user.username
@@ -60,7 +59,6 @@ def complete_reg(request):
         from raven.contrib.django.raven_compat.models import client
         import traceback
         client.captureException()
-        print traceback.format_exc()
         return HttpResponse(simplejson.dumps({'status': 'ERR',"message":"Error on server, please try again later"}))
 def start(request):
     context = csrf(request)
