@@ -4,7 +4,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='django-mfa2',
-    version='0.8.8',
+    version='0.9.0',
     description='Allows user to add 2FA to their accounts',
     author='Mohamed El-Kalioby',
     author_email = 'mkalioby@mkalioby.com',
@@ -23,6 +23,7 @@ setup(
         'user-agents',
         'python-jose',
         'fido2==0.5'
+        'jsonLookup'
       ],
     include_package_data=True,
       zip_safe=False, # because we're including static files

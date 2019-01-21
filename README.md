@@ -1,12 +1,12 @@
 # django-mfa2
-A Django app that handles MFA, it supports TOTP, U2F, FIDO2 U2F (Web Authn), and Trusted Devices
+A Django app that handles MFA, it supports TOTP, U2F, FIDO2 U2F (Web Authn), Email Tokens , and Trusted Devices
 
 
 For FIDO2, both security keys and android-safetynet are supported.
 
 Trusted device is a mode for the user to add a device that doesn't support security keys like iOS and andriod without fingerprints or NFC.
 
-`*Note*: U2F and FIDO2 can only be served under secure context (https)`
+`**Note**: U2F and FIDO2 can only be served under secure context (https)`
 
 Depends on
 
@@ -44,6 +44,13 @@ Depends on
    FIDO_SERVER_NAME=u"MDL"
    FIDO_LOGIN_URL=BASE_URL
    ```
+   **Method Names**
+   * U2F
+   * FIDO2
+   * TOTP
+   * Trusted_Devices
+   * Email
+   
 1. Break your login function
 
    Usually your login function will check for username and password, log the user in if the username and password are correct and create the user session, to support mfa, this has to change
@@ -77,6 +84,7 @@ Depends on
     ```
 1. Provide `mfa_auth_base.html` in your templaes with block called 'head' and 'content'
     The template will be included during the user login.
+    If you will use Email Token method, then you have to provide template named `mfa_email_token_template.html` that will content the format of the email with parameter named `user` and `otp`.
 1. To match the look and feel of your project, MFA includes `base.html` but it needs blocks named `head` & `content` to added its content to it.
 1. Somewhere in your app, add a link to 'mfa_home'
 ```<l><a href="{% url 'mfa_home' %}">Security</a> </l>```
