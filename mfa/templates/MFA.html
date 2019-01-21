@@ -51,6 +51,9 @@
                 {% if not 'TOTP' in UNALLOWED_AUTHEN_METHODS %}
                     <li><a href="{% url 'start_new_otop' %}">Authenticator app</a></li>
                 {% endif %}
+                {% if not 'Email' in UNALLOWED_AUTHEN_METHODS %}
+                    <li><a href="{% url 'start_email' %}">Email Token</a></li>
+                {% endif %}
                 {% if not 'U2F' in UNALLOWED_AUTHEN_METHODS %}
                     <li><a href="{% url 'start_u2f' %}">Security Key</a></li>
                 {% endif %}
