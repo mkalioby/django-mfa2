@@ -15,6 +15,7 @@
 
               <li><a href="{% url "mfa_goto" method %}">
                   {% if method == "TOTP" %}Authenticator App
+                  {% elif method == "Email" %}Send OTP by Email
                   {% elif method == "U2F" %}Secure Key
                   {% elif method == "FIDO2" %}FIDO2 Secure Key
                   {% endif %}

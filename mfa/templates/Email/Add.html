@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block head %}
+{% endblock %}
+{% block content %}
+    <br/>
+    <br/>
+
+    <div class="panel panel-default">
+      <div class="panel-heading">
+	      <strong> Activate Token by email</strong>
+      </div>
+      <div class="panel-body">
+
+      <FORM METHOD="POST" ACTION="{% url 'start_email' %}" Id="formLogin"  onSubmit="" name="FrontPage_Form1">
+
+
+      {% csrf_token %}
+          {%  if invalid %}
+          <div class="alert alert-danger">
+              Sorry, The provided token is not valid.
+          </div>
+          {% endif %}
+      {% if quota %}
+          <div class="alert alert-warning">
+              {{ quota }}
+          </div>
+      {% endif %}
+      <fieldset>
+      <div class="row">
+      <div class="col-sm-12 col-md-12">
+        <p>Enter the 6-digits sent to your email.</p>
+      </div>
+      </div>
+
+      <div class="row">
+	  <div class="col-sm-12 col-md-12">
+	    <div class="form-group">
+	      <div class="input-group">
+		<span class="input-group-addon">
+		<i class="glyphicon glyphicon-lock"></i>
+		</span>
+		<input class="form-control" size="6" MaxLength="6" value="" placeholder="e.g 55552" name="otp" type="text" id="otp" autofocus>
+
+	      </div>
+	    </div>
+
+          <div class="form-group">
+
+	      <input type="submit" class="btn btn-lg btn-success btn-block" value="Verify">
+	      </div>
+      </div>
+      </fieldset>
+      </FORM>
+      </div>
+{% endblock %}
