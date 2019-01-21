@@ -8,7 +8,7 @@ url(r'totp/verify', totp.verify, name="verify_otop"),
 url(r'totp/auth', totp.auth, name="totp_auth"),
 url(r'totp/recheck', totp.recheck, name="totp_recheck"),
 
-url(r'email/start/', Email.start , name="start_new_email"),
+url(r'email/start/', Email.start , name="start_email"),
 url(r'email/auth/', Email.auth , name="email_auth"),
 
 url(r'u2f/$', U2F.start, name="start_u2f"),
