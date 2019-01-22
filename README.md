@@ -37,11 +37,11 @@ Depends on
    MFA_RECHECK_MAX=30         # Maximum in seconds
    MFA_QUICKLOGIN=True        # Allow quick login for returning users by provide only their 2FA 
 
-   TOKEN_ISSUER_NAME="MDL"      #TOTP Issuer name
+   TOKEN_ISSUER_NAME="PROJECT_NAME"      #TOTP Issuer name
 
    U2F_APPID="https://localhost"    #URL For U2F
-   FIDO_SERVER_ID=u"localhost"      # Server rp id for FIDO2
-   FIDO_SERVER_NAME=u"MDL"
+   FIDO_SERVER_ID=u"localehost"      # Server rp id for FIDO2, it the full domain of your project
+   FIDO_SERVER_NAME=u"PROJECT_NAME"
    FIDO_LOGIN_URL=BASE_URL
    ```
    **Method Names**
