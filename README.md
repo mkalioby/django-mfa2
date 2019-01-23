@@ -1,12 +1,13 @@
 # django-mfa2
 A Django app that handles MFA, it supports TOTP, U2F, FIDO2 U2F (Web Authn), Email Tokens , and Trusted Devices
 
-
 For FIDO2, both security keys and android-safetynet are supported.
 
 Trusted device is a mode for the user to add a device that doesn't support security keys like iOS and andriod without fingerprints or NFC.
 
-`**Note**: U2F and FIDO2 can only be served under secure context (https)`
+**Note**: `U2F and FIDO2 can only be served under secure context (https)`
+
+Package tested with Django 1.8, Django 2.1 on Python 2.7 and Python 3.5+ but it was not checked with any version in between but open for issues.
 
 Depends on
 
