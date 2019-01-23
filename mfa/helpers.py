@@ -1,8 +1,6 @@
 import pyotp
 from .models import *
-import TrustedDevice
-import U2F, FIDO2
-import totp
+from . import TrustedDevice, U2F, FIDO2, totp
 import simplejson
 from django.shortcuts import HttpResponse
 from mfa.views import verify,goto

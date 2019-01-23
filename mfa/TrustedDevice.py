@@ -105,8 +105,8 @@ def start(request):
 
 def send_email(request):
     body=render(request,"TrustedDevices/email.html",{}).content
-    from Registry_app.Common import send
-    if send(request.user.email,"Add Trusted Device Link",body,delay=False):
+    from .Common import send
+    if send([request.user.email],"Add Trusted Device Link",body):
         res="Sent Successfully"
     else:
         res="Error occured, please try again later."

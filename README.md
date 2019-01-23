@@ -87,6 +87,6 @@ Depends on
     If you will use Email Token method, then you have to provide template named `mfa_email_token_template.html` that will content the format of the email with parameter named `user` and `otp`.
 1. To match the look and feel of your project, MFA includes `base.html` but it needs blocks named `head` & `content` to added its content to it.
 1. Somewhere in your app, add a link to 'mfa_home'
-```<l><a href="{% url 'mfa_home' %}">Security</a> </l>```
+```<li><a href="{% url 'mfa_home' %}">Security</a> </li>```
 
 For Example, See https://github.com/mkalioby/AutoDeploy/commit/5f1d94b1804e0aa33c79e9e8530ce849d9eb78cc in AutDeploy Project

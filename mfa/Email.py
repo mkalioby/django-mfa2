@@ -5,19 +5,13 @@ from random import randint
 from .models import *
 from django.template.context import RequestContext
 from .views import login
-
+from .Common import send
 def sendEmail(request,username,secret):
     from django.contrib.auth import get_user_model
     User = get_user_model()
     user=User.objects.get(username=username)
-    print secret
     res=render_to_response("mfa_email_token_template.html",{"request":request,"user":user,'otp':secret})
-    from django.conf import settings
-    from django.core.mail import EmailMessage
-    From = "%s <%s>" % (settings.EMAIL_FROM, settings.EMAIL_HOST_USER)
-    email = EmailMessage("OTP",res.content,From,[user.email] )
-    email.content_subtype = "html"
-    return email.send(False)
+    return  send([user.email],"OTP", res.content)
 
 def start(request):
     context = csrf(request)

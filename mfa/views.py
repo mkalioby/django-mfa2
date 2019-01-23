@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse
 from django.template.context_processors import csrf
 from django.template.context import RequestContext
 from django.conf import settings
-import TrustedDevice
+from . import TrustedDevice
 from user_agents import parse
 def index(request):
     keys=[]
@@ -24,7 +24,7 @@ def verify(request,username):
     #request.session["base_password"] = password
     keys=User_Keys.objects.filter(username=username,enabled=1)
     methods=list(set([k.key_type for k in keys]))
-    print methods
+
     if "Trusted Device" in methods and not request.session.get("checked_trusted_device",False):
         if TrustedDevice.verify(request):
             return login(request)
