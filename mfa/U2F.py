@@ -10,7 +10,7 @@ from django.template.context import RequestContext
 from django.template.context_processors import csrf
 from django.conf import settings
 from django.http import HttpResponse
-from.models import *
+from .models import *
 from .views import login
 from django.utils import timezone
 

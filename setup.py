@@ -4,7 +4,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='django-mfa2',
-    version='0.9.2',
+    version='0.9.4',
     description='Allows user to add 2FA to their accounts',
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
@@ -17,7 +17,7 @@ setup(
     license='MIT',
     packages=find_packages(),
     install_requires=[
-        'Django>=1.7',
+        'django >= 1.7',
         'jsonfield',
         'simplejson',
         'pyotp',
@@ -25,7 +25,7 @@ setup(
         'ua-parser',
         'user-agents',
         'python-jose',
-        'fido2==0.5'
+        'fido2 == 0.5',
         'jsonLookup'
       ],
     include_package_data=True,

@@ -1,6 +1,7 @@
 from django.conf.urls import  url
-from . import views,totp,U2F,TrustedDevice,helpers,FIDO2,Email
 
+from . import views,totp,U2F,TrustedDevice,helpers,FIDO2,Email
+app_name='mfa'
 urlpatterns = [
 url(r'totp/start/', totp.start , name="start_new_otop"),
 url(r'totp/getToken', totp.getToken , name="get_new_otop"),

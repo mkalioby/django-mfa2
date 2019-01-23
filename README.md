@@ -77,7 +77,7 @@ Depends on
    import mfa.TrustedDevice
    urls_patterns= [
    '...',
-   url(r'^mfa/', include(mfa.urls)),
+   url(r'^mfa/', include('mfa.urls')),
    url(r'devices/add$', mfa.TrustedDevice.add,name="mfa_add_new_trusted_device"), # This short link to add new trusted device
    '....',
     ]

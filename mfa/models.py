@@ -18,3 +18,5 @@ class User_Keys(models.Model):
             self.properties["signature"]= jwt.encode({"username": self.username, "key": self.properties["key"]}, settings.SECRET_KEY)
         super(User_Keys, self).save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
 
+    class Meta:
+        app_label='mfa'

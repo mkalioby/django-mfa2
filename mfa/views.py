@@ -1,7 +1,10 @@
 from django.shortcuts import render,render_to_response
 from django.http import HttpResponse,HttpResponseRedirect
 from .models import *
-from django.core.urlresolvers import reverse
+try:
+    from django.urls import reverse
+except:
+    from django.core.urlresolvers import reverse
 from django.template.context_processors import csrf
 from django.template.context import RequestContext
 from django.conf import settings

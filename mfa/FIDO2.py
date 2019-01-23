@@ -12,7 +12,7 @@ from django.conf import settings
 from .models import *
 from fido2.utils import websafe_decode,websafe_encode
 from fido2.ctap2 import AttestedCredentialData
-from views import login
+from .views import login
 import datetime
 from django.utils import timezone
 
