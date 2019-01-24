@@ -1,12 +1,15 @@
 # django-mfa2
 A Django app that handles MFA, it supports TOTP, U2F, FIDO2 U2F (Web Authn), Email Tokens , and Trusted Devices
 
-Web Authencation API (Webauthn) is state-of-the art techology that is expected to replace passwords.
+[![PyPI version](https://badge.fury.io/py/django-mfa2.svg)](https://badge.fury.io/py/django-mfa2)
+
+Web Authencation API (WebAuthn) is state-of-the art techology that is expected to replace passwords.
 
 ![Andriod Fingerprint](https://cdn-images-1.medium.com/max/800/1*1FWkRE8D7NTA2Kn1DrPjPA.png)
 
-
 For FIDO2, both security keys and android-safetynet are supported.
+
+In English :), It allows you to verify the user by security keys on PC, Laptops and Fingerprint/PIN on Andriod Phones.
 
 Trusted device is a mode for the user to add a device that doesn't support security keys like iOS and andriod without fingerprints or NFC.
 
