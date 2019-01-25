@@ -60,6 +60,8 @@ Depends on
    * Trusted_Devices
    * Email
    
+   **Note**: Starting version 1.1, ~~FIDO_LOGIN_URL~~ isn't required for FIDO2 anymore.
+   
 1. Break your login function
 
    Usually your login function will check for username and password, log the user in if the username and password are correct and create the user session, to support mfa, this has to change

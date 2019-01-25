@@ -112,6 +112,6 @@ def authenticate_complete(request):
                 mfa["next_check"] = int((datetime.datetime.now()+ datetime.timedelta(
                 seconds=random.randint(settings.MFA_RECHECK_MIN, settings.MFA_RECHECK_MAX))).strftime("%s"))
             request.session["mfa"] = mfa
-            login(request)
-            return HttpResponse(simplejson.dumps({'status':"OK","redirect":settings.FIDO_LOGIN_URL}),content_type="application/json")
+            res=login(request)
+            return HttpResponse(simplejson.dumps({'status':"OK","redirect":res["location"]}),content_type="application/json")
     return HttpResponse(simplejson.dumps({'status': "err"}),content_type="application/json")
