@@ -2,3 +2,5 @@ site_name: MkLorum
 nav:
     - Home: index.md
 theme: readthedocs
+markdown_extensions:
+    - fenced_code
