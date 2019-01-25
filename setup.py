@@ -12,7 +12,6 @@ setup(
     author='Mohamed El-Kalioby',
     author_email = 'mkalioby@mkalioby.com',
     url = 'https://github.com/mkalioby/django-mfa2/',
-    long_description=open('README.md').read(),
     download_url='https://github.com/mkalioby/django-mfa2/',
     license='MIT',
     packages=find_packages(),
