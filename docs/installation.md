@@ -37,7 +37,7 @@
    **Note**: Starting version 1.1, ~~FIDO_LOGIN_URL~~ isn't required for FIDO2 anymore.
    
 1. Add mfa to urls.py
-   ```python 
+   `python 
    import mfa
    import mfa.TrustedDevice
    urls_patterns= [
@@ -46,7 +46,7 @@
    url(r'devices/add$', mfa.TrustedDevice.add,name="mfa_add_new_trusted_device"), # This short link to add new trusted device
    '....',
     ]
-    ```
+    `
 1. Provide `mfa_auth_base.html` in your templaes with block called 'head' and 'content'
     The template will be included during the user login.
     If you will use Email Token method, then you have to provide template named `mfa_email_token_template.html` that will content the format of the email with parameter named `user` and `otp`.
