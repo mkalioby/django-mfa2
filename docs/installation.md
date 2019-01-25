@@ -36,26 +36,6 @@
    
    **Note**: Starting version 1.1, ~~FIDO_LOGIN_URL~~ isn't required for FIDO2 anymore.
    
-1. Break your login function
-
-   Usually your login function will check for username and password, log the user in if the username and password are correct and create the user session, to support mfa, this has to change
-   
-      * authenticate the user
-      * if username and password are correct , check if the user has mfa or not
-          * if user has mfa then redirect to mfa page
-          * if user doesn't have mfa then call your function to create the user session
-
-   ```python
-    def login(request): # this function handles the login form POST
-       user = auth.authenticate(username=username, password=password)  
-       if user is not None: # if the user object exist
-            from mfa.helpers import has_mfa
-            res =  has_mfa(username = username,request=request) # has_mfa returns false or HttpResponseRedirect
-            if res:
-                return res
-            return log_user_in(request,username=user.username) 
-            #log_user_in is a function that handles creatung user session, it should be in the setting file as MFA_CALLBACK
-     ```
 1. Add mfa to urls.py
    ```python 
    import mfa
@@ -73,3 +53,5 @@
 1. To match the look and feel of your project, MFA includes `base.html` but it needs blocks named `head` & `content` to added its content to it.
 1. Somewhere in your app, add a link to 'mfa_home'
 ```<li><a href="{% url 'mfa_home' %}">Security</a> </li>```
+
+Next, you need to [change your login code](change_login.md)
