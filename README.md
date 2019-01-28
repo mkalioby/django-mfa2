@@ -7,9 +7,9 @@ Web Authencation API (WebAuthn) is state-of-the art techology that is expected t
 
 ![Andriod Fingerprint](https://cdn-images-1.medium.com/max/800/1*1FWkRE8D7NTA2Kn1DrPjPA.png)
 
-For FIDO2, security keys, Apple's Touch ID and android-safetynet are supported.
+For FIDO2, security keys, Apple's Touch ID (Chrome) and android-safetynet are supported.
 
-In English :), It allows you to verify the user by security keys on PC, Laptops, Touch ID on Macboks and Fingerprint/PIN on Andriod Phones.
+In English :), It allows you to verify the user by security keys on PC, Laptops, Touch ID on Macboks (Chrome) and Fingerprint/PIN on Andriod Phones.
 
 Trusted device is a mode for the user to add a device that doesn't support security keys like iOS and andriod without fingerprints or NFC.
 
