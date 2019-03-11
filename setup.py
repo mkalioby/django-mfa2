@@ -4,7 +4,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='django-mfa2',
-    version='1.0.5',
+    version='1.1.2',
     description='Allows user to add 2FA to their accounts',
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
@@ -12,7 +12,6 @@ setup(
     author='Mohamed El-Kalioby',
     author_email = 'mkalioby@mkalioby.com',
     url = 'https://github.com/mkalioby/django-mfa2/',
-
     download_url='https://github.com/mkalioby/django-mfa2/',
     license='MIT',
     packages=find_packages(),
