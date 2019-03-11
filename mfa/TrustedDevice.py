@@ -106,7 +106,12 @@ def start(request):
 def send_email(request):
     body=render(request,"TrustedDevices/email.html",{}).content
     from .Common import send
-    if send([request.user.email],"Add Trusted Device Link",body):
+    e=request.user.email
+    if e=="":
+        e=request.session.get("user",{}).get("email","")
+    if e=="":
+        res = "User has no email on the system."
+    elif send([e],"Add Trusted Device Link",body):
         res="Sent Successfully"
     else:
         res="Error occured, please try again later."
