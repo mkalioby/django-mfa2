@@ -101,3 +101,44 @@ Depends on
 ```<li><a href="{% url 'mfa_home' %}">Security</a> </li>```
 
 For Example, See https://github.com/mkalioby/AutoDeploy/commit/5f1d94b1804e0aa33c79e9e8530ce849d9eb78cc in AutDeploy Project
+
+# Going Passwordless
+
+To be able to go passwordless for returning users, create a cookie  named 'base_username' containing username as shown in snippet below
+```python
+    response = render(request, 'Dashboard.html', context))
+    if request.session.get("mfa",{}).get("verified",False)  and getattr(settings,"MFA_QUICKLOGIN",False):
+        if request.session["mfa"]["method"]!="Trusted Device":
+            response.set_cookie("base_username", request.user.username, path="/",max_age = 15*24*60*60)
+    return response
+```
+
+Second, update the GET part of your login view
+```python
+    if "mfa" in settings.INSTALLED_APPS and getattr(settings,"MFA_QUICKLOGIN",False) and request.COOKIES.get('base_username'):
+        username=request.COOKIES.get('base_username')
+        from mfa.helpers import has_mfa
+        res =  has_mfa(username = username,request=request,)
+        if res: return res
+        ## continue and return the form.
+```
+# Checking MFA on Client Side
+
+Sometimes you like to verify that the user is still there so simple you can ask django-mfa2 to check that for you
+
+```html
+    {% include 'mfa_check.html' %}
+```
+````js
+function success_func() {
+  //logic if mfa check succeeds
+}
+function fail_func() {
+  //logic if mfa check fails
+}
+function some_func() {
+    recheck_mfa(success_func,fail_func,MUST_BE_MFA)
+    //MUST_BE_MFA true or false, if the user must has with MFA
+  }
+
+````
