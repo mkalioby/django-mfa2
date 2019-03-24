@@ -30,7 +30,7 @@ def start(request):
         context["invalid"] = True
     else:
         request.session["email_secret"] = str(randint(0,100000))
-        if sendEmail(request, request.session["base_username"], request.session["email_secret"]):
+        if sendEmail(request, request.user.username, request.session["email_secret"]):
             context["sent"] = True
     return render_to_response("Email/Add.html", context, context_instance=RequestContext(request))
 def auth(request):
