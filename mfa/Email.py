@@ -9,7 +9,9 @@ from .Common import send
 def sendEmail(request,username,secret):
     from django.contrib.auth import get_user_model
     User = get_user_model()
-    user=User.objects.get(username=username)
+    key = getattr(User, 'USERNAME_FIELD', 'username')
+    kwargs = {key: username}
+    user = User.objects.get(**kwargs)
     res=render_to_response("mfa_email_token_template.html",{"request":request,"user":user,'otp':secret})
     return  send([user.email],"OTP", res.content)
 
