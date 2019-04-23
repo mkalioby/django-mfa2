@@ -36,6 +36,8 @@ Depends on
    'mfa',
    '......')
    ```
+1. Collect Static Files
+`python manage.py collectstatic`
 1. Add the following settings to your file
 
    ```python 
