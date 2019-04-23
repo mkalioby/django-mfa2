@@ -10,7 +10,7 @@
         margin: 0px;
     }
     </style>
-    <script src="{{ STATIC_URL }}js/u2f-api.js" type="text/javascript"></script>
+    <script src="{% static 'js/u2f-api.js' %}" type="text/javascript"></script>
     <script type="text/javascript">
     $(document).ready(function addToken() {
                 data=JSON.parse('{{ token|safe }}')
