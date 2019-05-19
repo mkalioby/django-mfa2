@@ -20,6 +20,7 @@
         $("#modal-footer").prepend("<button id='actionBtn' class='btn btn-danger' onclick='confirmDel("+id+")'>Confirm Deletion</button>")
         $("#popUpModal").modal()
     }
+    {% if not HIDE_DISABLE %}
     function toggleKey(id) {
         $.ajax({
             url:"{% url 'toggle_key' %}?id="+id,
@@ -33,6 +34,7 @@
             }
         })
     }
+    {% endif %}
     </script>
     <link href="{% static  'mfa/css/bootstrap-toggle.min.css' %}" rel="stylesheet">
     <script src="{% static 'mfa/js/bootstrap-toggle.min.js'%}"></script>
@@ -87,7 +89,11 @@
                <td>{{ key.expires }}</td>
                <td>{% if key.device %}{{ key.device }}{% endif %}</td>
                <td>{{ key.last_used }}</td>
-               <td><input type="checkbox" id="toggle_{{ key.id }}" {% if key.enabled %}checked{% endif %} data-onstyle="success" data-offstyle="danger"  onchange="toggleKey({{ key.id }})" data-toggle="toggle"></td>
+                {% if key.key_type in HIDE_DISABLE %}
+                    <td>{% if key.enabled %}On{% else %} Off{% endif %}</td>
+                {% else %}
+                    <td><input type="checkbox" id="toggle_{{ key.id }}" {% if key.enabled %}checked{% endif %} data-onstyle="success" data-offstyle="danger"  onchange="toggleKey({{ key.id }})" data-toggle="toggle" class="status_chk"></td>
+                {% endif %}
                <td><a href="javascript:void(0)" onclick="deleteKey({{ key.id }},'{{ key.key_type }}')"> <span class="fa fa-trash"></span></a></td>
            </tr>
        {% empty %}

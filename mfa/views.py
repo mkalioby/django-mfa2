@@ -12,14 +12,15 @@ from . import TrustedDevice
 from user_agents import parse
 def index(request):
     keys=[]
-    context={"keys":User_Keys.objects.filter(username=request.user.username),"UNALLOWED_AUTHEN_METHODS":settings.MFA_UNALLOWED_METHODS}
+    context={"keys":User_Keys.objects.filter(username=request.user.username),"UNALLOWED_AUTHEN_METHODS":settings.MFA_UNALLOWED_METHODS
+             ,"HIDE_DISABLE":getattr(settings,"MFA_HIDE_DISABLE",[])}
     for k in context["keys"]:
         if k.key_type =="Trusted Device" :
             setattr(k,"device",parse(k.properties.get("user_agent","-----")))
         elif k.key_type == "FIDO2":
             setattr(k,"device",k.properties.get("type","----"))
         keys.append(k)
-        context["keys"]=keys
+    context["keys"]=keys
     return render_to_response("MFA.html",context,context_instance=RequestContext(request))
 
 def verify(request,username):
