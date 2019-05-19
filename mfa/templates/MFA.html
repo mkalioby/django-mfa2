@@ -94,7 +94,11 @@
                 {% else %}
                     <td><input type="checkbox" id="toggle_{{ key.id }}" {% if key.enabled %}checked{% endif %} data-onstyle="success" data-offstyle="danger"  onchange="toggleKey({{ key.id }})" data-toggle="toggle" class="status_chk"></td>
                 {% endif %}
-               <td><a href="javascript:void(0)" onclick="deleteKey({{ key.id }},'{{ key.key_type }}')"> <span class="fa fa-trash"></span></a></td>
+               <td>{% if key.key_type in HIDE_DISABLE %}
+                   ----
+                   {% else %}
+                    <a href="javascript:void(0)" onclick="deleteKey({{ key.id }},'{{ key.key_type }}')"> <span class="fa fa-trash"></span></a></td>
+                    {% endif %}
            </tr>
        {% empty %}
            <tr><td colspan="7" align="center">You didn't have any keys yet.</td> </tr>
