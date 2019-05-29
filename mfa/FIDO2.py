@@ -34,11 +34,11 @@ def begin_registeration(request):
     }, getUserCredentials(request.user.username))
     request.session['fido_state'] = state
 
-    return HttpResponse(cbor.dumps(registration_data),content_type='application/octet-stream')
+    return HttpResponse(cbor.encode(registration_data),content_type='application/octet-stream')
 @csrf_exempt
 def complete_reg(request):
     try:
-        data = cbor.loads(request.body)[0]
+        data = cbor.decode(request.body)
 
         client_data = ClientData(data['clientDataJSON'])
         att_obj = AttestationObject((data['attestationObject']))
@@ -79,7 +79,7 @@ def authenticate_begin(request):
     credentials=getUserCredentials(request.session.get("base_username",request.user.username))
     auth_data, state = server.authenticate_begin(credentials)
     request.session['fido_state'] = state
-    return HttpResponse(cbor.dumps(auth_data),content_type="application/octet-stream")
+    return HttpResponse(cbor.encode(auth_data),content_type="application/octet-stream")
 
 @csrf_exempt
 def authenticate_complete(request):
@@ -87,7 +87,7 @@ def authenticate_complete(request):
     username=request.session.get("base_username",request.user.username)
     server=getServer()
     credentials=getUserCredentials(username)
-    data = cbor.loads(request.body)[0]
+    data = cbor.decode(request.body)
     credential_id = data['credentialId']
     client_data = ClientData(data['clientDataJSON'])
     auth_data = AuthenticatorData(data['authenticatorData'])
