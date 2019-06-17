@@ -28,7 +28,7 @@ Depends on
 * ua-parser
 * user-agents
 * python-jose
-* fido2==0.5
+* fido2==0.7
 
 
 # Installation
