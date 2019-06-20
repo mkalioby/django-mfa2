@@ -1,6 +1,6 @@
 import string
 import random
-from django.shortcuts import render_to_response,render
+from django.shortcuts import render
 from django.http import HttpResponse
 from django.template.context import RequestContext
 from django.template.context_processors import csrf
@@ -46,7 +46,7 @@ def getCookie(request):
 
     if tk.properties["status"] == "trusted":
         context={"added":True}
-        response = render_to_response("TrustedDevices/Done.html", context, context_instance=RequestContext(request))
+        response = render(request,"TrustedDevices/Done.html", context)
         from datetime import datetime, timedelta
         expires = datetime.now() + timedelta(days=180)
         tk.expires=expires
@@ -57,7 +57,7 @@ def getCookie(request):
 def add(request):
     context=csrf(request)
     if request.method=="GET":
-        return render_to_response("TrustedDevices/Add.html",context,context_instance=RequestContext(request))
+        return render(request,"TrustedDevices/Add.html",context)
     else:
         key=request.POST["key"].replace("-","").replace(" ","").upper()
         context["username"] = request.POST["username"]
@@ -82,11 +82,11 @@ def add(request):
         else:
             context["invalid"]="The username or key is wrong, please check and try again."
 
-        return  render_to_response("TrustedDevices/Add.html", context, context_instance=RequestContext(request))
+        return  render(request,"TrustedDevices/Add.html", context)
 
 def start(request):
     if User_Keys.objects.filter(username=request.user.username,key_type="Trusted Device").count()>= 2:
-        return render_to_response("TrustedDevices/start.html",{"not_allowed":True},context_instance=RequestContext(request))
+        return render(request,"TrustedDevices/start.html",{"not_allowed":True})
     td=None
     if not request.session.get("td_id",None):
         td=User_Keys()
@@ -101,7 +101,7 @@ def start(request):
     except:
         del request.session["td_id"]
         return start(request)
-    return render_to_response("TrustedDevices/start.html",context,context_instance=RequestContext(request))
+    return render(request,"TrustedDevices/start.html",context)
 
 def send_email(request):
     body=render(request,"TrustedDevices/email.html",{}).content

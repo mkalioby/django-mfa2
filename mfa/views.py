@@ -1,5 +1,5 @@
-from django.shortcuts import render,render_to_response
-from django.http import HttpResponse,HttpResponseRedirect
+from django.shortcuts import render
+#from django.http import HttpResponse,HttpResponseRedirect
 from .models import *
 try:
     from django.urls import reverse
@@ -21,7 +21,7 @@ def index(request):
             setattr(k,"device",k.properties.get("type","----"))
         keys.append(k)
     context["keys"]=keys
-    return render_to_response("MFA.html",context,context_instance=RequestContext(request))
+    return render(request,"MFA.html",context)
 
 def verify(request,username):
     request.session["base_username"] = username
@@ -39,7 +39,7 @@ def verify(request,username):
     return show_methods(request)
 
 def show_methods(request):
-    return render_to_response("select_mfa_method.html", {}, context_instance = RequestContext(request))
+    return render(request,"select_mfa_method.html", {})
 
 def reset_cookie(request):
     response=HttpResponseRedirect(settings.BASE_URL)

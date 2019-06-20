@@ -3,8 +3,8 @@ from fido2.server import Fido2Server, RelyingParty
 from fido2.ctap2 import AttestationObject, AuthenticatorData
 from django.template.context_processors import csrf
 from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import render_to_response
-from django.template.context import RequestContext
+from django.shortcuts import render
+#from django.template.context import RequestContext
 import simplejson
 from fido2 import cbor
 from django.http import HttpResponse
@@ -19,7 +19,7 @@ from django.utils import timezone
 def recheck(request):
     context = csrf(request)
     context["mode"]="recheck"
-    return render_to_response("FIDO2/recheck.html", context, context_instance=RequestContext(request))
+    return request("FIDO2/recheck.html", context)
 
 
 def getServer():
@@ -62,7 +62,7 @@ def complete_reg(request):
         return HttpResponse(simplejson.dumps({'status': 'ERR',"message":"Error on server, please try again later"}))
 def start(request):
     context = csrf(request)
-    return render_to_response("FIDO2/Add.html", context, RequestContext(request))
+    return render(request,"FIDO2/Add.html", context)
 
 def getUserCredentials(username):
     credentials = []
@@ -72,7 +72,7 @@ def getUserCredentials(username):
 
 def auth(request):
     context=csrf(request)
-    return render_to_response("FIDO2/Auth.html",context,context_instance=RequestContext(request))
+    return render(request,"FIDO2/Auth.html",context)
 
 def authenticate_begin(request):
     server = getServer()

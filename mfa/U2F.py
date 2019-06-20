@@ -4,9 +4,9 @@ from u2flib_server.u2f import (begin_registration, begin_authentication,
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.serialization import Encoding
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 import simplejson
-from django.template.context import RequestContext
+#from django.template.context import RequestContext
 from django.template.context_processors import csrf
 from django.conf import settings
 from django.http import HttpResponse
@@ -21,7 +21,7 @@ def recheck(request):
     request.session["_u2f_challenge_"] = s[0]
     context["token"] = s[1]
     request.session["mfa_recheck"]=True
-    return render_to_response("U2F/recheck.html", context, context_instance=RequestContext(request))
+    return render(request,"U2F/recheck.html", context)
 
 def process_recheck(request):
     x=validate(request,request.user.username)
@@ -66,14 +66,14 @@ def auth(request):
     request.session["_u2f_challenge_"]=s[0]
     context["token"]=s[1]
 
-    return render_to_response("U2F/Auth.html",context,context_instance = RequestContext(request))
+    return render(request,"U2F/Auth.html")
 
 def start(request):
     enroll = begin_registration(settings.U2F_APPID, [])
     request.session['_u2f_enroll_'] = enroll.json
     context=csrf(request)
     context["token"]=simplejson.dumps(enroll.data_for_client)
-    return render_to_response("U2F/Add.html",context,RequestContext(request))
+    return render(request,"U2F/Add.html",context)
 
 
 def bind(request):
