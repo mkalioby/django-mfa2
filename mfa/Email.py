@@ -13,7 +13,7 @@ def sendEmail(request,username,secret):
     kwargs = {key: username}
     user = User.objects.get(**kwargs)
     res=render(request,"mfa_email_token_template.html",{"request":request,"user":user,'otp':secret})
-    return  send([user.email],"OTP", res.content)
+    return  send([user.email],"OTP", str(res.content))
 
 def start(request):
     context = csrf(request)
@@ -25,7 +25,10 @@ def start(request):
             uk.enabled=1
             uk.save()
             from django.http import HttpResponseRedirect
-            from django.core.urlresolvers import reverse
+            try:
+                from django.core.urlresolvers import reverse
+            except:
+                from django.urls import reverse
             return HttpResponseRedirect(reverse('mfa_home'))
         context["invalid"] = True
     else:

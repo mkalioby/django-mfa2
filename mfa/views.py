@@ -7,6 +7,7 @@ except:
     from django.core.urlresolvers import reverse
 from django.template.context_processors import csrf
 from django.template.context import RequestContext
+from django.http import HttpResponseRedirect
 from django.conf import settings
 from . import TrustedDevice
 from user_agents import parse
@@ -42,7 +43,7 @@ def show_methods(request):
     return render(request,"select_mfa_method.html", {})
 
 def reset_cookie(request):
-    response=HttpResponseRedirect(settings.BASE_URL)
+    response=HttpResponseRedirect(settings.LOGIN_URL)
     response.delete_cookie("base_username")
     return response
 def login(request):
