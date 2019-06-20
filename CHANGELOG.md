@@ -1,5 +1,9 @@
 # Change Log
 
+## v 1.6.0
+* Fixed some issues for django>= 2.0
+* Added example app.
+
 ## v.1.5.0
 * Added id the key used to validate to the session dictionary as 'id'
 ## v1.4.0
