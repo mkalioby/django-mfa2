@@ -107,7 +107,7 @@ def authenticate_complete(request):
         if AttestedCredentialData(websafe_decode(k.properties["device"])).credential_id == cred.credential_id:
             k.last_used = timezone.now()
             k.save()
-            mfa = {"verified": True, "method": "FIDO2"}
+            mfa = {"verified": True, "method": "FIDO2",'id':k.id}
             if getattr(settings, "MFA_RECHECK", False):
                 mfa["next_check"] = int((datetime.datetime.now()+ datetime.timedelta(
                 seconds=random.randint(settings.MFA_RECHECK_MIN, settings.MFA_RECHECK_MAX))).strftime("%s"))

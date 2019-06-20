@@ -16,8 +16,8 @@ def verify_login(request,username,token):
         if  totp.verify(token,valid_window = 30):
             key.last_used=timezone.now()
             key.save()
-            return True
-    return False
+            return [True,key.id]
+    return [False]
 
 def recheck(request):
     context = csrf(request)
@@ -32,8 +32,9 @@ def recheck(request):
 def auth(request):
     context=csrf(request)
     if request.method=="POST":
-        if verify_login(request,request.session["base_username"],token = request.POST["otp"]):
-            mfa = {"verified": True, "method": "TOTP"}
+        res=verify_login(request,request.session["base_username"],token = request.POST["otp"])
+        if res[0]:
+            mfa = {"verified": True, "method": "TOTP","id":res[1]}
             if getattr(settings, "MFA_RECHECK", False):
                 mfa["next_check"] = int((datetime.datetime.now()
                                          + datetime.timedelta(

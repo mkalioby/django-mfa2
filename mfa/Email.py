@@ -37,12 +37,13 @@ def auth(request):
     context=csrf(request)
     if request.method=="POST":
         if request.session["email_secret"]==request.POST["otp"].strip():
-            mfa = {"verified": True, "method": "Email"}
+            uk = User_Keys.objects.get(username=request.session["base_username"], key_type="Email")
+            mfa = {"verified": True, "method": "Email","id":uk.id}
             if getattr(settings, "MFA_RECHECK", False):
                 mfa["next_check"] = int((datetime.datetime.now() + datetime.timedelta(
                     seconds = random.randint(settings.MFA_RECHECK_MIN, settings.MFA_RECHECK_MAX))).strftime("%s"))
             request.session["mfa"] = mfa
-            uk=User_Keys.objects.get(username=request.session["base_username"],key_type="Email")
+
             from django.utils import timezone
             uk.last_used=timezone.now()
             uk.save()

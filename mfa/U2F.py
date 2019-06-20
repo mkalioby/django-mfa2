@@ -52,7 +52,7 @@ def validate(request,username):
     key=User_Keys.objects.get(username=username,properties__shas="$.device.publicKey=%s"%device["publicKey"])
     key.last_used=timezone.now()
     key.save()
-    mfa = {"verified": True, "method": "U2F"}
+    mfa = {"verified": True, "method": "U2F","id":key.id}
     if getattr(settings, "MFA_RECHECK", False):
         mfa["next_check"] = int((datetime.datetime.now()
                                  + datetime.timedelta(

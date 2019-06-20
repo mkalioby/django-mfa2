@@ -128,7 +128,7 @@ def verify(request):
                 if uk.enabled and uk.properties["status"] == "trusted":
                     uk.last_used=timezone.now()
                     uk.save()
-                    request.session["mfa"] = {"verified": True, "method": "Trusted Device"}
+                    request.session["mfa"] = {"verified": True, "method": "Trusted Device","id":uk.id}
                     return True
             except:
                 return False
