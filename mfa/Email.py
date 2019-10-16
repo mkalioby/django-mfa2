@@ -1,9 +1,9 @@
-from django.shortcuts import render,render_to_response
+from django.shortcuts import render
 from django.template.context_processors import csrf
 import datetime,random
 from random import randint
 from .models import *
-from django.template.context import RequestContext
+#from django.template.context import RequestContext
 from .views import login
 from .Common import send
 def sendEmail(request,username,secret):
@@ -12,8 +12,8 @@ def sendEmail(request,username,secret):
     key = getattr(User, 'USERNAME_FIELD', 'username')
     kwargs = {key: username}
     user = User.objects.get(**kwargs)
-    res=render_to_response("mfa_email_token_template.html",{"request":request,"user":user,'otp':secret})
-    return  send([user.email],"OTP", res.content)
+    res=render(request,"mfa_email_token_template.html",{"request":request,"user":user,'otp':secret})
+    return  send([user.email],"OTP", str(res.content))
 
 def start(request):
     context = csrf(request)
@@ -25,14 +25,17 @@ def start(request):
             uk.enabled=1
             uk.save()
             from django.http import HttpResponseRedirect
-            from django.core.urlresolvers import reverse
+            try:
+                from django.core.urlresolvers import reverse
+            except:
+                from django.urls import reverse
             return HttpResponseRedirect(reverse('mfa_home'))
         context["invalid"] = True
     else:
         request.session["email_secret"] = str(randint(0,100000))
         if sendEmail(request, request.user.username, request.session["email_secret"]):
             context["sent"] = True
-    return render_to_response("Email/Add.html", context, context_instance=RequestContext(request))
+    return render(request,"Email/Add.html", context)
 def auth(request):
     context=csrf(request)
     if request.method=="POST":
@@ -53,4 +56,4 @@ def auth(request):
         request.session["email_secret"] = str(randint(0, 100000))
         if sendEmail(request, request.session["base_username"], request.session["email_secret"]):
             context["sent"] = True
-    return render_to_response("Email/Auth.html", context, context_instance = RequestContext(request))
+    return render(request,"Email/Auth.html", context)

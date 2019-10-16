@@ -71,7 +71,7 @@ Depends on
    
    **Notes**:
     * Starting version 1.1, ~~FIDO_LOGIN_URL~~ isn't required for FIDO2 anymore.
-    * Starting version 1.6.0, Key owners can be specified.
+    * Starting version 1.7.0, Key owners can be specified.
 1. Break your login function
 
    Usually your login function will check for username and password, log the user in if the username and password are correct and create the user session, to support mfa, this has to change

@@ -1,4 +1,4 @@
-from django.shortcuts import render,render_to_response
+from django.shortcuts import render
 from django.http import HttpResponse
 from .models import *
 from django.template.context_processors import csrf
@@ -27,7 +27,7 @@ def recheck(request):
             return HttpResponse(simplejson.dumps({"recheck": True}), content_type="application/json")
         else:
             return HttpResponse(simplejson.dumps({"recheck": False}), content_type="application/json")
-    return render_to_response("TOTP/recheck.html", context, context_instance=RequestContext(request))
+    return render(request,"TOTP/recheck.html", context)
 
 def auth(request):
     context=csrf(request)
@@ -42,7 +42,7 @@ def auth(request):
             request.session["mfa"] = mfa
             return login(request)
         context["invalid"]=True
-    return render_to_response("TOTP/Auth.html", context, context_instance = RequestContext(request))
+    return render(request,"TOTP/Auth.html", context)
 
 
 
@@ -67,4 +67,4 @@ def verify(request):
     else: return HttpResponse("Error")
 
 def start(request):
-    return render_to_response("TOTP/Add.html",{},context_instance = RequestContext(request ))
+    return render(request,"TOTP/Add.html",{})
