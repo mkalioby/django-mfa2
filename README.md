@@ -52,7 +52,8 @@ Depends on
    MFA_RECHECK_MIN=10         # Minimum interval in seconds
    MFA_RECHECK_MAX=30         # Maximum in seconds
    MFA_QUICKLOGIN=True        # Allow quick login for returning users by provide only their 2FA
-   MFA_HIDE_DISABLE=('FIDO2',)     # Can the user disable his key (Added in 1.2.0).   
+   MFA_HIDE_DISABLE=('FIDO2',)     # Can the user disable his key (Added in 1.2.0).
+   MFA_OWNED_BY_ENTERPRISE = FALSE  # Who ownes security keys   
 
    TOKEN_ISSUER_NAME="PROJECT_NAME"      #TOTP Issuer name
 
@@ -68,8 +69,9 @@ Depends on
    * Trusted_Devices
    * Email
    
-   **Note**: Starting version 1.1, ~~FIDO_LOGIN_URL~~ isn't required for FIDO2 anymore.
-   
+   **Notes**:
+    * Starting version 1.1, ~~FIDO_LOGIN_URL~~ isn't required for FIDO2 anymore.
+    * Starting version 1.6.0, Key owners can be specified.
 1. Break your login function
 
    Usually your login function will check for username and password, log the user in if the username and password are correct and create the user session, to support mfa, this has to change

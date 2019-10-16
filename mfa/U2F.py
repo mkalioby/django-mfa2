@@ -89,6 +89,7 @@ def bind(request):
     User_Keys.objects.filter(username=request.user.username,key_type="U2F").delete()
     uk = User_Keys()
     uk.username = request.user.username
+    uk.owned_by_enterprise = getattr(settings, "MFA_OWNED_BY_ENTERPRISE", False)
     uk.properties = {"device":simplejson.loads(device.json),"cert":cert_hash}
     uk.key_type = "U2F"
     uk.save()

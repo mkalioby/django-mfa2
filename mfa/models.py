@@ -13,6 +13,8 @@ class User_Keys(models.Model):
     enabled=models.BooleanField(default=True)
     expires=models.DateTimeField(null=True,default=None,blank=True)
     last_used=models.DateTimeField(null=True,default=None,blank=True)
+    owned_by_enterprise=models.NullBooleanField(default=None,null=True,blank=True)
+
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         if self.key_type == "Trusted Device" and self.properties.get("signature","") == "":
             self.properties["signature"]= jwt.encode({"username": self.username, "key": self.properties["key"]}, settings.SECRET_KEY)

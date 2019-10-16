@@ -52,6 +52,7 @@ def complete_reg(request):
         uk=User_Keys()
         uk.username = request.user.username
         uk.properties = {"device":encoded,"type":att_obj.fmt,}
+        uk.owned_by_enterprise=getattr(settings,"MFA_OWNED_BY_ENTERPRISE",False)
         uk.key_type = "FIDO2"
         uk.save()
         return HttpResponse(simplejson.dumps({'status': 'OK'}))
