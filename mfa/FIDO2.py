@@ -19,7 +19,8 @@ from django.utils import timezone
 def recheck(request):
     context = csrf(request)
     context["mode"]="recheck"
-    return request("FIDO2/recheck.html", context)
+    request.session["mfa_recheck"]=True
+    return render(request,"FIDO2/recheck.html", context)
 
 
 def getServer():
@@ -102,17 +103,24 @@ def authenticate_complete(request):
         auth_data,
         signature
     )
-    keys = User_Keys.objects.filter(username=username, key_type="FIDO2",enabled=1)
-    import random
-    for k in keys:
-        if AttestedCredentialData(websafe_decode(k.properties["device"])).credential_id == cred.credential_id:
-            k.last_used = timezone.now()
-            k.save()
-            mfa = {"verified": True, "method": "FIDO2",'id':k.id}
-            if getattr(settings, "MFA_RECHECK", False):
-                mfa["next_check"] = int((datetime.datetime.now()+ datetime.timedelta(
-                seconds=random.randint(settings.MFA_RECHECK_MIN, settings.MFA_RECHECK_MAX))).strftime("%s"))
-            request.session["mfa"] = mfa
-            res=login(request)
-            return HttpResponse(simplejson.dumps({'status':"OK","redirect":res["location"]}),content_type="application/json")
+
+    if request.session.get("mfa_recheck",False):
+        import time
+        request.session["mfa"]["rechecked_at"]=time.time()
+        return HttpResponse(simplejson.dumps({'status': "OK"}),
+                            content_type="application/json")
+    else:
+        import random
+        keys = User_Keys.objects.filter(username=username, key_type="FIDO2", enabled=1)
+        for k in keys:
+            if AttestedCredentialData(websafe_decode(k.properties["device"])).credential_id == cred.credential_id:
+                k.last_used = timezone.now()
+                k.save()
+                mfa = {"verified": True, "method": "FIDO2",'id':k.id}
+                if getattr(settings, "MFA_RECHECK", False):
+                    mfa["next_check"] = int((datetime.datetime.now()+ datetime.timedelta(
+                    seconds=random.randint(settings.MFA_RECHECK_MIN, settings.MFA_RECHECK_MAX))).strftime("%s"))
+                request.session["mfa"] = mfa
+                res=login(request)
+                return HttpResponse(simplejson.dumps({'status':"OK","redirect":res["location"]}),content_type="application/json")
     return HttpResponse(simplejson.dumps({'status': "err"}),content_type="application/json")

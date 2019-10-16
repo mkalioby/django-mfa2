@@ -21,7 +21,7 @@
                 {% if mode == "auth" %}
                     <form id="u2f_login" action="{% url 'fido2_complete_auth' %}" method="post" enctype="multipart/form-data">
                 {% elif mode == "recheck" %}
-                    <form id="u2f_login" action="{% url 'u2f_recheck' %}" method="post">
+                    <form id="u2f_login" action="{% url 'fido2_recheck' %}" method="post" enctype="multipart/form-data">
                 {% endif %}
               {% csrf_token %}
               <input type="hidden" name="response" id="response" value=""/>

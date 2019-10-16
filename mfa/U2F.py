@@ -12,6 +12,7 @@ from django.conf import settings
 from django.http import HttpResponse
 from .models import *
 from .views import login
+import datetime
 from django.utils import timezone
 
 def recheck(request):
@@ -26,6 +27,8 @@ def recheck(request):
 def process_recheck(request):
     x=validate(request,request.user.username)
     if x==True:
+        import time
+        request.session["mfa"]["rechecked_at"] = time.time()
         return HttpResponse(simplejson.dumps({"recheck":True}),content_type="application/json")
     return x
 

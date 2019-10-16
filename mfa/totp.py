@@ -24,6 +24,8 @@ def recheck(request):
     context["mode"]="recheck"
     if request.method == "POST":
         if verify_login(request,request.user.username, token=request.POST["otp"]):
+            import time
+            request.session["mfa"]["rechecked_at"] = time.time()
             return HttpResponse(simplejson.dumps({"recheck": True}), content_type="application/json")
         else:
             return HttpResponse(simplejson.dumps({"recheck": False}), content_type="application/json")
