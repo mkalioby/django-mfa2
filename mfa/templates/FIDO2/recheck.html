@@ -18,6 +18,7 @@
 
             {% endif %}
                 <p style="color: green">please press the button on your security key to prove it is you.</p>
+                <div id="msgdiv"></div>
                 {% if mode == "auth" %}
                     <form id="u2f_login" action="{% url 'fido2_complete_auth' %}" method="post" enctype="multipart/form-data">
                 {% elif mode == "recheck" %}
@@ -71,17 +72,22 @@
       }).then(function (response) {if (response.ok) return res = response.json()}).then(function (res) {
           if (res.status=="OK")
           {
+              $("#msgdiv").addClass("alert alert-success").removeClass("alert-danger")
+             $("#msgdiv").html("Verified....please wait")
           {%  if mode == "auth" %}
           window.location.href=res.redirect;
           {% elif mode == "recheck" %}
-           mfa_success_function();
+              mfa_success_function();
           {% endif %}
           }
           else {
+              $("#msgdiv").addClass("alert alert-danger").removeClass("alert-success")
+                $("#res").html("<div class='alert alert-danger'>Verification Failed as " + res["message"] + ", <a href='javascript:void(0)' onclick='authen())'> try again or <a href='javascript:void(0)' onclick='history.back()'> Go Back</a></div>")
+
               {%  if mode == "auth" %}
-                alert("Error occured, please try again")
-                login()
+
               {% elif mode == "recheck" %}
+
                 mfa_failed_function();
               {% endif %}
           }

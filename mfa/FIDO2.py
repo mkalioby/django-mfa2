@@ -58,9 +58,11 @@ def complete_reg(request):
         uk.save()
         return HttpResponse(simplejson.dumps({'status': 'OK'}))
     except Exception as exp:
-        from raven.contrib.django.raven_compat.models import client
-        import traceback
-        client.captureException()
+        try:
+            from raven.contrib.django.raven_compat.models import client
+            client.captureException()
+        except:
+            pass
         return HttpResponse(simplejson.dumps({'status': 'ERR',"message":"Error on server, please try again later"}))
 def start(request):
     context = csrf(request)
@@ -94,15 +96,27 @@ def authenticate_complete(request):
     client_data = ClientData(data['clientDataJSON'])
     auth_data = AuthenticatorData(data['authenticatorData'])
     signature = data['signature']
-
-    cred = server.authenticate_complete(
-        request.session.pop('fido_state'),
-        credentials,
-        credential_id,
-        client_data,
-        auth_data,
-        signature
-    )
+    try:
+        cred = server.authenticate_complete(
+            request.session.pop('fido_state'),
+            credentials,
+            credential_id,
+            client_data,
+            auth_data,
+            signature
+        )
+    except ValueError:
+        return HttpResponse(simplejson.dumps({'status': "ERR", "message": "Wrong challenge received, make sure that this is your security and try again."}),
+                            content_type = "application/json")
+    except Exception as excep:
+        try:
+            from raven.contrib.django.raven_compat.models import client
+            client.captureException()
+        except:
+            pass
+        return HttpResponse(simplejson.dumps({'status': "ERR",
+                                              "message": "Err: " + excep.message}),
+                            content_type = "application/json")
 
     if request.session.get("mfa_recheck",False):
         import time
@@ -123,4 +137,4 @@ def authenticate_complete(request):
                 request.session["mfa"] = mfa
                 res=login(request)
                 return HttpResponse(simplejson.dumps({'status':"OK","redirect":res["location"]}),content_type="application/json")
-    return HttpResponse(simplejson.dumps({'status': "err"}),content_type="application/json")
+    return HttpResponse(simplejson.dumps({'status': "ERR","message":"Unknown error happened"}),content_type="application/json")
