@@ -27,10 +27,7 @@ urlpatterns = [
     url(r'fido2/complete_auth', FIDO2.authenticate_complete, name="fido2_complete_auth"),
     url(r'fido2/begin_reg', FIDO2.begin_registeration, name="fido2_begin_reg"),
     url(r'fido2/complete_reg', FIDO2.complete_reg, name="fido2_complete_reg"),
-    url(r'u2f/bind', U2F.bind, name="bind_u2f"),
-    url(r'u2f/auth', U2F.auth, name="u2f_auth"),
-    url(r'u2f/process_recheck', U2F.process_recheck, name="u2f_recheck"),
-    url(r'u2f/verify', U2F.verify, name="u2f_verify"),
+    url(r'fido2/recheck', FIDO2.recheck, name="fido2_recheck"),
 
 
     url(r'td/$', TrustedDevice.start, name="start_td"),

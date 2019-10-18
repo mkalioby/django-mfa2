@@ -82,7 +82,7 @@
           }
           else {
               $("#msgdiv").addClass("alert alert-danger").removeClass("alert-success")
-                $("#res").html("<div class='alert alert-danger'>Verification Failed as " + res["message"] + ", <a href='javascript:void(0)' onclick='authen())'> try again or <a href='javascript:void(0)' onclick='history.back()'> Go Back</a></div>")
+                $("#msgdiv").html("Verification Failed as " + res.message + ", <a href='javascript:void(0)' onclick='authen())'> try again</a> or <a href='javascript:void(0)' onclick='history.back()'> Go Back</a>")
 
               {%  if mode == "auth" %}
 

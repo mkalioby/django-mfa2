@@ -12,7 +12,7 @@ from django.conf import settings
 from .models import *
 from fido2.utils import websafe_decode,websafe_encode
 from fido2.ctap2 import AttestedCredentialData
-from .views import login
+from .views import login,reset_cookie
 import datetime
 from django.utils import timezone
 
@@ -87,54 +87,60 @@ def authenticate_begin(request):
 
 @csrf_exempt
 def authenticate_complete(request):
-    credentials = []
-    username=request.session.get("base_username",request.user.username)
-    server=getServer()
-    credentials=getUserCredentials(username)
-    data = cbor.decode(request.body)
-    credential_id = data['credentialId']
-    client_data = ClientData(data['clientDataJSON'])
-    auth_data = AuthenticatorData(data['authenticatorData'])
-    signature = data['signature']
     try:
-        cred = server.authenticate_complete(
-            request.session.pop('fido_state'),
-            credentials,
-            credential_id,
-            client_data,
-            auth_data,
-            signature
-        )
-    except ValueError:
-        return HttpResponse(simplejson.dumps({'status': "ERR", "message": "Wrong challenge received, make sure that this is your security and try again."}),
-                            content_type = "application/json")
-    except Exception as excep:
+        credentials = []
+        username=request.session.get("base_username",request.user.username)
+        server=getServer()
+        credentials=getUserCredentials(username)
+        data = cbor.decode(request.body)
+        credential_id = data['credentialId']
+        client_data = ClientData(data['clientDataJSON'])
+        auth_data = AuthenticatorData(data['authenticatorData'])
+        signature = data['signature']
         try:
-            from raven.contrib.django.raven_compat.models import client
-            client.captureException()
-        except:
-            pass
-        return HttpResponse(simplejson.dumps({'status': "ERR",
-                                              "message": "Err: " + excep.message}),
-                            content_type = "application/json")
+            cred = server.authenticate_complete(
+                request.session.pop('fido_state'),
+                credentials,
+                credential_id,
+                client_data,
+                auth_data,
+                signature
+            )
+        except ValueError:
+            return HttpResponse(simplejson.dumps({'status': "ERR", "message": "Wrong challenge received, make sure that this is your security and try again."}),
+                                content_type = "application/json")
+        except Exception as excep:
+            try:
+                from raven.contrib.django.raven_compat.models import client
+                client.captureException()
+            except:
+                pass
+            return HttpResponse(simplejson.dumps({'status': "ERR",
+                                                  "message": excep.message}),
+                                content_type = "application/json")
 
-    if request.session.get("mfa_recheck",False):
-        import time
-        request.session["mfa"]["rechecked_at"]=time.time()
-        return HttpResponse(simplejson.dumps({'status': "OK"}),
-                            content_type="application/json")
-    else:
-        import random
-        keys = User_Keys.objects.filter(username=username, key_type="FIDO2", enabled=1)
-        for k in keys:
-            if AttestedCredentialData(websafe_decode(k.properties["device"])).credential_id == cred.credential_id:
-                k.last_used = timezone.now()
-                k.save()
-                mfa = {"verified": True, "method": "FIDO2",'id':k.id}
-                if getattr(settings, "MFA_RECHECK", False):
-                    mfa["next_check"] = int((datetime.datetime.now()+ datetime.timedelta(
-                    seconds=random.randint(settings.MFA_RECHECK_MIN, settings.MFA_RECHECK_MAX))).strftime("%s"))
-                request.session["mfa"] = mfa
-                res=login(request)
-                return HttpResponse(simplejson.dumps({'status':"OK","redirect":res["location"]}),content_type="application/json")
-    return HttpResponse(simplejson.dumps({'status': "ERR","message":"Unknown error happened"}),content_type="application/json")
+        if request.session.get("mfa_recheck",False):
+            import time
+            request.session["mfa"]["rechecked_at"]=time.time()
+            return HttpResponse(simplejson.dumps({'status': "OK"}),
+                                content_type="application/json")
+        else:
+            import random
+            keys = User_Keys.objects.filter(username=username, key_type="FIDO2", enabled=1)
+            for k in keys:
+                if AttestedCredentialData(websafe_decode(k.properties["device"])).credential_id == cred.credential_id:
+                    k.last_used = timezone.now()
+                    k.save()
+                    mfa = {"verified": True, "method": "FIDO2",'id':k.id}
+                    if getattr(settings, "MFA_RECHECK", False):
+                        mfa["next_check"] = int((datetime.datetime.now()+ datetime.timedelta(
+                        seconds=random.randint(settings.MFA_RECHECK_MIN, settings.MFA_RECHECK_MAX))).strftime("%s"))
+                    request.session["mfa"] = mfa
+                    if not request.user.is_authenticated():
+                        res=login(request)
+                        if not "location" in res: return reset_cookie(request)
+                        return HttpResponse(simplejson.dumps({'status':"OK","redirect":res["location"]}),content_type="application/json")
+                    return HttpResponse(simplejson.dumps({'status': "OK"}),
+                                        content_type = "application/json")
+    except Exception as exp:
+        return HttpResponse(simplejson.dumps({'status': "ERR","message":exp.message}),content_type="application/json")
