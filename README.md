@@ -8,7 +8,7 @@ Web Authencation API (WebAuthn) is state-of-the art techology that is expected t
 ![Andriod Fingerprint](https://cdn-images-1.medium.com/max/800/1*1FWkRE8D7NTA2Kn1DrPjPA.png)
 
 For FIDO2, the following are supported
- * **security keys** (Firefox 60+, Chrome 67+, Edge 18+),
+ * **security keys** (Firefox 60+, Chrome 67+, Edge 18+, Safari 13 on Mac OS, Chrome on Andriod),
  * **Windows Hello** (Firefox 67+, Chrome 72+ , Edge) ,
  * **Apple's Touch ID** (Chrome 70+ on Mac OS X ),
  * **android-safetynet** (Chrome 70+)
