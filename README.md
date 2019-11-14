@@ -11,7 +11,7 @@ For FIDO2, the following are supported
  * **security keys** (Firefox 60+, Chrome 67+, Edge 18+, Safari 13 on Mac OS, Chrome on Andriod),
  * **Windows Hello** (Firefox 67+, Chrome 72+ , Edge) ,
  * **Apple's Touch ID** (Chrome 70+ on Mac OS X ),
- * **android-safetynet** (Chrome 70+)
+ * **android-safetynet** (Chrome 70+, Firefox 68+)
  * **NFC devices using PCSC** (Not Tested, but as supported in fido2)
 
 In English :), It allows you to verify the user by security keys on PC, Laptops or Mobiles, Windows Hello (Fingerprint, PIN) on Windows 10 Build 1903+ (May 2019 Update) Touch ID on Macbooks (Chrome) and Fingerprint/Face/Iris/PIN on Andriod Phones.
