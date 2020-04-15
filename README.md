@@ -2,7 +2,6 @@
 A Django app that handles MFA, it supports TOTP, U2F, FIDO2 U2F (Web Authn), Email Tokens , and Trusted Devices
 
 [![PyPI version](https://badge.fury.io/py/django-mfa2.svg)](https://badge.fury.io/py/django-mfa2)
-[![Downloads](https://pepy.tech/badge/django-mfa2)](https://pepy.tech/project/django-mfa2)
 
 Web Authencation API (WebAuthn) is state-of-the art techology that is expected to replace passwords.
 
