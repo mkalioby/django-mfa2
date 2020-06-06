@@ -1,5 +1,5 @@
 from django.shortcuts import render
-#from django.http import HttpResponse,HttpResponseRedirect
+from django.http import HttpResponse,HttpResponseRedirect
 from .models import *
 try:
     from django.urls import reverse
@@ -7,7 +7,6 @@ except:
     from django.core.urlresolvers import reverse
 from django.template.context_processors import csrf
 from django.template.context import RequestContext
-from django.http import HttpResponseRedirect
 from django.conf import settings
 from . import TrustedDevice
 from user_agents import parse
@@ -86,5 +85,3 @@ def toggleKey(request):
 
 def goto(request,method):
     return HttpResponseRedirect(reverse(method.lower()+"_auth"))
-
-
