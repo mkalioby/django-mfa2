@@ -69,7 +69,7 @@ def auth(request):
     request.session["_u2f_challenge_"]=s[0]
     context["token"]=s[1]
 
-    return render(request,"U2F/Auth.html")
+    return render(request,"U2F/Auth.html", context)
 
 def start(request):
     enroll = begin_registration(settings.U2F_APPID, [])
