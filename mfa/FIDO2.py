@@ -136,7 +136,11 @@ def authenticate_complete(request):
                         mfa["next_check"] = int((datetime.datetime.now()+ datetime.timedelta(
                         seconds=random.randint(settings.MFA_RECHECK_MIN, settings.MFA_RECHECK_MAX))).strftime("%s"))
                     request.session["mfa"] = mfa
-                    if not request.user.is_authenticated():
+                    try:
+                        authenticated=request.user.is_authenticated
+                    except:
+                        authenticated = request.user.is_authenticated()
+                    if not authenticated:
                         res=login(request)
                         if not "location" in res: return reset_cookie(request)
                         return HttpResponse(simplejson.dumps({'status':"OK","redirect":res["location"]}),content_type="application/json")
