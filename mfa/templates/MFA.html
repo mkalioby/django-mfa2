@@ -20,7 +20,7 @@
         $("#modal-footer").prepend("<button id='actionBtn' class='btn btn-danger' onclick='confirmDel("+id+")'>Confirm Deletion</button>")
         $("#popUpModal").modal()
     }
-    {% if not HIDE_DISABLE %}
+
     function toggleKey(id) {
         $.ajax({
             url:"{% url 'toggle_key' %}?id="+id,
@@ -34,7 +34,6 @@
             }
         })
     }
-    {% endif %}
     </script>
     <link href="{% static  'mfa/css/bootstrap-toggle.min.css' %}" rel="stylesheet">
     <script src="{% static 'mfa/js/bootstrap-toggle.min.js'%}"></script>

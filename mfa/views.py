@@ -77,9 +77,12 @@ def toggleKey(request):
     q=User_Keys.objects.filter(username=request.user.username, id=id)
     if q.count()==1:
         key=q[0]
-        key.enabled=not key.enabled
-        key.save()
-        return HttpResponse("OK")
+        if not key.key_type in settings.MFA_HIDE_DISABLE:
+            key.enabled=not key.enabled
+            key.save()
+            return HttpResponse("OK")
+        else:
+            return HttpResponse("You can't change this method.")
     else:
         return HttpResponse("Error")
 
