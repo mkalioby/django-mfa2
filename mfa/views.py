@@ -9,7 +9,10 @@ from django.template.context_processors import csrf
 from django.template.context import RequestContext
 from django.conf import settings
 from . import TrustedDevice
+from django.contrib.auth.decorators import login_required
 from user_agents import parse
+
+@login_required
 def index(request):
     keys=[]
     context={"keys":User_Keys.objects.filter(username=request.user.username),"UNALLOWED_AUTHEN_METHODS":settings.MFA_UNALLOWED_METHODS
@@ -51,6 +54,8 @@ def login(request):
     callable_func = __get_callable_function__(settings.MFA_LOGIN_CALLBACK)
     return callable_func(request,username=request.session["base_username"])
 
+
+@login_required
 def delKey(request):
     key=User_Keys.objects.get(id=request.GET["id"])
     if key.username == request.user.username:
@@ -72,6 +77,7 @@ def __get_callable_function__(func_path):
         raise Exception("Module does not have requested function")
     return callable_func
 
+@login_required
 def toggleKey(request):
     id=request.GET["id"]
     q=User_Keys.objects.filter(username=request.user.username, id=id)
