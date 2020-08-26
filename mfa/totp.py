@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.views.decorators.cache import never_cache
 from django.http import HttpResponse
 from .models import *
 from django.template.context_processors import csrf
@@ -31,6 +32,7 @@ def recheck(request):
             return HttpResponse(simplejson.dumps({"recheck": False}), content_type="application/json")
     return render(request,"TOTP/recheck.html", context)
 
+@never_cache
 def auth(request):
     context=csrf(request)
     if request.method=="POST":
@@ -68,5 +70,6 @@ def verify(request):
         return HttpResponse("Success")
     else: return HttpResponse("Error")
 
+@never_cache
 def start(request):
     return render(request,"TOTP/Add.html",{})
