@@ -2,7 +2,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% block head %}
-    <style>
+<style>
     #two-factor-steps {
 	border: 1px solid #ccc;
 	border-radius: 3px;
@@ -12,8 +12,8 @@
         margin: 0px;
     }
     </style>
-    <script src="{% static 'mfa/js/qrious.min.js' %}" type="text/javascript"></script>
-    <script type="text/javascript">
+<script src="{% static 'mfa/js/qrious.min.js' %}" type="text/javascript"></script>
+<script type="text/javascript">
     var key="";
     $(document).ready(function addToken() {
         $.ajax({
@@ -61,49 +61,49 @@
     </script>
 {% endblock %}
 {% block content %}
-    <br/>
-    <br/>
-    <div class="container">
-        <div class="col-md-6 col-md-offset-3" id="two-factor-steps">
-            <div class="row" align="center">
-                <h4>Adding Authenticator</h4>
-            </div>
-    <div class="row">
+<br/>
+<br/>
+<div class="container">
+    <div class="col-md-6 col-md-offset-3" id="two-factor-steps">
+        <div class="row" align="center">
+            <h4>Adding Authenticator</h4>
+        </div>
+        <div class="row">
 
-        <p>Scan the image below with the two-factor authentication app on your <a href="javascript:void(0)" onclick="showTOTP()">phone/PC</a> phone/PC. If you can’t use a barcode,
-            <a href="javascript:void(0)" onclick="showKey()">enter this text</a> instead. </p>
+            <p>Scan the image below with the two-factor authentication app on your <a href="javascript:void(0)" onclick="showTOTP()">phone/PC</a>. If you can’t use a barcode,
+                <a href="javascript:void(0)" onclick="showKey()">enter this text</a> instead. </p>
         </div>
 
         <div class="row">
 
-        <div align="center" style="display: none" id="second_step">
+            <div align="center" style="display: none" id="second_step">
 
-        <img id="qr"/>
+                <img id="qr"/>
 
             </div>
-        <div class="row">
+            <div class="row">
 
                 <p><b>Enter the six-digit code from the application</b></p>
                 <p style="color: #333333;font-size: 10px">After scanning the barcode image, the app will display a six-digit code that you can enter below. </p>
 
-        </div>
+            </div>
             <div class="row">
 
 
-            <input style="display: inline;width: 95%" maxlength="6" size="6" class="form-control" id="answer" placeholder="e.g 785481"/>
+                <input style="display: inline;width: 95%" maxlength="6" size="6" class="form-control" id="answer" placeholder="e.g 785481"/>
 
-        </div>
-        <div class="row">
-            <div class="col-md-6" style="padding-left: 0px">
-                <button class="btn btn-success" onclick="verify()">Enable</button>
             </div>
-            <div class="col-md-6" align="right" style="padding-right: 30px">
-                <a href="{% url 'mfa_home' %}"><button class="btn btn-default">Cancel</button></a>
+            <div class="row" style="padding-top: 10px;">
+                <div class="col-md-6" style="padding-left: 0px">
+                    <button class="btn btn-success" onclick="verify()">Enable</button>
+                </div>
+                <div class="col-md-6" align="right" style="padding-right: 30px">
+                    <a href="{% url 'mfa_home' %}"><button class="btn btn-default">Cancel</button></a>
+                </div>
             </div>
-        </div>
         </div>
 
     </div>
-        </div>
-    {% include "modal.html" %}
+</div>
+{% include "modal.html" %}
 {% endblock %}
