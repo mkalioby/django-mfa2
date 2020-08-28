@@ -1,5 +1,5 @@
 from fido2.client import ClientData
-from fido2.server import Fido2Server, RelyingParty
+from fido2.server import Fido2Server, PublicKeyCredentialRpEntity
 from fido2.ctap2 import AttestationObject, AuthenticatorData
 from django.template.context_processors import csrf
 from django.views.decorators.csrf import csrf_exempt
@@ -24,7 +24,7 @@ def recheck(request):
 
 
 def getServer():
-    rp = RelyingParty(settings.FIDO_SERVER_ID, settings.FIDO_SERVER_NAME)
+    rp = PublicKeyCredentialRpEntity(settings.FIDO_SERVER_ID, settings.FIDO_SERVER_NAME)
     return Fido2Server(rp)
 def begin_registeration(request):
     server = getServer()
