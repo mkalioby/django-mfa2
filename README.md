@@ -156,3 +156,4 @@ function some_func() {
 # Contributors
 * [mahmoodnasr](https://github.com/mahmoodnasr)
 * [d3cline](https://github.com/d3cline)
+* [swainn](https://github.com/swainn)

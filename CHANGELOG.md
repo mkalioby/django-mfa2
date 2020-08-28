@@ -1,5 +1,13 @@
 # Change Log
 
+## 2.0 (work in progress)
+  * Dropped support to djangp-1.8 and Python 2.7
+  * Added: never-cache decorator
+  * Addresses several structure and style issues with TOTP and Email dialogs
+  * Updated to fido2 0.8.1
+    
+Thanks to @swainn
+
 ## v1.9.1
    * Fixed: is_authenticated #13
    * Fixed: is_anonymous #6

@@ -1,11 +1,10 @@
 django >= 1.7
-        jsonfield
-        simplejson
-        pyotp
-        python-u2flib-server
-        ua-parser
-        user-agents
-        python-jose
-        fido2 == 0.7
-        jsonLookup
-
+jsonfield
+simplejson
+pyotp
+python-u2flib-server
+ua-parser
+user-agents
+python-jose
+fido2 == 0.8.1
+jsonLookup
