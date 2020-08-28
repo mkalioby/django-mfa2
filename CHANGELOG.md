@@ -1,5 +1,14 @@
 # Change Log
 
+## v1.9.1
+   * Fixed: is_authenticated #13
+   * Fixed: is_anonymous #6
+    
+    thanks to @d3cline,  
+
+## v1.7
+  * Better Error Management
+  * Better Token recheck
 ## v 1.6.0
   * Fixed some issues for django>= 2.0
   * Added example app.
