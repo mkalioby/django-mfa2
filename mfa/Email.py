@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.views.decorators.cache import never_cache
 from django.template.context_processors import csrf
 import datetime,random
 from random import randint
@@ -15,6 +16,7 @@ def sendEmail(request,username,secret):
     res=render(request,"mfa_email_token_template.html",{"request":request,"user":user,'otp':secret})
     return  send([user.email],"OTP", str(res.content))
 
+@never_cache
 def start(request):
     context = csrf(request)
     if request.method == "POST":
@@ -36,6 +38,7 @@ def start(request):
         if sendEmail(request, request.user.username, request.session["email_secret"]):
             context["sent"] = True
     return render(request,"Email/Add.html", context)
+@never_cache
 def auth(request):
     context=csrf(request)
     if request.method=="POST":
