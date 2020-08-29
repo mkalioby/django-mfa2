@@ -53,7 +53,7 @@ Depends on
    MFA_RECHECK_MAX=30         # Maximum in seconds
    MFA_QUICKLOGIN=True        # Allow quick login for returning users by provide only their 2FA
    MFA_HIDE_DISABLE=('FIDO2',)     # Can the user disable his key (Added in 1.2.0).
-   MFA_OWNED_BY_ENTERPRISE = FALSE  # Who ownes security keys   
+   MFA_OWNED_BY_ENTERPRISE = FALSE  # Who owns security keys   
 
    TOKEN_ISSUER_NAME="PROJECT_NAME"      #TOTP Issuer name
 
