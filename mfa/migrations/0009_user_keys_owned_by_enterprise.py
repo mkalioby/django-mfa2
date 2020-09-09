@@ -16,5 +16,5 @@ class Migration(migrations.Migration):
             name='owned_by_enterprise',
             field=models.NullBooleanField(default=None),
         ),
-        migrations.RunSQL("update mfa_user_keys set owned_by_enterprise = %s where key_type='FIDO2'"%(True if getattr(settings,"MFA_OWNED_BY_ENTERPRISE",False) else False ))
+        migrations.RunSQL("update mfa_user_keys set owned_by_enterprise = %s where key_type='FIDO2'"%(getattr(settings,"MFA_OWNED_BY_ENTERPRISE",False)))
     ]
