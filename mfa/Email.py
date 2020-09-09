@@ -14,7 +14,7 @@ def sendEmail(request,username,secret):
     kwargs = {key: username}
     user = User.objects.get(**kwargs)
     res=render(request,"mfa_email_token_template.html",{"request":request,"user":user,'otp':secret})
-    return  send([user.email],"OTP", str(res.content))
+    return send([user.email],"OTP", res.content.decode())
 
 @never_cache
 def start(request):
