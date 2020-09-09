@@ -1,8 +1,9 @@
 # Change Log
 
-## 2.0 (work in progress)
+## 2.0
   * Dropped support to djangp-1.8 and Python 2.7
   * Added: never-cache decorator
+  * Fixes to Make Email Method More Robust 
   * Addresses several structure and style issues with TOTP and Email dialogs
   * Updated to fido2 0.8.1
     
