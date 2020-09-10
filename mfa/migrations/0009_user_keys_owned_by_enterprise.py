@@ -4,6 +4,12 @@ from __future__ import unicode_literals
 from django.db import models, migrations
 from django.conf import settings
 
+
+def update_owned_by_enterprise(apps, schema_editor):
+    user_keys = apps.get_model('mfa', 'user_keys')
+    user_keys.objects.filter(key_type='FIDO2').update(owned_by_enterprise=getattr(settings,"MFA_OWNED_BY_ENTERPRISE",False))
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -16,5 +22,5 @@ class Migration(migrations.Migration):
             name='owned_by_enterprise',
             field=models.NullBooleanField(default=None),
         ),
-        migrations.RunSQL("update mfa_user_keys set owned_by_enterprise = %s where key_type='FIDO2'"%(1 if getattr(settings,"MFA_OWNED_BY_ENTERPRISE",False) else 0 ))
+        migrations.RunPython(update_owned_by_enterprise)
     ]
