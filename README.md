@@ -29,7 +29,7 @@ Depends on
 * ua-parser
 * user-agents
 * python-jose
-* fido2==0.7
+* fido2==0.8.1
 
 
 # Installation
@@ -158,3 +158,4 @@ function some_func() {
 * [d3cline](https://github.com/d3cline)
 * [swainn](https://github.com/swainn)
 * [unramk](https://github.com/unramk)
+* [willingham](https://github.com/willingham)

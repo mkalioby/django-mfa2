@@ -1,4 +1,7 @@
 # Change Log
+## 2.0.1
+  * Fixed: issue in migration between Postgres and SQLite
+    thnks to @swainn and @willingham 
 
 ## 2.0
   * Dropped support to djangp-1.8 and Python 2.7
