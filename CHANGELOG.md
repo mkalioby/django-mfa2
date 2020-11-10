@@ -1,4 +1,12 @@
 # Change Log
+
+## 2.0.3
+  * Fixed: __version__ to show correct version
+
+## 2.0.2
+  * Added: A missing migration 
+    thnks to @swainn
+
 ## 2.0.1
   * Fixed: issue in migration between Postgres and SQLite
     thnks to @swainn and @willingham 
