@@ -42,13 +42,15 @@ Depends on
 1. using pip 
 
     `pip install django-mfa2`
-2. Using Conda forge
+2. Using Conda forge 
    
    `conda config --add channels conda-forge`
    
    `conda install django-mfa2`
    
    For more info, see the conda-forge repo (https://github.com/conda-forge/django-mfa2-feedstock)
+   
+   Thanks for [swainn](https://github.com/swainn) for adding package to conda-forge
 
 # Usage
 1. in your settings.py add the application to your installed apps
