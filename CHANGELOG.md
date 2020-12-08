@@ -1,5 +1,12 @@
 # Change Log
 
+## 2.0.5
+  * Fixed issue in __version__
+
+## 2.0.4
+   * Fixed: Closes #30
+
+
 ## 2.0.3
   * Fixed: __version__ to show correct version
 
