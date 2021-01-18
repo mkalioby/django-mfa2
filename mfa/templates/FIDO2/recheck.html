@@ -104,7 +104,7 @@
             $("#main_paragraph").addClass("alert alert-danger")
             $("#main_paragraph").html("FIDO2 must work under secure context")
         } else {
-            ua=UAParser().getResult()
+            ua=new UAParser().getResult()
             if (ua.browser.name == "Safari")
                 $("#res").html("<button class='btn btn-success' onclick='authen()'>Authenticate...</button>")
             else

@@ -45,7 +45,7 @@
         ua=new UAParser().getResult()
         if (ua.browser.name == "Safari")
         {
-                $("#res").html("<button class='btn btn-primary' onclick='begin_reg()'>Start...</button>")
+                $("#res").html("<button class='btn btn-success' onclick='begin_reg()'>Start...</button>")
         }
         else
         {
@@ -66,7 +66,7 @@
       <div class="panel-body">
 
 
-    <div class="row alert alert-pr" id="res">
+    <div class="row alert alert-pr" id="res" align="center">
     <p style="color: green">Your browser should ask you to confirm you identity.</p>
 
     </div>
