@@ -24,9 +24,10 @@ setup(
         'ua-parser',
         'user-agents',
         'python-jose',
-        'fido2 == 0.8.1',
+       # 'fido2 == 0.8.1',
         'jsonLookup'
       ],
+    dependency_links =["https://github.com/Yubico/python-fido2/tarball/master"],
     python_requires=">=3.5",
     include_package_data=True,
       zip_safe=False, # because we're including static files

@@ -2,6 +2,7 @@
 {% load static %}
 {% block head %}
     <script type="application/javascript" src="{% static 'mfa/js/cbor.js'%}"></script>
+    <script type="application/javascript" src="{% static 'mfa/js/ua-parser.min.js'%}"></script>
     <script type="application/javascript">
     function begin_reg(){
     fetch('{% url 'fido2_begin_reg' %}',{}).then(function(response) {
@@ -40,7 +41,17 @@
        $("#res").html("<div class='alert alert-danger'>Registeration Failed as " +reason +", <a href='javascript:void(0)' onclick='begin_reg()'> try again </a> or <a href='{% url 'mfa_home' %}'> Go to Security Home</a></div>")
     })
     }
-    $(document).ready(setTimeout(begin_reg,500))
+    $(document).ready(function (){
+        ua=new UAParser()
+        if (ua.getBrowser().name == "Safari")
+        {
+                $("#res").html("<button class='btn btn-primary' onclick='begin_reg()'>Start...</button>")
+        }
+        else
+        {
+            setTimeout(begin_reg, 500)
+        }
+    })
     </script>
 
 {% endblock %}
@@ -56,7 +67,7 @@
 
 
     <div class="row alert alert-pr" id="res">
-    <p style="color: green">Your broswer should ask you to confirm you indentity.</p>
+    <p style="color: green">Your browser should ask you to confirm you identity.</p>
 
     </div>
         </div>
