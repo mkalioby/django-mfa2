@@ -1,5 +1,6 @@
 {%  load static %}
 <script type="application/javascript" src="{% static 'mfa/js/cbor.js' %}"></script>
+<script type="application/javascript" src="{% static 'mfa/js/us-parser.min.js' %}"></script>
 <div class="row">
 
 <div class="col-sm-10 col-sm-offset-1 col-xs-12 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
@@ -17,7 +18,9 @@
                     <br/>
 
             {% endif %}
-                <p style="color: green">please press the button on your security key to prove it is you.</p>
+                <div id="res">
+                    <p style="color: green">please press the button on your security key to prove it is you.</p>
+                </div>
                 <div id="msgdiv"></div>
                 {% if mode == "auth" %}
                     <form id="u2f_login" action="{% url 'fido2_complete_auth' %}" method="post" enctype="multipart/form-data">
@@ -101,7 +104,11 @@
             $("#main_paragraph").addClass("alert alert-danger")
             $("#main_paragraph").html("FIDO2 must work under secure context")
         } else {
-            authen()
+            ua=UAParser()
+            if (ua.getBrowser().name == "Safari")
+                $("#res").html("<button class='btn btn-success' onclick='authen()'>Authenticate...</button>")
+            else
+                authen()
         }
     });
 
