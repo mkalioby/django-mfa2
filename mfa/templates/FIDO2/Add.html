@@ -42,8 +42,8 @@
     })
     }
     $(document).ready(function (){
-        ua=new UAParser()
-        if (ua.getBrowser().name == "Safari")
+        ua=new UAParser().getResult()
+        if (ua.browser.name == "Safari")
         {
                 $("#res").html("<button class='btn btn-primary' onclick='begin_reg()'>Start...</button>")
         }
