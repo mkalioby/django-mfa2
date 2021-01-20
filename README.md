@@ -17,17 +17,17 @@ Web Authencation API (WebAuthn) is state-of-the art techology that is expected t
 For FIDO2, the following are supported
  * **security keys** (Firefox 60+, Chrome 67+, Edge 18+, Safari 13 on Mac OS, Chrome on Andriod, Safari on iOS 13.3+),
  * **Windows Hello** (Firefox 67+, Chrome 72+ , Edge) ,
- * **Apple's Touch ID** (Chrome 70+ on Mac OS X ),
+ * **Apple's Touch ID/Face ID** (Chrome 70+ on Mac OS X, Safari on macOS Big Sur, Safari on iOS 14.0+ ),
  * **android-safetynet** (Chrome 70+, Firefox 68+)
  * **NFC devices using PCSC** (Not Tested, but as supported in fido2)
 
-In English :), It allows you to verify the user by security keys on PC, Laptops or Mobiles, Windows Hello (Fingerprint, PIN) on Windows 10 Build 1903+ (May 2019 Update) Touch ID on Macbooks (Chrome) and Fingerprint/Face/Iris/PIN on Andriod Phones.
+In English :), It allows you to verify the user by security keys on PC, Laptops or Mobiles, Windows Hello (Fingerprint, PIN) on Windows 10 Build 1903+ (May 2019 Update) Touch/Face ID on Macbooks (Chrome, Safari), Touch/Face ID on iPhone and iPad and Fingerprint/Face/Iris/PIN on Android Phones.
 
-Trusted device is a mode for the user to add a device that doesn't support security keys like iOS and andriod without fingerprints or NFC.
+Trusted device is a mode for the user to add a device that doesn't support security keys like Android without fingerprints or NFC.
 
 **Note**: `U2F and FIDO2 can only be served under secure context (https)`
 
-Package tested with Django 1.8, Django 2.1 on Python 2.7 and Python 3.5+ but it was not checked with any version in between but open for issues.
+Package tested with Django 1.8, Django 2.2 on Python 2.7 and Python 3.5+ but it was not checked with any version in between but open for issues.
 
 Depends on
 
@@ -36,7 +36,7 @@ Depends on
 * ua-parser
 * user-agents
 * python-jose
-* fido2==0.8.1
+* fido2==0.9.0
 
 # Installation
 1. using pip 
