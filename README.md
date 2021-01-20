@@ -12,6 +12,8 @@ A Django app that handles MFA, it supports TOTP, U2F, FIDO2 U2F (Web Authn), Ema
 
 Web Authencation API (WebAuthn) is state-of-the art techology that is expected to replace passwords.
 
+Touch ID is in beta testing, see #33 :partying_face: :partying_face:
+
 ![Andriod Fingerprint](https://cdn-images-1.medium.com/max/800/1*1FWkRE8D7NTA2Kn1DrPjPA.png)
 
 For FIDO2, the following are supported
