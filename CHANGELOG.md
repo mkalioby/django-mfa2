@@ -1,5 +1,8 @@
 # Change Log
 
+## 2.1.1
+  * Fixed: FIDO2 version in requirments.txt file.
+  
 ## 2.1.0
    * Added Support for Touch ID for Mac OSx and iOS 14 on Safari
 
