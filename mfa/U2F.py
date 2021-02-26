@@ -57,9 +57,9 @@ def validate(request,username):
     key.save()
     mfa = {"verified": True, "method": "U2F","id":key.id}
     if getattr(settings, "MFA_RECHECK", False):
-        mfa["next_check"] = int((datetime.datetime.now()
+        mfa["next_check"] = datetime.datetime.timestamp((datetime.datetime.now()
                                  + datetime.timedelta(
-                    seconds=random.randint(settings.MFA_RECHECK_MIN, settings.MFA_RECHECK_MAX))).strftime("%s"))
+                    seconds=random.randint(settings.MFA_RECHECK_MIN, settings.MFA_RECHECK_MAX))))
     request.session["mfa"] = mfa
     return True
 

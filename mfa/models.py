@@ -6,6 +6,7 @@ from jsonLookup import shasLookup, hasLookup
 JSONField.register_lookup(shasLookup)
 JSONField.register_lookup(hasLookup)
 
+
 class User_Keys(models.Model):
     username=models.CharField(max_length = 50)
     properties=JSONField(null = True)
@@ -20,9 +21,12 @@ class User_Keys(models.Model):
         if self.key_type == "Trusted Device" and self.properties.get("signature","") == "":
             self.properties["signature"]= jwt.encode({"username": self.username, "key": self.properties["key"]}, settings.SECRET_KEY)
         super(User_Keys, self).save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
+
     def __unicode__(self):
         return "%s -- %s"%(self.username,self.key_type)
+
     def __str__(self):
         return self.__unicode__()
+
     class Meta:
         app_label='mfa'

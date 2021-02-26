@@ -40,9 +40,9 @@ def auth(request):
         if res[0]:
             mfa = {"verified": True, "method": "TOTP","id":res[1]}
             if getattr(settings, "MFA_RECHECK", False):
-                mfa["next_check"] = int((datetime.datetime.now()
+                mfa["next_check"] = datetime.datetime.timestamp((datetime.datetime.now()
                                          + datetime.timedelta(
-                            seconds=random.randint(settings.MFA_RECHECK_MIN, settings.MFA_RECHECK_MAX))).strftime("%s"))
+                            seconds=random.randint(settings.MFA_RECHECK_MIN, settings.MFA_RECHECK_MAX))))
             request.session["mfa"] = mfa
             return login(request)
         context["invalid"]=True

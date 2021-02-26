@@ -4,7 +4,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='django-mfa2',
-    version='2.1.0',
+    version='2.1.2b1',
     description='Allows user to add 2FA to their accounts',
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
@@ -24,14 +24,14 @@ setup(
         'ua-parser',
         'user-agents',
         'python-jose',
-        'fido2 == 0.9',
+        'fido2 == 0.9.1',
         'jsonLookup'
       ],
     python_requires=">=3.5",
     include_package_data=True,
     zip_safe=False, # because we're including static files
     classifiers=[
-        "Development Status :: 5 - Production/Stable",
+        "Development Status :: 4 - Beta",
         "Environment :: Web Environment",
         "Framework :: Django",
         "Framework :: Django :: 1.11",

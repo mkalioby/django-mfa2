@@ -46,8 +46,8 @@ def auth(request):
             uk = User_Keys.objects.get(username=request.session["base_username"], key_type="Email")
             mfa = {"verified": True, "method": "Email","id":uk.id}
             if getattr(settings, "MFA_RECHECK", False):
-                mfa["next_check"] = int((datetime.datetime.now() + datetime.timedelta(
-                    seconds = random.randint(settings.MFA_RECHECK_MIN, settings.MFA_RECHECK_MAX))).strftime("%s"))
+                mfa["next_check"] = datetime.datetime.timestamp(datetime.datetime.now() + datetime.timedelta(
+                    seconds = random.randint(settings.MFA_RECHECK_MIN, settings.MFA_RECHECK_MAX)))
             request.session["mfa"] = mfa
 
             from django.utils import timezone

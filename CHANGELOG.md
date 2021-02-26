@@ -1,5 +1,10 @@
 # Change Log
 
+## 2.1.2
+  * Fixed: Getting timestamp on Python 3.7 as ("%s") is raising an exception
+  * Upgraded to FIDO 0.9.1
+
+
 ## 2.1.1
   * Fixed: FIDO2 version in requirments.txt file.
   
