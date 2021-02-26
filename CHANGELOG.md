@@ -1,5 +1,8 @@
 # Change Log
 
+## 2.1.0
+   * Added Support for Touch ID for Mac OSx and iOS 14 on Safari
+
 ## 2.0.5
   * Fixed issue in __version__
 
