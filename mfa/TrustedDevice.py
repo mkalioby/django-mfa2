@@ -62,7 +62,7 @@ def add(request):
         key=request.POST["key"].replace("-","").replace(" ","").upper()
         context["username"] = request.POST["username"]
         context["key"] = request.POST["key"]
-        trusted_keys=User_Keys.objects.filter(username=request.POST["username"],properties__has="$.key="+key)
+        trusted_keys=User_Keys.objects.filter(username=request.POST["username"],properties__iregex=rf'{key}')
         cookie=False
         if trusted_keys.exists():
             tk=trusted_keys[0]
