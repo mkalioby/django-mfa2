@@ -52,7 +52,7 @@ def validate(request,username):
     challenge = request.session.pop('_u2f_challenge_')
     device, c, t = complete_authentication(challenge, data, [settings.U2F_APPID])
 
-    key=User_Keys.objects.get(username=username,properties__shas="$.device.publicKey=%s"%device["publicKey"])
+    key = User_Keys.objects.get(username=username, properties__iregex=rf'{device["publicKey"]}')
     key.last_used=timezone.now()
     key.save()
     mfa = {"verified": True, "method": "U2F","id":key.id}
