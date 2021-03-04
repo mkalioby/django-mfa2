@@ -1,10 +1,11 @@
 from . import views,totp,U2F,TrustedDevice,helpers,FIDO2,Email
-#app_name='mfa'
+
 
 try:
     from django.urls import  re_path as url
 except:
      from django.conf.urls import  url
+
 urlpatterns = [
     url(r'totp/start/', totp.start , name="start_new_otop"),
     url(r'totp/getToken', totp.getToken , name="get_new_otop"),
@@ -39,6 +40,7 @@ urlpatterns = [
     url(r'u2f/secure_device', TrustedDevice.getCookie, name="td_securedevice"),
 
     url(r'^$', views.index, name="mfa_home"),
+    url(r'devices/add$', TrustedDevice.add,name="mfa_add_new_trusted_device"),
     url(r'goto/(.*)', views.goto, name="mfa_goto"),
     url(r'selct_method', views.show_methods, name="mfa_methods_list"),
     url(r'recheck', helpers.recheck, name="mfa_recheck"),

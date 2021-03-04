@@ -16,9 +16,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path,re_path,include
 from . import views,auth
+import mfa
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('mfa/', include('mfa.urls')),
+    path('devices/add', mfa.TrustedDevice.add,name="mfa_add_new_trusted_device"),
     path('auth/login',auth.loginView,name="login"),
     path('auth/logout',auth.logoutView,name="logout"),
 

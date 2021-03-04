@@ -2,7 +2,6 @@ import string
 import random
 from django.shortcuts import render
 from django.http import HttpResponse
-from django.template.context import RequestContext
 from django.template.context_processors import csrf
 from .models import *
 import user_agents
@@ -10,7 +9,7 @@ from django.utils import timezone
 
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
     x=''.join(random.choice(chars) for _ in range(size))
-    if not User_Keys.objects.filter(properties__shas="$.key="+x).exists(): return x
+    if not User_Keys.objects.filter(properties__icontains=x, key_type="Trusted Device").exists(): return x
     else: return id_generator(size,chars)
 
 def getUserAgent(request):
@@ -19,6 +18,7 @@ def getUserAgent(request):
         tk=User_Keys.objects.get(id=id)
         if tk.properties.get("user_agent","")!="":
             ua = user_agents.parse(tk.properties["user_agent"])
+            print(ua.os)
             res = render(None, "TrustedDevices/user-agent.html", context={"ua":ua})
             return HttpResponse(res)
     return HttpResponse("")
@@ -69,6 +69,7 @@ def add(request):
             request.session["td_id"]=tk.id
             ua=request.META['HTTP_USER_AGENT']
             agent=user_agents.parse(ua)
+            print(agent.os)
             if agent.is_pc:
                 context["invalid"]="This is a PC, it can't used as a trusted device."
             else:
@@ -124,7 +125,7 @@ def verify(request):
         json= jwt.decode(request.COOKIES.get('deviceid'),settings.SECRET_KEY)
         if json["username"].lower()== request.session['base_username'].lower():
             try:
-                uk = User_Keys.objects.get(username=request.POST["username"].lower(), properties__has="$.key=" + json["key"])
+                uk = User_Keys.objects.get(username=request.POST["username"].lower(), properties__properties__iregex=rf'{json["key"]}')
                 if uk.enabled and uk.properties["status"] == "trusted":
                     uk.last_used=timezone.now()
                     uk.save()
