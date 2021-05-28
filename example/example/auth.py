@@ -28,3 +28,7 @@ def create_session(request,username):
 def logoutView(request):
     logout(request)
     return  render(request,"logout.html",{})
+
+def register(request):
+    if request.method == "GET":
+        return

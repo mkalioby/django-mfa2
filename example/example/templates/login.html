@@ -17,7 +17,6 @@
 
   <!-- Custom styles for this template-->
   <link href="{% static 'css/sb-admin.css'%}" rel="stylesheet">
-
 </head>
 
 <body class="bg-dark">
@@ -29,7 +28,6 @@
           {% if invalid %}
               <div class="alert alert-danger">Invalid Username or password</div>
           {% endif %}
-        <form action="{% url 'login' %}" method="post">
             {% csrf_token %}
           <div class="form-group">
             <div class="form-label-group">
@@ -37,14 +35,9 @@
               <label for="inputUsername">Username</label>
             </div>
           </div>
-          <div class="form-group">
-            <div class="form-label-group">
-              <input type="password" id="inputPassword"  name="password" class="form-control" placeholder="Password" required="required">
-              <label for="inputPassword">Password</label>
-            </div>
-          </div>
 
-          <button class="btn btn-primary btn-block" type="submit">Login</button>
+
+          <button class="btn btn-primary btn-block" type="button" onclick="authen()">Login</button>
         </form>
       </div>
     </div>
@@ -56,7 +49,7 @@
 
   <!-- Core plugin JavaScript-->
   <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js'%}"></script>
-
+{% include 'FIDO2/login.html' %}
 </body>
 
 </html>

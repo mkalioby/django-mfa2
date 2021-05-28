@@ -80,6 +80,7 @@ def start(request):
     """Start Registeration a new FIDO Token"""
     context = csrf(request)
     context.update(get_redirect_url())
+    context["mfa_invoke"] = True
     return render(request, "FIDO2/Add.html", context)
 
 
@@ -97,8 +98,8 @@ def auth(request):
 
 def authenticate_begin(request):
     server = getServer()
-    credentials = getUserCredentials(request.session.get("base_username", request.user.username))
-    auth_data, state = server.authenticate_begin(credentials)
+    #credentials = getUserCredentials(request.session.get("base_username", request.user.username))
+    auth_data, state = server.authenticate_begin()
     request.session['fido_state'] = state
     return HttpResponse(cbor.encode(auth_data), content_type = "application/octet-stream")
 
@@ -107,7 +108,7 @@ def authenticate_begin(request):
 def authenticate_complete(request):
     try:
         credentials = []
-        username = request.session.get("base_username", request.user.username)
+        username = request.session.get("base_username", request.POST.get("username",request.user.username))
         server = getServer()
         credentials = getUserCredentials(username)
         data = cbor.decode(request.body)
