@@ -76,6 +76,7 @@ def start(request):
     request.session['_u2f_enroll_'] = enroll.json
     context=csrf(request)
     context["token"]=simplejson.dumps(enroll.data_for_client)
+    context.update(get_redirect_url())
     return render(request,"U2F/Add.html",context)
 
 

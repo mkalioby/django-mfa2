@@ -1,5 +1,8 @@
 # Change Log
 
+## 2.2.0 (Not released)
+   * Added: MFA_REDIRECT_AFTER_REGISTRATION settings parameter 
+
 ## 2.1.2
   * Fixed: Getting timestamp on Python 3.7 as ("%s") is raising an exception
   * Upgraded to FIDO 0.9.1

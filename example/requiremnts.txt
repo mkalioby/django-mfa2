@@ -1,2 +1,2 @@
-django==2.0
-django-sslserver
+django >= 2.2
+django_ssl

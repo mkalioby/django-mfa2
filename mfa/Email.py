@@ -7,7 +7,9 @@ from .models import *
 #from django.template.context import RequestContext
 from .views import login
 from .Common import send
+
 def sendEmail(request,username,secret):
+    """Send Email to the user after rendering `mfa_email_token_template`"""
     from django.contrib.auth import get_user_model
     User = get_user_model()
     key = getattr(User, 'USERNAME_FIELD', 'username')
@@ -18,9 +20,10 @@ def sendEmail(request,username,secret):
 
 @never_cache
 def start(request):
+    """Start adding email as a 2nd factor"""
     context = csrf(request)
     if request.method == "POST":
-        if request.session["email_secret"] == request.POST["otp"]:
+        if request.session["email_secret"] == request.POST["otp"]:  #if successful
             uk=User_Keys()
             uk.username=request.user.username
             uk.key_type="Email"
@@ -31,15 +34,16 @@ def start(request):
                 from django.core.urlresolvers import reverse
             except:
                 from django.urls import reverse
-            return HttpResponseRedirect(reverse('mfa_home'))
+            return HttpResponseRedirect(reverse(getattr(settings,'MFA_REDIRECT_AFTER_REGISTRATION','mfa_home')))
         context["invalid"] = True
     else:
-        request.session["email_secret"] = str(randint(0,100000))
+        request.session["email_secret"] = str(randint(0,100000))  #generate a random integer
         if sendEmail(request, request.user.username, request.session["email_secret"]):
             context["sent"] = True
     return render(request,"Email/Add.html", context)
 @never_cache
 def auth(request):
+    """Authenticating the user by email."""
     context=csrf(request)
     if request.method=="POST":
         if request.session["email_secret"]==request.POST["otp"].strip():

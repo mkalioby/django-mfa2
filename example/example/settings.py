@@ -77,10 +77,8 @@ WSGI_APPLICATION = 'example.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'mfa',
-        'USER': 'root',
-        'PASSWORD': 'password',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'test_db',
     }
 }
 
@@ -141,7 +139,9 @@ MFA_RECHECK=True           # Allow random rechecking of the user
 MFA_RECHECK_MIN=10         # Minimum interval in seconds
 MFA_RECHECK_MAX=30         # Maximum in seconds
 MFA_QUICKLOGIN=True        # Allow quick login for returning users by provide only their 2FA
-MFA_HIDE_DISABLE=('FIDO2',)     # Can the user disable his key (Added in 1.2.0).
+MFA_HIDE_DISABLE=('',)     # Can the user disable his key (Added in 1.2.0).
+MFA_REDIRECT_AFTER_REGISTRATION="registered"
+MFA_SUCCESS_REGISTRATION_MSG="Go to Home"
 
 TOKEN_ISSUER_NAME="PROJECT_NAME"      #TOTP Issuer name
 

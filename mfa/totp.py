@@ -72,4 +72,5 @@ def verify(request):
 
 @never_cache
 def start(request):
-    return render(request,"TOTP/Add.html",{})
+    """Start Adding Time One Time Password (TOTP)"""
+    return render(request,"TOTP/Add.html",get_redirect_url())

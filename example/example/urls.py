@@ -22,5 +22,6 @@ urlpatterns = [
     path('auth/login',auth.loginView,name="login"),
     path('auth/logout',auth.logoutView,name="logout"),
 
-    re_path('^$',views.home,name='home')
+    re_path('^$',views.home,name='home'),
+    path('registered/',views.registered,name='registered')
 ]

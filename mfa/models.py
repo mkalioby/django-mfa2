@@ -2,9 +2,9 @@ from django.db import models
 from jsonfield import JSONField
 from jose import jwt
 from django.conf import settings
-from jsonLookup import shasLookup, hasLookup
-JSONField.register_lookup(shasLookup)
-JSONField.register_lookup(hasLookup)
+#from jsonLookup import shasLookup, hasLookup
+# JSONField.register_lookup(shasLookup)
+# JSONField.register_lookup(hasLookup)
 
 
 class User_Keys(models.Model):

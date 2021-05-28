@@ -14,10 +14,12 @@ from fido2.utils import websafe_decode, websafe_encode
 from fido2.ctap2 import AttestedCredentialData
 from .views import login, reset_cookie
 import datetime
+from .Common import get_redirect_url
 from django.utils import timezone
 
 
 def recheck(request):
+    """Starts FIDO2 recheck"""
     context = csrf(request)
     context["mode"] = "recheck"
     request.session["mfa_recheck"] = True
@@ -25,11 +27,13 @@ def recheck(request):
 
 
 def getServer():
+    """Get Server Info from settings and returns a Fido2Server"""
     rp = PublicKeyCredentialRpEntity(settings.FIDO_SERVER_ID, settings.FIDO_SERVER_NAME)
     return Fido2Server(rp)
 
 
 def begin_registeration(request):
+    """Starts registering a new FIDO Device, called from API"""
     server = getServer()
     registration_data, state = server.register_begin({
         u'id': request.user.username.encode("utf8"),
@@ -43,6 +47,7 @@ def begin_registeration(request):
 
 @csrf_exempt
 def complete_reg(request):
+    """Completes the registeration, called by API"""
     try:
         data = cbor.decode(request.body)
 
@@ -72,7 +77,9 @@ def complete_reg(request):
 
 
 def start(request):
+    """Start Registeration a new FIDO Token"""
     context = csrf(request)
+    context.update(get_redirect_url())
     return render(request, "FIDO2/Add.html", context)
 
 

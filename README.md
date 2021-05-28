@@ -68,6 +68,8 @@ Depends on
    MFA_UNALLOWED_METHODS=()   # Methods that shouldn't be allowed for the user
    MFA_LOGIN_CALLBACK=""      # A function that should be called by username to login the user in session
    MFA_RECHECK=True           # Allow random rechecking of the user
+   MFA_REDIRECT_AFTER_REGISTRATION="mfa_home"   # Allows Changing the page after successful registeration
+   MFA_SUCCESS_REGISTRATION_MSG = "Go to Security Home" # The text of the link
    MFA_RECHECK_MIN=10         # Minimum interval in seconds
    MFA_RECHECK_MAX=30         # Maximum in seconds
    MFA_QUICKLOGIN=True        # Allow quick login for returning users by provide only their 2FA
@@ -91,6 +93,8 @@ Depends on
    **Notes**:
     * Starting version 1.1, ~~FIDO_LOGIN_URL~~ isn't required for FIDO2 anymore.
     * Starting version 1.7.0, Key owners can be specified.
+    * Starting version 2.2.0
+        * Added: `MFA_SUCCESS_REGISTRATION_MSG` & `MFA_REDIRECT_AFTER_REGISTRATION`
 1. Break your login function
 
    Usually your login function will check for username and password, log the user in if the username and password are correct and create the user session, to support mfa, this has to change

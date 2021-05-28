@@ -24,7 +24,7 @@
                             if (data == "OK")
                             {
                                 alert("Your device is added successfully.")
-                                window.location.href="{% url 'mfa_home' %}"
+                                window.location.href="{{ redirect_html }}"
                             }
                         }
                     })

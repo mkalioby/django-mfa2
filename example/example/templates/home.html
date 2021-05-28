@@ -12,6 +12,9 @@
         </ol>
 
         <!-- Page Content -->
+          {% if registered %}
+              <div class="alert alert-success">Registered Successfully</div>
+          {% endif %}
         <h1>Welcome {{ request.user.username }}!</h1>
         <hr>
 

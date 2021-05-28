@@ -32,7 +32,7 @@
     }).then(function (res)
         {
       if (res["status"] =='OK')
-            $("#res").html("<div class='alert alert-success'>Registered Successfully, <a href='{% url 'mfa_home' %}'> Go to Security Home</a></div>")
+            $("#res").html("<div class='alert alert-success'>Registered Successfully, <a href='{{redirect_html}}'> {{reg_success_msg}}</a></div>")
         else
             $("#res").html("<div class='alert alert-danger'>Registeration Failed as " + res["message"] + ", <a href='javascript:void(0)' onclick='begin_reg()'> try again or <a href='{% url 'mfa_home' %}'> Go to Security Home</a></div>")
 
