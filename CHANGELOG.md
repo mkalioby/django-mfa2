@@ -1,7 +1,8 @@
 # Change Log
 
-## 2.2.0 (Not released)
-   * Added: MFA_REDIRECT_AFTER_REGISTRATION settings parameter 
+## 2.2.0
+   * Added: MFA_REDIRECT_AFTER_REGISTRATION settings parameter
+   * Fixed: Deprecation error for NULBooleanField
 
 ## 2.1.2
   * Fixed: Getting timestamp on Python 3.7 as ("%s") is raising an exception
@@ -9,7 +10,7 @@
 
 
 ## 2.1.1
-  * Fixed: FIDO2 version in requirments.txt file.
+  * Fixed: FIDO2 version in requirements.txt file.
   
 ## 2.1.0
    * Added Support for Touch ID for Mac OSx and iOS 14 on Safari
