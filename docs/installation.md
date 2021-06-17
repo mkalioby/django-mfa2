@@ -1,5 +1,5 @@
 # Installation & Configuration
-1. Install the package 
+1. Install the package
   ```sh
    pip install django-mfa2
    ```
@@ -17,27 +17,27 @@
     MFA_RECHECK=True           # Allow random rechecking of the user
     MFA_RECHECK_MIN=10         # Minimum interval in seconds
     MFA_RECHECK_MAX=30         # Maximum in seconds
-    MFA_QUICKLOGIN=True        # Allow quick login for returning users by provide only their 2FA 
-    
+    MFA_QUICKLOGIN=True        # Allow quick login for returning users by provide only their 2FA
+
     TOKEN_ISSUER_NAME="PROJECT_NAME"      #TOTP Issuer name
-    
+
     U2F_APPID="https://localhost"    #URL For U2
     FIDO_SERVER_ID=u"localehost"      # Server rp id for FIDO2, it the full domain of your project
     FIDO_SERVER_NAME=u"PROJECT_NAME"
     FIDO_LOGIN_URL=BASE_URL
    ```
-   
+
    **Method Names**
    * U2F
    * FIDO2
    * TOTP
    * Trusted_Devices
    * Email
-   
+
    **Note**: Starting version 1.1, ~~FIDO_LOGIN_URL~~ isn't required for FIDO2 anymore.
-   
+
 1. Add mfa to urls.py
-    
+
     ```python
     import mfa
     import mfa.TrustedDevice
