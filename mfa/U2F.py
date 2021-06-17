@@ -8,7 +8,7 @@ from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.serialization import Encoding
 from django.conf import settings
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.template.context_processors import csrf
 from django.utils import timezone
@@ -38,9 +38,7 @@ def process_recheck(request):
     x = validate(request, request.user.username)
     if x == True:
         request.session["mfa"]["rechecked_at"] = time.time()
-        return HttpResponse(
-            simplejson.dumps({"recheck": True}), content_type="application/json"
-        )
+        return JsonResponse({"recheck": True})
     return x
 
 

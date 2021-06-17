@@ -1,5 +1,4 @@
-import simplejson
-from django.shortcuts import HttpResponse
+from django.http import JsonResponse
 
 from . import FIDO2, U2F, TrustedDevice, totp
 from .models import User_Keys
@@ -22,26 +21,12 @@ def is_mfa(request, ignore_methods=[]):
 def recheck(request):
     method = request.session.get("mfa", {}).get("method", None)
     if not method:
-        return HttpResponse(
-            simplejson.dumps({"res": False}), content_type="application/json"
-        )
+        return JsonResponse({"res": False})
     if method == "Trusted Device":
-        return HttpResponse(
-            simplejson.dumps({"res": TrustedDevice.verify(request)}),
-            content_type="application/json",
-        )
+        return JsonResponse({"res": TrustedDevice.verify(request)})
     elif method == "U2F":
-        return HttpResponse(
-            simplejson.dumps({"html": U2F.recheck(request).content}),
-            content_type="application/json",
-        )
+        return JsonResponse({"html": U2F.recheck(request).content})
     elif method == "FIDO2":
-        return HttpResponse(
-            simplejson.dumps({"html": FIDO2.recheck(request).content}),
-            content_type="application/json",
-        )
+        return JsonResponse({"html": FIDO2.recheck(request).content})
     elif method == "TOTP":
-        return HttpResponse(
-            simplejson.dumps({"html": totp.recheck(request).content}),
-            content_type="application/json",
-        )
+        return JsonResponse({"html": totp.recheck(request).content})

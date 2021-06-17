@@ -3,9 +3,8 @@ import random
 import time
 
 import pyotp
-import simplejson
 from django.conf import settings
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.template.context_processors import csrf
 from django.utils import timezone
@@ -32,13 +31,9 @@ def recheck(request):
     if request.method == "POST":
         if verify_login(request, request.user.username, token=request.POST["otp"]):
             request.session["mfa"]["rechecked_at"] = time.time()
-            return HttpResponse(
-                simplejson.dumps({"recheck": True}), content_type="application/json"
-            )
+            return JsonResponse({"recheck": True})
         else:
-            return HttpResponse(
-                simplejson.dumps({"recheck": False}), content_type="application/json"
-            )
+            return JsonResponse({"recheck": False})
     return render(request, "TOTP/recheck.html", context)
 
 
@@ -72,15 +67,13 @@ def getToken(request):
     secret_key = pyotp.random_base32()
     totp = pyotp.TOTP(secret_key)
     request.session["new_mfa_answer"] = totp.now()
-    return HttpResponse(
-        simplejson.dumps(
-            {
-                "qr": pyotp.totp.TOTP(secret_key).provisioning_uri(
-                    str(request.user.username), issuer_name=settings.TOKEN_ISSUER_NAME
-                ),
-                "secret_key": secret_key,
-            }
-        )
+    return JsonResponse(
+        {
+            "qr": pyotp.totp.TOTP(secret_key).provisioning_uri(
+                str(request.user.username), issuer_name=settings.TOKEN_ISSUER_NAME
+            ),
+            "secret_key": secret_key,
+        }
     )
 
 

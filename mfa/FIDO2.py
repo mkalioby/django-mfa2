@@ -3,9 +3,8 @@ import random
 import time
 import traceback
 
-import simplejson
 from django.conf import settings
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.template.context_processors import csrf
 from django.utils import timezone
@@ -75,13 +74,11 @@ def complete_reg(request):
         uk.owned_by_enterprise = getattr(settings, "MFA_OWNED_BY_ENTERPRISE", False)
         uk.key_type = "FIDO2"
         uk.save()
-        return HttpResponse(simplejson.dumps({"status": "OK"}))
+        return JsonResponse({"status": "OK"})
     except Exception as exp:
         print(traceback.format_exc())
-        return HttpResponse(
-            simplejson.dumps(
-                {"status": "ERR", "message": "Error on server, please try again later"}
-            )
+        return JsonResponse(
+            {"status": "ERR", "message": "Error on server, please try again later"}
         )
 
 
@@ -138,27 +135,19 @@ def authenticate_complete(request):
                 signature,
             )
         except ValueError:
-            return HttpResponse(
-                simplejson.dumps(
-                    {
-                        "status": "ERR",
-                        "message": "Wrong challenge received, make sure that this is your security and try again.",
-                    }
-                ),
-                content_type="application/json",
+            return JsonResponse(
+                {
+                    "status": "ERR",
+                    "message": "Wrong challenge received, make sure that this is your security and try again.",
+                }
             )
         except Exception as excep:
             print(traceback.format_exc())
-            return HttpResponse(
-                simplejson.dumps({"status": "ERR", "message": excep.message}),
-                content_type="application/json",
-            )
+            return JsonResponse({"status": "ERR", "message": excep.message})
 
         if request.session.get("mfa_recheck", False):
             request.session["mfa"]["rechecked_at"] = time.time()
-            return HttpResponse(
-                simplejson.dumps({"status": "OK"}), content_type="application/json"
-            )
+            return JsonResponse({"status": "OK"})
         else:
             keys = User_Keys.objects.filter(
                 username=username, key_type="FIDO2", enabled=1
@@ -190,18 +179,9 @@ def authenticate_complete(request):
                         res = login(request)
                         if not "location" in res:
                             return reset_cookie(request)
-                        return HttpResponse(
-                            simplejson.dumps(
-                                {"status": "OK", "redirect": res["location"]}
-                            ),
-                            content_type="application/json",
+                        return JsonResponse(
+                            {"status": "OK", "redirect": res["location"]}
                         )
-                    return HttpResponse(
-                        simplejson.dumps({"status": "OK"}),
-                        content_type="application/json",
-                    )
+                    return JsonResponse({"status": "OK"})
     except Exception as exp:
-        return HttpResponse(
-            simplejson.dumps({"status": "ERR", "message": str(exp)}),
-            content_type="application/json",
-        )
+        return JsonResponse({"status": "ERR", "message": str(exp)})
