@@ -117,7 +117,7 @@ def start(request):
         td.save()
         request.session["td_id"] = td.id
     try:
-        if td == None:
+        if td is None:
             td = User_Keys.objects.get(id=request.session["td_id"])
         context = {"key": td.properties["key"]}
     except:

@@ -36,7 +36,7 @@ def recheck(request):
 
 def process_recheck(request):
     x = validate(request, request.user.username)
-    if x == True:
+    if x is True:
         request.session["mfa"]["rechecked_at"] = time.time()
         return JsonResponse({"recheck": True})
     return x
@@ -57,7 +57,7 @@ def validate(request, username):
     data = simplejson.loads(request.POST["response"])
 
     res = check_errors(request, data)
-    if res != True:
+    if res is not True:
         return res
 
     challenge = request.session.pop("_u2f_challenge_")
@@ -135,7 +135,7 @@ def sign(username):
 
 def verify(request):
     x = validate(request, request.session["base_username"])
-    if x == True:
+    if x is True:
         return login(request)
     else:
         return x

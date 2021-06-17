@@ -177,7 +177,7 @@ def authenticate_complete(request):
                     request.session["mfa"] = mfa
                     if not request.user.is_authenticated:
                         res = login(request)
-                        if not "location" in res:
+                        if "location" not in res:
                             return reset_cookie(request)
                         return JsonResponse(
                             {"status": "OK", "redirect": res["location"]}

@@ -72,7 +72,7 @@ def delKey(request):
 
 
 def __get_callable_function__(func_path):
-    if not "." in func_path:
+    if "." not in func_path:
         raise Exception("class Name should include modulename.classname")
 
     parsed_str = func_path.split(".")
@@ -90,7 +90,7 @@ def toggleKey(request):
     q = User_Keys.objects.filter(username=request.user.username, id=id)
     if q.count() == 1:
         key = q[0]
-        if not key.key_type in settings.MFA_HIDE_DISABLE:
+        if key.key_type not in settings.MFA_HIDE_DISABLE:
             key.enabled = not key.enabled
             key.save()
             return HttpResponse("OK")
