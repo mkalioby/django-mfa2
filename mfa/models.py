@@ -14,9 +14,7 @@ class User_Keys(models.Model):
     last_used = models.DateTimeField(null=True, default=None, blank=True)
     owned_by_enterprise = models.BooleanField(default=None, null=True, blank=True)
 
-    def save(
-        self, force_insert=False, force_update=False, using=None, update_fields=None
-    ):
+    def save(self, *args, **kwargs):
         if (
             self.key_type == "Trusted Device"
             and self.properties.get("signature", "") == ""
@@ -25,12 +23,7 @@ class User_Keys(models.Model):
                 {"username": self.username, "key": self.properties["key"]},
                 settings.SECRET_KEY,
             )
-        super().save(
-            force_insert=force_insert,
-            force_update=force_update,
-            using=using,
-            update_fields=update_fields,
-        )
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return "%s -- %s" % (self.username, self.key_type)
