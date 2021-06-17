@@ -87,9 +87,6 @@ def add(request):
                 tk.properties["user_agent"] = ua
                 tk.save()
                 context["success"] = True
-            # tk.properties["user_agent"]=ua
-            # tk.save()
-            # context["success"]=True
 
         else:
             context[

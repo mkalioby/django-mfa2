@@ -7,7 +7,6 @@ from django.template.context_processors import csrf
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render
 
-# from django.template.context import RequestContext
 import simplejson
 from fido2 import cbor
 from django.http import HttpResponse

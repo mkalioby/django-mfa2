@@ -91,7 +91,6 @@ def verify(request):
         uk = User_Keys()
         uk.username = request.user.username
         uk.properties = {"secret_key": secret_key}
-        # uk.name="Authenticatior #%s"%User_Keys.objects.filter(username=user.username,type="TOTP")
         uk.key_type = "TOTP"
         uk.save()
         return HttpResponse("Success")

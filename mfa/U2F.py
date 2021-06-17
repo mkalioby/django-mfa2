@@ -10,7 +10,6 @@ from cryptography.hazmat.primitives.serialization import Encoding
 from django.shortcuts import render
 import simplejson
 
-# from django.template.context import RequestContext
 from django.template.context_processors import csrf
 from django.conf import settings
 from django.http import HttpResponse

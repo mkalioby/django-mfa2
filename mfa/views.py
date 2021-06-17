@@ -34,7 +34,6 @@ def index(request):
 
 def verify(request, username):
     request.session["base_username"] = username
-    # request.session["base_password"] = password
     keys = User_Keys.objects.filter(username=username, enabled=1)
     methods = list(set([k.key_type for k in keys]))
 
