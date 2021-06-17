@@ -11,12 +11,12 @@ from django.utils import timezone
 from django.views.decorators.cache import never_cache
 
 from .Common import get_redirect_url
-from .models import User_Keys
+from .models import UserKey
 from .views import login
 
 
 def verify_login(request, username, token):
-    for key in User_Keys.objects.filter(username=username, key_type="TOTP"):
+    for key in UserKey.objects.filter(username=username, key_type="TOTP"):
         totp = pyotp.TOTP(key.properties["secret_key"])
         if totp.verify(token, valid_window=30):
             key.last_used = timezone.now()
@@ -82,7 +82,7 @@ def verify(request):
     secret_key = request.GET["key"]
     totp = pyotp.TOTP(secret_key)
     if totp.verify(answer, valid_window=60):
-        uk = User_Keys()
+        uk = UserKey()
         uk.username = request.user.username
         uk.properties = {"secret_key": secret_key}
         uk.key_type = "TOTP"

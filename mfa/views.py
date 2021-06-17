@@ -8,14 +8,14 @@ from django.urls import reverse
 from user_agents import parse
 
 from . import TrustedDevice
-from .models import User_Keys
+from .models import UserKey
 
 
 @login_required
 def index(request):
     keys = []
     context = {
-        "keys": User_Keys.objects.filter(username=request.user.username),
+        "keys": UserKey.objects.filter(username=request.user.username),
         "UNALLOWED_AUTHEN_METHODS": settings.MFA_UNALLOWED_METHODS,
         "HIDE_DISABLE": getattr(settings, "MFA_HIDE_DISABLE", []),
     }
@@ -31,7 +31,7 @@ def index(request):
 
 def verify(request, username):
     request.session["base_username"] = username
-    keys = User_Keys.objects.filter(username=username, enabled=1)
+    keys = UserKey.objects.filter(username=username, enabled=1)
     methods = list(set([k.key_type for k in keys]))
 
     if "Trusted Device" in methods and not request.session.get(
@@ -63,7 +63,7 @@ def login(request):
 
 @login_required
 def delKey(request):
-    key = User_Keys.objects.get(id=request.GET["id"])
+    key = UserKey.objects.get(id=request.GET["id"])
     if key.username == request.user.username:
         key.delete()
         return HttpResponse("Deleted Successfully")
@@ -87,7 +87,7 @@ def __get_callable_function__(func_path):
 @login_required
 def toggleKey(request):
     id = request.GET["id"]
-    q = User_Keys.objects.filter(username=request.user.username, id=id)
+    q = UserKey.objects.filter(username=request.user.username, id=id)
     if q.count() == 1:
         key = q[0]
         if key.key_type not in settings.MFA_HIDE_DISABLE:

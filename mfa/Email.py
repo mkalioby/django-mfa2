@@ -12,7 +12,7 @@ from django.utils import timezone
 from django.views.decorators.cache import never_cache
 
 from .Common import send
-from .models import User_Keys
+from .models import UserKey
 from .views import login
 
 
@@ -36,7 +36,7 @@ def start(request):
     context = csrf(request)
     if request.method == "POST":
         if request.session["email_secret"] == request.POST["otp"]:  # if successful
-            uk = User_Keys()
+            uk = UserKey()
             uk.username = request.user.username
             uk.key_type = "Email"
             uk.enabled = 1
@@ -62,7 +62,7 @@ def auth(request):
     context = csrf(request)
     if request.method == "POST":
         if request.session["email_secret"] == request.POST["otp"].strip():
-            uk = User_Keys.objects.get(
+            uk = UserKey.objects.get(
                 username=request.session["base_username"], key_type="Email"
             )
             mfa = {"verified": True, "method": "Email", "id": uk.id}

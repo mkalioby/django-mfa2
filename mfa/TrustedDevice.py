@@ -11,12 +11,12 @@ from django.utils import timezone
 from jose import jwt
 
 from .Common import send
-from .models import User_Keys
+from .models import UserKey
 
 
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
     x = "".join(random.choice(chars) for _ in range(size))
-    if not User_Keys.objects.filter(properties__shas="$.key=" + x).exists():
+    if not UserKey.objects.filter(properties__shas="$.key=" + x).exists():
         return x
     else:
         return id_generator(size, chars)
@@ -25,7 +25,7 @@ def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
 def getUserAgent(request):
     id = id = request.session.get("td_id", None)
     if id:
-        tk = User_Keys.objects.get(id=id)
+        tk = UserKey.objects.get(id=id)
         if tk.properties.get("user_agent", "") != "":
             ua = user_agents.parse(tk.properties["user_agent"])
             res = render(None, "TrustedDevices/user-agent.html", context={"ua": ua})
@@ -34,7 +34,7 @@ def getUserAgent(request):
 
 
 def trust_device(request):
-    tk = User_Keys.objects.get(id=request.session["td_id"])
+    tk = UserKey.objects.get(id=request.session["td_id"])
     tk.properties["status"] = "trusted"
     tk.save()
     del request.session["td_id"]
@@ -46,7 +46,7 @@ def checkTrusted(request):
     id = request.session.get("td_id", "")
     if id != "":
         try:
-            tk = User_Keys.objects.get(id=id)
+            tk = UserKey.objects.get(id=id)
             if tk.properties["status"] == "trusted":
                 res = "OK"
         except:
@@ -55,7 +55,7 @@ def checkTrusted(request):
 
 
 def getCookie(request):
-    tk = User_Keys.objects.get(id=request.session["td_id"])
+    tk = UserKey.objects.get(id=request.session["td_id"])
 
     if tk.properties["status"] == "trusted":
         context = {"added": True}
@@ -76,7 +76,7 @@ def add(request):
         key = request.POST["key"].replace("-", "").replace(" ", "").upper()
         context["username"] = request.POST["username"]
         context["key"] = request.POST["key"]
-        trusted_keys = User_Keys.objects.filter(
+        trusted_keys = UserKey.objects.filter(
             username=request.POST["username"], properties__has="$.key=" + key
         )
         cookie = False
@@ -102,7 +102,7 @@ def add(request):
 
 def start(request):
     if (
-        User_Keys.objects.filter(
+        UserKey.objects.filter(
             username=request.user.username, key_type="Trusted Device"
         ).count()
         >= 2
@@ -110,7 +110,7 @@ def start(request):
         return render(request, "TrustedDevices/start.html", {"not_allowed": True})
     td = None
     if not request.session.get("td_id", None):
-        td = User_Keys()
+        td = UserKey()
         td.username = request.user.username
         td.properties = {"key": id_generator(), "status": "adding"}
         td.key_type = "Trusted Device"
@@ -118,7 +118,7 @@ def start(request):
         request.session["td_id"] = td.id
     try:
         if td is None:
-            td = User_Keys.objects.get(id=request.session["td_id"])
+            td = UserKey.objects.get(id=request.session["td_id"])
         context = {"key": td.properties["key"]}
     except:
         del request.session["td_id"]
@@ -145,7 +145,7 @@ def verify(request):
         json = jwt.decode(request.COOKIES.get("deviceid"), settings.SECRET_KEY)
         if json["username"].lower() == request.session["base_username"].lower():
             try:
-                uk = User_Keys.objects.get(
+                uk = UserKey.objects.get(
                     username=request.POST["username"].lower(),
                     properties__has="$.key=" + json["key"],
                 )

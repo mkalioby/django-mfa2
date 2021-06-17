@@ -1,12 +1,12 @@
 from django.http import JsonResponse
 
 from . import FIDO2, U2F, TrustedDevice, totp
-from .models import User_Keys
+from .models import UserKey
 from .views import verify
 
 
 def has_mfa(request, username):
-    if User_Keys.objects.filter(username=username, enabled=1).count() > 0:
+    if UserKey.objects.filter(username=username, enabled=1).count() > 0:
         return verify(request, username)
     return False
 

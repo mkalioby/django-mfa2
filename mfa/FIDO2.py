@@ -16,7 +16,7 @@ from fido2.server import Fido2Server, PublicKeyCredentialRpEntity
 from fido2.utils import websafe_decode, websafe_encode
 
 from .Common import get_redirect_url
-from .models import User_Keys
+from .models import UserKey
 from .views import login, reset_cookie
 
 
@@ -65,7 +65,7 @@ def complete_reg(request):
             request.session["fido_state"], client_data, att_obj
         )
         encoded = websafe_encode(auth_data.credential_data)
-        uk = User_Keys()
+        uk = UserKey()
         uk.username = request.user.username
         uk.properties = {
             "device": encoded,
@@ -91,7 +91,7 @@ def start(request):
 
 def getUserCredentials(username):
     credentials = []
-    for uk in User_Keys.objects.filter(username=username, key_type="FIDO2"):
+    for uk in UserKey.objects.filter(username=username, key_type="FIDO2"):
         credentials.append(
             AttestedCredentialData(websafe_decode(uk.properties["device"]))
         )
@@ -149,7 +149,7 @@ def authenticate_complete(request):
             request.session["mfa"]["rechecked_at"] = time.time()
             return JsonResponse({"status": "OK"})
         else:
-            keys = User_Keys.objects.filter(
+            keys = UserKey.objects.filter(
                 username=username, key_type="FIDO2", enabled=1
             )
             for k in keys:

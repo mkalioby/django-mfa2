@@ -20,7 +20,7 @@ from u2flib_server.u2f import (
 )
 
 from .Common import get_redirect_url
-from .models import User_Keys
+from .models import UserKey
 from .views import login
 
 
@@ -63,7 +63,7 @@ def validate(request, username):
     challenge = request.session.pop("_u2f_challenge_")
     device, c, t = complete_authentication(challenge, data, [settings.U2F_APPID])
 
-    key = User_Keys.objects.get(
+    key = UserKey.objects.get(
         username=username,
         properties__shas="$.device.publicKey=%s" % device["publicKey"],
     )
@@ -109,13 +109,13 @@ def bind(request):
     device, cert = complete_registration(enroll, data, [settings.U2F_APPID])
     cert = x509.load_der_x509_certificate(cert, default_backend())
     cert_hash = hashlib.md5(cert.public_bytes(Encoding.PEM)).hexdigest()
-    q = User_Keys.objects.filter(key_type="U2F", properties__icontains=cert_hash)
+    q = UserKey.objects.filter(key_type="U2F", properties__icontains=cert_hash)
     if q.exists():
         return HttpResponse(
             "This key is registered before, it can't be registered again."
         )
-    User_Keys.objects.filter(username=request.user.username, key_type="U2F").delete()
-    uk = User_Keys()
+    UserKey.objects.filter(username=request.user.username, key_type="U2F").delete()
+    uk = UserKey()
     uk.username = request.user.username
     uk.owned_by_enterprise = getattr(settings, "MFA_OWNED_BY_ENTERPRISE", False)
     uk.properties = {"device": simplejson.loads(device.json), "cert": cert_hash}
@@ -127,7 +127,7 @@ def bind(request):
 def sign(username):
     u2f_devices = [
         d.properties["device"]
-        for d in User_Keys.objects.filter(username=username, key_type="U2F")
+        for d in UserKey.objects.filter(username=username, key_type="U2F")
     ]
     challenge = begin_authentication(settings.U2F_APPID, u2f_devices)
     return [challenge.json, simplejson.dumps(challenge.data_for_client)]

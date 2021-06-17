@@ -4,7 +4,7 @@ from jose import jwt
 from jsonfield import JSONField
 
 
-class User_Keys(models.Model):
+class UserKey(models.Model):
     username = models.CharField(max_length=50)
     properties = JSONField(null=True)
     added_on = models.DateTimeField(auto_now_add=True)
