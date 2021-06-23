@@ -1,3 +1,7 @@
+import importlib
+
+from django.conf import settings
+from django.contrib import auth
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from .models import *
@@ -60,9 +64,6 @@ def reset_cookie(request):
 
 
 def login(request):
-    from django.contrib import auth
-    from django.conf import settings
-
     callable_func = __get_callable_function__(settings.MFA_LOGIN_CALLBACK)
     return callable_func(request, username=request.session["base_username"])
 
@@ -78,8 +79,6 @@ def delKey(request):
 
 
 def __get_callable_function__(func_path):
-    import importlib
-
     if not "." in func_path:
         raise Exception("class Name should include modulename.classname")
 

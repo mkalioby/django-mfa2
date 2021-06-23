@@ -1,3 +1,5 @@
+import random
+import time
 import traceback
 
 from fido2.client import ClientData
@@ -154,15 +156,11 @@ def authenticate_complete(request):
             )
 
         if request.session.get("mfa_recheck", False):
-            import time
-
             request.session["mfa"]["rechecked_at"] = time.time()
             return HttpResponse(
                 simplejson.dumps({"status": "OK"}), content_type="application/json"
             )
         else:
-            import random
-
             keys = User_Keys.objects.filter(
                 username=username, key_type="FIDO2", enabled=1
             )

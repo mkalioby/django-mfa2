@@ -1,6 +1,15 @@
+from django.contrib.auth import get_user_model
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.decorators.cache import never_cache
 from django.template.context_processors import csrf
+from django.utils import timezone
+
+try:
+    from django.core.urlresolvers import reverse
+except:
+    from django.urls import reverse
+
 import datetime, random
 from random import randint
 from .models import *
@@ -11,8 +20,6 @@ from .Common import send
 
 def sendEmail(request, username, secret):
     """Send Email to the user after rendering `mfa_email_token_template`"""
-    from django.contrib.auth import get_user_model
-
     User = get_user_model()
     key = getattr(User, "USERNAME_FIELD", "username")
     kwargs = {key: username}
@@ -36,12 +43,6 @@ def start(request):
             uk.key_type = "Email"
             uk.enabled = 1
             uk.save()
-            from django.http import HttpResponseRedirect
-
-            try:
-                from django.core.urlresolvers import reverse
-            except:
-                from django.urls import reverse
             return HttpResponseRedirect(
                 reverse(
                     getattr(settings, "MFA_REDIRECT_AFTER_REGISTRATION", "mfa_home")
@@ -77,8 +78,6 @@ def auth(request):
                     )
                 )
             request.session["mfa"] = mfa
-
-            from django.utils import timezone
 
             uk.last_used = timezone.now()
             uk.save()

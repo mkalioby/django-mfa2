@@ -1,3 +1,5 @@
+import time
+
 from django.shortcuts import render
 from django.views.decorators.cache import never_cache
 from django.http import HttpResponse
@@ -28,8 +30,6 @@ def recheck(request):
     context["mode"] = "recheck"
     if request.method == "POST":
         if verify_login(request, request.user.username, token=request.POST["otp"]):
-            import time
-
             request.session["mfa"]["rechecked_at"] = time.time()
             return HttpResponse(
                 simplejson.dumps({"recheck": True}), content_type="application/json"

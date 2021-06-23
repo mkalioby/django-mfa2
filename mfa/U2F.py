@@ -1,3 +1,7 @@
+import datetime, random
+import hashlib
+import time
+
 from u2flib_server.u2f import (
     begin_registration,
     begin_authentication,
@@ -32,8 +36,6 @@ def recheck(request):
 def process_recheck(request):
     x = validate(request, request.user.username)
     if x == True:
-        import time
-
         request.session["mfa"]["rechecked_at"] = time.time()
         return HttpResponse(
             simplejson.dumps({"recheck": True}), content_type="application/json"
@@ -53,8 +55,6 @@ def check_errors(request, data):
 
 
 def validate(request, username):
-    import datetime, random
-
     data = simplejson.loads(request.POST["response"])
 
     res = check_errors(request, data)
@@ -105,8 +105,6 @@ def start(request):
 
 
 def bind(request):
-    import hashlib
-
     enroll = request.session["_u2f_enroll_"]
     data = simplejson.loads(request.POST["response"])
     device, cert = complete_registration(enroll, data, [settings.U2F_APPID])

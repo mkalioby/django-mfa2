@@ -3,6 +3,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+from mfa.helpers import has_mfa
 
 
 def loginView(request):
@@ -12,8 +13,6 @@ def loginView(request):
         password = request.POST["password"]
         user = authenticate(username=username, password=password)
         if user:
-            from mfa.helpers import has_mfa
-
             res = has_mfa(
                 username=username, request=request
             )  # has_mfa returns false or HttpResponseRedirect

@@ -1,5 +1,6 @@
 import string
 import random
+from datetime import datetime, timedelta
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.template.context import RequestContext
@@ -7,6 +8,9 @@ from django.template.context_processors import csrf
 from .models import *
 import user_agents
 from django.utils import timezone
+from jose import jwt
+
+from .Common import send
 
 
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
@@ -55,7 +59,6 @@ def getCookie(request):
     if tk.properties["status"] == "trusted":
         context = {"added": True}
         response = render(request, "TrustedDevices/Done.html", context)
-        from datetime import datetime, timedelta
 
         expires = datetime.now() + timedelta(days=180)
         tk.expires = expires
@@ -124,8 +127,6 @@ def start(request):
 
 def send_email(request):
     body = render(request, "TrustedDevices/email.html", {}).content
-    from .Common import send
-
     e = request.user.email
     if e == "":
         e = request.session.get("user", {}).get("email", "")
@@ -140,8 +141,6 @@ def send_email(request):
 
 def verify(request):
     if request.COOKIES.get("deviceid", None):
-        from jose import jwt
-
         json = jwt.decode(request.COOKIES.get("deviceid"), settings.SECRET_KEY)
         if json["username"].lower() == request.session["base_username"].lower():
             try:
