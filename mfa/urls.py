@@ -1,9 +1,9 @@
-from . import views, totp, U2F, TrustedDevice, helpers, FIDO2, Email
-
 try:
     from django.urls import re_path as url
 except:
     from django.conf.urls import url
+
+from . import FIDO2, U2F, Email, TrustedDevice, helpers, totp, views
 
 urlpatterns = [
     url(r"totp/start/", totp.start, name="start_new_otop"),

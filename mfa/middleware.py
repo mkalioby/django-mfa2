@@ -1,7 +1,8 @@
 import time
-from django.http import HttpResponseRedirect
-from django.core.urlresolvers import reverse
+
 from django.conf import settings
+from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect
 
 
 def process(request):

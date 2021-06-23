@@ -1,26 +1,26 @@
-import datetime, random
+import datetime
 import hashlib
+import random
 import time
 
-from u2flib_server.u2f import (
-    begin_registration,
-    begin_authentication,
-    complete_registration,
-    complete_authentication,
-)
+import simplejson
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.serialization import Encoding
-from django.shortcuts import render
-import simplejson
-
-from django.template.context_processors import csrf
 from django.conf import settings
 from django.http import HttpResponse
+from django.shortcuts import render
+from django.template.context_processors import csrf
+from django.utils import timezone
+from u2flib_server.u2f import (
+    begin_authentication,
+    begin_registration,
+    complete_authentication,
+    complete_registration,
+)
+
 from .models import *
 from .views import login
-import datetime
-from django.utils import timezone
 
 
 def recheck(request):

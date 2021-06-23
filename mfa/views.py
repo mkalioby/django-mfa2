@@ -2,20 +2,20 @@ import importlib
 
 from django.conf import settings
 from django.contrib import auth
-from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
-from .models import *
+from django.shortcuts import render
+from django.template.context import RequestContext
+from django.template.context_processors import csrf
+from user_agents import parse
 
 try:
     from django.urls import reverse
 except:
     from django.core.urlresolvers import reverse
-from django.template.context_processors import csrf
-from django.template.context import RequestContext
-from django.conf import settings
+
 from . import TrustedDevice
-from django.contrib.auth.decorators import login_required
-from user_agents import parse
+from .models import *
 
 
 @login_required

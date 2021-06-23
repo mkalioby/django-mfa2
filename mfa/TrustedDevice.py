@@ -1,16 +1,17 @@
-import string
 import random
+import string
 from datetime import datetime, timedelta
-from django.shortcuts import render
+
+import user_agents
 from django.http import HttpResponse
+from django.shortcuts import render
 from django.template.context import RequestContext
 from django.template.context_processors import csrf
-from .models import *
-import user_agents
 from django.utils import timezone
 from jose import jwt
 
 from .Common import send
+from .models import *
 
 
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):

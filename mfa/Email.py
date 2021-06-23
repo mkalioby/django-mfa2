@@ -1,21 +1,22 @@
+import datetime
+import random
+from random import randint
+
 from django.contrib.auth import get_user_model
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.views.decorators.cache import never_cache
 from django.template.context_processors import csrf
 from django.utils import timezone
+from django.views.decorators.cache import never_cache
 
 try:
     from django.core.urlresolvers import reverse
 except:
     from django.urls import reverse
 
-import datetime, random
-from random import randint
-from .models import *
-
-from .views import login
 from .Common import send
+from .models import *
+from .views import login
 
 
 def sendEmail(request, username, secret):

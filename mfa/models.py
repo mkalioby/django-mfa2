@@ -1,7 +1,7 @@
-from django.db import models
-from jsonfield import JSONField
-from jose import jwt
 from django.conf import settings
+from django.db import models
+from jose import jwt
+from jsonfield import JSONField
 
 
 class User_Keys(models.Model):

@@ -1,9 +1,10 @@
 import pyotp
-from .models import *
-from . import TrustedDevice, U2F, FIDO2, totp
 import simplejson
 from django.shortcuts import HttpResponse
-from mfa.views import verify, goto
+
+from . import FIDO2, U2F, TrustedDevice, totp
+from .models import *
+from .views import goto, verify
 
 
 def has_mfa(request, username):

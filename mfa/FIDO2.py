@@ -1,25 +1,24 @@
+import datetime
 import random
 import time
 import traceback
 
-from fido2.client import ClientData
-from fido2.server import Fido2Server, PublicKeyCredentialRpEntity
-from fido2.ctap2 import AttestationObject, AuthenticatorData
-from django.template.context_processors import csrf
-from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import render
-
 import simplejson
-from fido2 import cbor
-from django.http import HttpResponse
 from django.conf import settings
-from .models import *
-from fido2.utils import websafe_decode, websafe_encode
-from fido2.ctap2 import AttestedCredentialData
-from .views import login, reset_cookie
-import datetime
-from .Common import get_redirect_url
+from django.http import HttpResponse
+from django.shortcuts import render
+from django.template.context_processors import csrf
 from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
+from fido2 import cbor
+from fido2.client import ClientData
+from fido2.ctap2 import AttestationObject, AttestedCredentialData, AuthenticatorData
+from fido2.server import Fido2Server, PublicKeyCredentialRpEntity
+from fido2.utils import websafe_decode, websafe_encode
+
+from .Common import get_redirect_url
+from .models import *
+from .views import login, reset_cookie
 
 
 def recheck(request):

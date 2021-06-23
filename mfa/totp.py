@@ -1,18 +1,19 @@
+import datetime
+import random
 import time
 
-from django.shortcuts import render
-from django.views.decorators.cache import never_cache
-from django.http import HttpResponse
-from .models import *
-from django.template.context_processors import csrf
-import simplejson
-from django.template.context import RequestContext
-from django.conf import settings
 import pyotp
-from .views import login
-import datetime
+import simplejson
+from django.conf import settings
+from django.http import HttpResponse
+from django.shortcuts import render
+from django.template.context import RequestContext
+from django.template.context_processors import csrf
 from django.utils import timezone
-import random
+from django.views.decorators.cache import never_cache
+
+from .models import *
+from .views import login
 
 
 def verify_login(request, username, token):
