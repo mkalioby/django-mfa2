@@ -186,11 +186,7 @@ def authenticate_complete(request):
                             )
                         )
                     request.session["mfa"] = mfa
-                    try:
-                        authenticated = request.user.is_authenticated
-                    except:
-                        authenticated = request.user.is_authenticated()
-                    if not authenticated:
+                    if not request.user.is_authenticated:
                         res = login(request)
                         if not "location" in res:
                             return reset_cookie(request)
