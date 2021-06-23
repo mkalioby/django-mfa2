@@ -2,7 +2,7 @@
 
 ## 2.2.0
    * Added: MFA_REDIRECT_AFTER_REGISTRATION settings parameter
-   * Fixed: Deprecation error for NULBooleanField
+   * Fixed: Deprecation error for NullBooleanField
 
 ## 2.1.2
   * Fixed: Getting timestamp on Python 3.7 as ("%s") is raising an exception
@@ -11,7 +11,7 @@
 
 ## 2.1.1
   * Fixed: FIDO2 version in requirements.txt file.
-  
+
 ## 2.1.0
    * Added Support for Touch ID for Mac OSx and iOS 14 on Safari
 
@@ -26,27 +26,27 @@
   * Fixed: __version__ to show correct version
 
 ## 2.0.2
-  * Added: A missing migration 
+  * Added: A missing migration
     thnks to @swainn
 
 ## 2.0.1
   * Fixed: issue in migration between Postgres and SQLite
-    thnks to @swainn and @willingham 
+    thnks to @swainn and @willingham
 
 ## 2.0
   * Dropped support to djangp-1.8 and Python 2.7
   * Added: never-cache decorator
-  * Fixes to Make Email Method More Robust 
+  * Fixes to Make Email Method More Robust
   * Addresses several structure and style issues with TOTP and Email dialogs
   * Updated to fido2 0.8.1
-    
+
 Thanks to @swainn
 
 ## v1.9.1
    * Fixed: is_authenticated #13
    * Fixed: is_anonymous #6
-    
-    thanks to @d3cline,  
+
+    thanks to @d3cline,
 
 ## v1.7
   * Better Error Management

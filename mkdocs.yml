@@ -2,7 +2,7 @@ site_name: MkLorum
 nav:
     - Home: index.md
     - Installation: installation.md
-    - Code Changes: change_login.md 
+    - Code Changes: change_login.md
 theme: readthedocs
 markdown_extensions:
     - fenced_code

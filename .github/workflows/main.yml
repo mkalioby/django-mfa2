@@ -1,0 +1,13 @@
+on: [push]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: python
+      run: |
+        sudo apt-get install python3
+    - name: lint
+      run: |
+        pip install black
+        black --check --exclude migrations mfa/ example/ setup.py

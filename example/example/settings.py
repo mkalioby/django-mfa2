@@ -20,7 +20,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '#9)q!_i3@pr-^3oda(e^3$x!kq3b4f33#5l@+=+&vuz+p6gb3g'
+SECRET_KEY = "#9)q!_i3@pr-^3oda(e^3$x!kq3b4f33#5l@+=+&vuz+p6gb3g"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -31,54 +31,54 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'mfa',
-    'sslserver'
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "mfa",
+    "sslserver",
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = 'example.urls'
+ROOT_URLCONF = "example.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR ,'example','templates' )],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [os.path.join(BASE_DIR, "example", "templates")],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'example.wsgi.application'
+WSGI_APPLICATION = "example.wsgi.application"
 
 
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'test_db',
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": "test_db",
     }
 }
 
@@ -88,16 +88,16 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
@@ -105,9 +105,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = "UTC"
 
 USE_I18N = True
 
@@ -119,32 +119,33 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
-STATIC_URL = '/static/'
-#STATIC_ROOT=(os.path.join(BASE_DIR,'static'))
-STATICFILES_DIRS=[os.path.join(BASE_DIR,'static')]
-LOGIN_URL="/auth/login"
+STATIC_URL = "/static/"
+# STATIC_ROOT=(os.path.join(BASE_DIR,'static'))
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
+LOGIN_URL = "/auth/login"
 
-EMAIL_FROM='Test App'
-EMAIL_HOST="smtp.gmail.com"
-EMAIL_PORT=587
-EMAIL_HOST_USER=""
-EMAIL_HOST_PASSWORD=''
-EMAIL_USE_TLS=True
+EMAIL_FROM = "Test App"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_HOST_USER = ""
+EMAIL_HOST_PASSWORD = ""
+EMAIL_USE_TLS = True
 
 
+MFA_UNALLOWED_METHODS = ()  # Methods that shouldn't be allowed for the user
+MFA_LOGIN_CALLBACK = "example.auth.create_session"  # A function that should be called by username to login the user in session
+MFA_RECHECK = True  # Allow random rechecking of the user
+MFA_RECHECK_MIN = 10  # Minimum interval in seconds
+MFA_RECHECK_MAX = 30  # Maximum in seconds
+MFA_QUICKLOGIN = True  # Allow quick login for returning users by provide only their 2FA
+MFA_HIDE_DISABLE = ("",)  # Can the user disable his key (Added in 1.2.0).
+MFA_REDIRECT_AFTER_REGISTRATION = "registered"
+MFA_SUCCESS_REGISTRATION_MSG = "Go to Home"
 
-MFA_UNALLOWED_METHODS=()   # Methods that shouldn't be allowed for the user
-MFA_LOGIN_CALLBACK="example.auth.create_session"      # A function that should be called by username to login the user in session
-MFA_RECHECK=True           # Allow random rechecking of the user
-MFA_RECHECK_MIN=10         # Minimum interval in seconds
-MFA_RECHECK_MAX=30         # Maximum in seconds
-MFA_QUICKLOGIN=True        # Allow quick login for returning users by provide only their 2FA
-MFA_HIDE_DISABLE=('',)     # Can the user disable his key (Added in 1.2.0).
-MFA_REDIRECT_AFTER_REGISTRATION="registered"
-MFA_SUCCESS_REGISTRATION_MSG="Go to Home"
+TOKEN_ISSUER_NAME = "PROJECT_NAME"  # TOTP Issuer name
 
-TOKEN_ISSUER_NAME="PROJECT_NAME"      #TOTP Issuer name
-
-U2F_APPID="https://localhost"    #URL For U2F
-FIDO_SERVER_ID=u"localhost"      # Server rp id for FIDO2, it the full domain of your project
-FIDO_SERVER_NAME=u"PROJECT_NAME"
+U2F_APPID = "https://localhost"  # URL For U2F
+FIDO_SERVER_ID = (
+    u"localhost"  # Server rp id for FIDO2, it the full domain of your project
+)
+FIDO_SERVER_NAME = u"PROJECT_NAME"
