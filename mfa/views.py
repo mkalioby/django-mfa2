@@ -1,12 +1,9 @@
 import importlib
 
 from django.conf import settings
-from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
-from django.template.context import RequestContext
-from django.template.context_processors import csrf
 from user_agents import parse
 
 try:

@@ -19,6 +19,7 @@ from u2flib_server.u2f import (
     complete_registration,
 )
 
+from .Common import get_redirect_url
 from .models import User_Keys
 from .views import login
 

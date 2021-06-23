@@ -6,7 +6,6 @@ import user_agents
 from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import render
-from django.template.context import RequestContext
 from django.template.context_processors import csrf
 from django.utils import timezone
 from jose import jwt
