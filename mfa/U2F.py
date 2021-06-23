@@ -19,7 +19,7 @@ from u2flib_server.u2f import (
     complete_registration,
 )
 
-from .models import *
+from .models import User_Keys
 from .views import login
 
 

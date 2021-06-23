@@ -17,7 +17,7 @@ from fido2.server import Fido2Server, PublicKeyCredentialRpEntity
 from fido2.utils import websafe_decode, websafe_encode
 
 from .Common import get_redirect_url
-from .models import *
+from .models import User_Keys
 from .views import login, reset_cookie
 
 

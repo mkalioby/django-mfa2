@@ -15,7 +15,7 @@ except:
     from django.core.urlresolvers import reverse
 
 from . import TrustedDevice
-from .models import *
+from .models import User_Keys
 
 
 @login_required

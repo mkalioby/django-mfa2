@@ -2,6 +2,7 @@ import datetime
 import random
 from random import randint
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -15,7 +16,7 @@ except:
     from django.urls import reverse
 
 from .Common import send
-from .models import *
+from .models import User_Keys
 from .views import login
 
 

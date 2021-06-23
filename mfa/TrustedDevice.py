@@ -3,6 +3,7 @@ import string
 from datetime import datetime, timedelta
 
 import user_agents
+from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.template.context import RequestContext
@@ -11,7 +12,7 @@ from django.utils import timezone
 from jose import jwt
 
 from .Common import send
-from .models import *
+from .models import User_Keys
 
 
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
