@@ -11,7 +11,7 @@ from django.utils import timezone
 from django.views.decorators.cache import never_cache
 
 from .Common import get_redirect_url
-from .models import UserKey
+from .models import UserKey, OTPTracker
 from .views import login
 
 
@@ -19,10 +19,14 @@ def verify_login(request, username, token):
     for key in UserKey.objects.filter(username=username, key_type="TOTP"):
         totp = pyotp.TOTP(key.properties["secret_key"])
         if totp.verify(token, valid_window=30):
+            if OTPTracker.objects.filter(username=username, value=token).exists():
+                return [False, "Used Before, please generate another token"]
+            TOTP_Tracker.objects.create(username=username,value=token, success=True)
             key.last_used = timezone.now()
             key.save()
             return [True, key.id]
-    return [False]
+    TOTP_Tracker.objects.create(username = username, value = token, success = False)
+    return [False,"Invalid Token"]
 
 
 def recheck(request):
@@ -60,6 +64,7 @@ def auth(request):
             request.session["mfa"] = mfa
             return login(request)
         context["invalid"] = True
+        context["invalid_msg"] = res[1]
     return render(request, "TOTP/Auth.html", context)
 
 

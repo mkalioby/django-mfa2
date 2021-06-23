@@ -30,3 +30,14 @@ class UserKey(models.Model):
 
     class Meta:
         app_label = "mfa"
+
+
+class OTPTracker(models.Model):
+    username = models.CharField(max_length=50)
+    value = models.CharField(max_length = 6)
+    success = models.BooleanField(blank=True)
+    done_on = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        app_label = 'mfa'
+        indexes  = [models.Index(fields=['username'])]
