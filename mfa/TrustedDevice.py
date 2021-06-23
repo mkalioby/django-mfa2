@@ -22,7 +22,7 @@ def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
         return id_generator(size, chars)
 
 
-def getUserAgent(request):
+def get_user_agent(request):
     id = id = request.session.get("td_id", None)
     if id:
         tk = UserKey.objects.get(id=id)
@@ -41,7 +41,7 @@ def trust_device(request):
     return HttpResponse("OK")
 
 
-def checkTrusted(request):
+def check_trusted(request):
     res = ""
     id = request.session.get("td_id", "")
     if id != "":
@@ -54,7 +54,7 @@ def checkTrusted(request):
     return HttpResponse(res)
 
 
-def getCookie(request):
+def get_cookie(request):
     tk = UserKey.objects.get(id=request.session["td_id"])
 
     if tk.properties["status"] == "trusted":

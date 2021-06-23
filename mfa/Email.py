@@ -16,7 +16,7 @@ from .models import UserKey
 from .views import login
 
 
-def sendEmail(request, username, secret):
+def send_email(request, username, secret):
     """Send Email to the user after rendering `mfa_email_token_template`"""
     User = get_user_model()
     key = getattr(User, "USERNAME_FIELD", "username")
@@ -51,7 +51,7 @@ def start(request):
         request.session["email_secret"] = str(
             randint(0, 100000)
         )  # generate a random integer
-        if sendEmail(request, request.user.username, request.session["email_secret"]):
+        if send_email(request, request.user.username, request.session["email_secret"]):
             context["sent"] = True
     return render(request, "Email/Add.html", context)
 
@@ -83,7 +83,7 @@ def auth(request):
         context["invalid"] = True
     else:
         request.session["email_secret"] = str(randint(0, 100000))
-        if sendEmail(
+        if send_email(
             request, request.session["base_username"], request.session["email_secret"]
         ):
             context["sent"] = True

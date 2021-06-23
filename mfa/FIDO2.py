@@ -28,7 +28,7 @@ def recheck(request):
     return render(request, "FIDO2/recheck.html", context)
 
 
-def getServer():
+def get_server():
     """Get Server Info from settings and returns a Fido2Server"""
     rp = PublicKeyCredentialRpEntity(settings.FIDO_SERVER_ID, settings.FIDO_SERVER_NAME)
     return Fido2Server(rp)
@@ -36,14 +36,14 @@ def getServer():
 
 def begin_registeration(request):
     """Starts registering a new FIDO Device, called from API"""
-    server = getServer()
+    server = get_server()
     registration_data, state = server.register_begin(
         {
             u"id": request.user.username.encode("utf8"),
             u"name": (request.user.first_name + " " + request.user.last_name),
             u"displayName": request.user.username,
         },
-        getUserCredentials(request.user.username),
+        get_user_credentials(request.user.username),
     )
     request.session["fido_state"] = state
 
@@ -60,7 +60,7 @@ def complete_reg(request):
 
         client_data = ClientData(data["clientDataJSON"])
         att_obj = AttestationObject((data["attestationObject"]))
-        server = getServer()
+        server = get_server()
         auth_data = server.register_complete(
             request.session["fido_state"], client_data, att_obj
         )
@@ -89,7 +89,7 @@ def start(request):
     return render(request, "FIDO2/Add.html", context)
 
 
-def getUserCredentials(username):
+def get_user_credentials(username):
     credentials = []
     for uk in UserKey.objects.filter(username=username, key_type="FIDO2"):
         credentials.append(
@@ -104,8 +104,8 @@ def auth(request):
 
 
 def authenticate_begin(request):
-    server = getServer()
-    credentials = getUserCredentials(
+    server = get_server()
+    credentials = get_user_credentials(
         request.session.get("base_username", request.user.username)
     )
     auth_data, state = server.authenticate_begin(credentials)
@@ -118,8 +118,8 @@ def authenticate_complete(request):
     try:
         credentials = []
         username = request.session.get("base_username", request.user.username)
-        server = getServer()
-        credentials = getUserCredentials(username)
+        server = get_server()
+        credentials = get_user_credentials(username)
         data = cbor.decode(request.body)
         credential_id = data["credentialId"]
         client_data = ClientData(data["clientDataJSON"])

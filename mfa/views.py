@@ -62,7 +62,7 @@ def login(request):
 
 
 @login_required
-def delKey(request):
+def del_key(request):
     key = UserKey.objects.get(id=request.GET["id"])
     if key.username == request.user.username:
         key.delete()
@@ -85,7 +85,7 @@ def __get_callable_function__(func_path):
 
 
 @login_required
-def toggleKey(request):
+def toggle_key(request):
     id = request.GET["id"]
     q = UserKey.objects.filter(username=request.user.username, id=id)
     if q.count() == 1:
