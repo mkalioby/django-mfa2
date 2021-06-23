@@ -7,13 +7,9 @@ from django.contrib.auth import get_user_model
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.template.context_processors import csrf
+from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.cache import never_cache
-
-try:
-    from django.core.urlresolvers import reverse
-except:
-    from django.urls import reverse
 
 from .Common import send
 from .models import User_Keys

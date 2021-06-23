@@ -1,10 +1,6 @@
 from django.conf import settings
 from django.core.mail import EmailMessage
-
-try:
-    from django.urls import reverse
-except:
-    from django.core.urlresolver import reverse
+from django.urls import reverse
 
 
 def send(to, subject, body):
