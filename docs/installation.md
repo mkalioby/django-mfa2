@@ -48,7 +48,7 @@
     '....',
     ]
     ```
-1. Provide `mfa_auth_base.html` in your templaes with block called 'head' and 'content'
+1. Provide `mfa_auth_base.html` in your templates with block called 'head' and 'content'
     The template will be included during the user login.
     If you will use Email Token method, then you have to provide template named `mfa_email_token_template.html` that will content the format of the email with parameter named `user` and `otp`.
 1. To match the look and feel of your project, MFA includes `base.html` but it needs blocks named `head` & `content` to added its content to it.

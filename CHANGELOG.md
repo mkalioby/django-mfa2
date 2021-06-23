@@ -2,7 +2,7 @@
 
 ## 2.2.0
    * Added: MFA_REDIRECT_AFTER_REGISTRATION settings parameter
-   * Fixed: Deprecation error for NULBooleanField
+   * Fixed: Deprecation error for NullBooleanField
 
 ## 2.1.2
   * Fixed: Getting timestamp on Python 3.7 as ("%s") is raising an exception
