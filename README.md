@@ -106,27 +106,29 @@ Depends on
           * if user doesn't have mfa then call your function to create the user session
 
    ```python
-    def login(request): # this function handles the login form POST
+    from mfa.helpers import has_mfa
+
+    def login(request):  # this function handles the login form POST
        user = auth.authenticate(username=username, password=password)
-       if user is not None: # if the user object exist
-            from mfa.helpers import has_mfa
-            res =  has_mfa(username = username,request=request) # has_mfa returns false or HttpResponseRedirect
+       if user is not None:  # if the user object exist
+            res =  has_mfa(username=username, request=request)  # has_mfa returns false or HttpResponseRedirect
             if res:
                 return res
-            return log_user_in(request,username=user.username)
-            #log_user_in is a function that handles creatung user session, it should be in the setting file as MFA_CALLBACK
+            return log_user_in(request, username=user.username)
+            # log_user_in is a function that handles creating user session, it should be in the setting file as MFA_CALLBACK
      ```
 1. Add mfa to urls.py
    ```python
    import mfa
    import mfa.TrustedDevice
-   urls_patterns= [
-   '...',
-   url(r'^mfa/', include('mfa.urls')),
-   url(r'devices/add$', mfa.TrustedDevice.add,name="mfa_add_new_trusted_device"), # This short link to add new trusted device
-   '....',
-    ]
-    ```
+
+   urls_patterns = [
+       '...',
+       url(r'^mfa/', include('mfa.urls')),
+       url(r'devices/add$', mfa.TrustedDevice.add,name="mfa_add_new_trusted_device"),  # This short link to add new trusted device
+       '....',
+   ]
+   ```
 1. Provide `mfa_auth_base.html` in your templates with block called 'head' and 'content'
     The template will be included during the user login.
     If you will use Email Token method, then you have to provide template named `mfa_email_token_template.html` that will content the format of the email with parameter named `user` and `otp`.
@@ -140,40 +142,42 @@ For Example, See https://github.com/mkalioby/AutoDeploy/commit/5f1d94b1804e0aa33
 
 To be able to go passwordless for returning users, create a cookie  named 'base_username' containing username as shown in snippet below
 ```python
-    response = render(request, 'Dashboard.html', context))
-    if request.session.get("mfa",{}).get("verified",False)  and getattr(settings,"MFA_QUICKLOGIN",False):
-        if request.session["mfa"]["method"]!="Trusted Device":
-            response.set_cookie("base_username", request.user.username, path="/",max_age = 15*24*60*60)
-    return response
+response = render(request, 'Dashboard.html', context))
+if request.session.get("mfa", {}).get("verified", False) and getattr(settings, "MFA_QUICKLOGIN", False):
+    if request.session["mfa"]["method"] != "Trusted Device":
+        response.set_cookie("base_username", request.user.username, path="/", max_age=15 * 24 * 60 * 60)
+return response
 ```
 
 Second, update the GET part of your login view
 ```python
-    if "mfa" in settings.INSTALLED_APPS and getattr(settings,"MFA_QUICKLOGIN",False) and request.COOKIES.get('base_username'):
-        username=request.COOKIES.get('base_username')
-        from mfa.helpers import has_mfa
-        res =  has_mfa(username = username,request=request,)
-        if res: return res
-        ## continue and return the form.
+from mfa.helpers import has_mfa
+
+if "mfa" in settings.INSTALLED_APPS and getattr(settings, "MFA_QUICKLOGIN", False) and request.COOKIES.get('base_username'):
+    username=request.COOKIES.get('base_username')
+    res = has_mfa(username=username, request=request)
+    if res:
+        return res
+    # continue and return the form.
 ```
 # Checking MFA on Client Side
 
 Sometimes you like to verify that the user is still there so simple you can ask django-mfa2 to check that for you
 
 ```html
-    {% include 'mfa_check.html' %}
+{% include 'mfa_check.html' %}
 ```
 ````js
 function success_func() {
-  //logic if mfa check succeeds
+  // logic if mfa check succeeds
 }
 function fail_func() {
-  //logic if mfa check fails
+  // logic if mfa check fails
 }
 function some_func() {
-    recheck_mfa(success_func,fail_func,MUST_BE_MFA)
-    //MUST_BE_MFA true or false, if the user must has with MFA
-  }
+  recheck_mfa(success_func, fail_func, MUST_BE_MFA)
+  // MUST_BE_MFA true or false, if the user must has with MFA
+}
 
 ````
 
