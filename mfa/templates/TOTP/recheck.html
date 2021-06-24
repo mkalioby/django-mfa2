@@ -28,7 +28,7 @@
       {% csrf_token %}
           {%  if invalid %}
           <div class="alert alert-danger">
-              Sorry, The provided token is not valid.
+              {{ invalid_msg }}
           </div>
           {% endif %}
       {% if quota %}

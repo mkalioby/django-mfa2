@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.3.0
+   * Some code cleanup thanks to @xi
+   * Added: MFA_TOTP_FAILURE_WINDOW & MFA_TOTP_FAILURE_LIMIT
+
 ## 2.2.0
    * Added: MFA_REDIRECT_AFTER_REGISTRATION settings parameter
    * Fixed: Deprecation error for NullBooleanField

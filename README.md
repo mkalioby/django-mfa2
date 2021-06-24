@@ -78,7 +78,9 @@ Depends on
    MFA_OWNED_BY_ENTERPRISE = FALSE  # Who owns security keys
 
    TOKEN_ISSUER_NAME="PROJECT_NAME"      #TOTP Issuer name
-
+   MFA_TOTP_FAILURE_LIMIT = 3            # Allowed TOTP Failures / user
+   MFA_TOTP_FAILURE_WINDOW = 5           # The number of minutes to check failed logins against.
+   
    U2F_APPID="https://localhost"    #URL For U2F
    FIDO_SERVER_ID=u"localehost"      # Server rp id for FIDO2, it the full domain of your project
    FIDO_SERVER_NAME=u"PROJECT_NAME"
@@ -96,6 +98,8 @@ Depends on
     * Starting version 1.7.0, Key owners can be specified.
     * Starting version 2.2.0
         * Added: `MFA_SUCCESS_REGISTRATION_MSG` & `MFA_REDIRECT_AFTER_REGISTRATION`
+   * Starting version 2.3.0
+       * Added: `MFA_TOTP_FAILURE_LIMIT` & `MFA_TOTP_FAILURE_WINDOW`
 1. Break your login function
 
    Usually your login function will check for username and password, log the user in if the username and password are correct and create the user session, to support mfa, this has to change

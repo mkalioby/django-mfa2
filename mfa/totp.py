@@ -16,17 +16,34 @@ from .views import login
 
 
 def verify_login(request, username, token):
+    FAILURE_LIMIT = getattr("settings", "MFA_TOTP_FAILURE_LIMIT", 3)
+    start_time = timezone.now() + datetime.timedelta(
+        minutes=-1 * getattr(settings, "MFA_TOTP_FAILURE_WINDOW", 5)
+    )
+    if (
+        OTPTracker.objects.filter(
+            done_on__gt=start_time, actor=username, success=0
+        ).count()
+        >= FAILURE_LIMIT
+    ):
+        return [
+            False,
+            "Using this method is temporarily suspended on your account, use another method, or later again later ",
+        ]
     for key in UserKey.objects.filter(username=username, key_type="TOTP"):
         totp = pyotp.TOTP(key.properties["secret_key"])
         if totp.verify(token, valid_window=30):
-            if OTPTracker.objects.filter(username=username, value=token).exists():
-                return [False, "Used Before, please generate another token"]
-            TOTP_Tracker.objects.create(username=username,value=token, success=True)
+            if OTPTracker.objects.filter(actor=username, value=token).exists():
+                return [
+                    False,
+                    "This code is used before, please generate another token",
+                ]
+            OTPTracker.objects.create(actor=username, value=token, success=True)
             key.last_used = timezone.now()
             key.save()
             return [True, key.id]
-    TOTP_Tracker.objects.create(username = username, value = token, success = False)
-    return [False,"Invalid Token"]
+    OTPTracker.objects.create(actor=username, value=token, success=False)
+    return [False, "Invalid Token"]
 
 
 def recheck(request):
@@ -68,7 +85,7 @@ def auth(request):
     return render(request, "TOTP/Auth.html", context)
 
 
-def getToken(request):
+def get_token(request):
     secret_key = pyotp.random_base32()
     totp = pyotp.TOTP(secret_key)
     request.session["new_mfa_answer"] = totp.now()
