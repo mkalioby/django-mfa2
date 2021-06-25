@@ -133,7 +133,7 @@ Depends on
 1. Somewhere in your app, add a link to 'mfa_home'
 ```<li><a href="{% url 'mfa_home' %}">Security</a> </li>```
 
-For Example, See https://github.com/mkalioby/AutoDeploy/commit/5f1d94b1804e0aa33c79e9e8530ce849d9eb78cc in AutDeploy Project
+For Example, See 'example' app
 
 # Going Passwordless
 
