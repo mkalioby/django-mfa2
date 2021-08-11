@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.views.decorators.cache import never_cache
 from django.http import HttpResponse
+from .Common import get_redirect_url
 from .models import *
 from django.template.context_processors import csrf
 import simplejson

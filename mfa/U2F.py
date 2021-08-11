@@ -12,6 +12,7 @@ from django.conf import settings
 from django.http import HttpResponse
 from .models import *
 from .views import login
+from .Common import get_redirect_url
 import datetime
 from django.utils import timezone
 
