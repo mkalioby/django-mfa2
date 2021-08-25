@@ -57,7 +57,7 @@ def login(request):
 
 @login_required
 def delKey(request):
-    key=User_Keys.objects.get(id=request.GET["id"])
+    key=User_Keys.objects.get(id=request.POST["id"])
     if key.username == request.user.username:
         key.delete()
         return HttpResponse("Deleted Successfully")
