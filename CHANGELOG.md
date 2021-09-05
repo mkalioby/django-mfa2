@@ -1,4 +1,6 @@
 # Change Log
+## 2.2.1
+   * Fixed: A missing import Thanks @AndreasDickow
 
 ## 2.2.0
    * Added: MFA_REDIRECT_AFTER_REGISTRATION settings parameter
