@@ -1,7 +1,7 @@
 # Change Log
 ## 2.3.0
    * Fixed: A missing import Thanks @AndreasDickow
-   * Fixed: `MFA.html` now call `{{block.super}}` for head and content blocks
+   * Fixed: `MFA.html` now call `{{block.super}}` for head and content blocks, thanks @mnelson4
    * Added: #55 introduced `mfa_base.html` which will be extended by `MFA.html` for better styling 
 
 ## 2.2.0
