@@ -1,6 +1,8 @@
 # Change Log
-## 2.2.1
+## 2.3.0
    * Fixed: A missing import Thanks @AndreasDickow
+   * Fixed: `MFA.html` now call `{{block.super}}` for head and content blocks
+   * Added: #55 introduced `mfa_base.html` which will be extended by `MFA.html` for better styling 
 
 ## 2.2.0
    * Added: MFA_REDIRECT_AFTER_REGISTRATION settings parameter
