@@ -1,58 +1,10 @@
 {% extends "base.html" %}
 {% load static %}
+{% load i18n %}
 {% block head %}
     <script type="application/javascript" src="{% static 'mfa/js/cbor.js'%}"></script>
     <script type="application/javascript" src="{% static 'mfa/js/ua-parser.min.js'%}"></script>
-    <script type="application/javascript">
-    function begin_reg(){
-    fetch('{% url 'fido2_begin_reg' %}',{}).then(function(response) {
-      if(response.ok)
-      {
-          return response.arrayBuffer();
-      }
-      throw new Error('Error getting registration data!');
-    }).then(CBOR.decode).then(function(options) {
-        options.publicKey.attestation="direct"
-        console.log(options)
-
-      return navigator.credentials.create(options);
-    }).then(function(attestation) {
-      return fetch('{% url 'fido2_complete_reg' %}', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/cbor'},
-        body: CBOR.encode({
-          "attestationObject": new Uint8Array(attestation.response.attestationObject),
-          "clientDataJSON": new Uint8Array(attestation.response.clientDataJSON),
-        })
-      });
-    }).then(function(response) {
-
-        var stat = response.ok ? 'successful' : 'unsuccessful';
-        return response.json()
-    }).then(function (res)
-        {
-      if (res["status"] =='OK')
-            $("#res").html("<div class='alert alert-success'>Registered Successfully, <a href='{{redirect_html}}'> {{reg_success_msg}}</a></div>")
-        else
-            $("#res").html("<div class='alert alert-danger'>Registeration Failed as " + res["message"] + ", <a href='javascript:void(0)' onclick='begin_reg()'> try again or <a href='{% url 'mfa_home' %}'> Go to Security Home</a></div>")
-
-
-    }, function(reason) {
-       $("#res").html("<div class='alert alert-danger'>Registeration Failed as " +reason +", <a href='javascript:void(0)' onclick='begin_reg()'> try again </a> or <a href='{% url 'mfa_home' %}'> Go to Security Home</a></div>")
-    })
-    }
-    $(document).ready(function (){
-        ua=new UAParser().getResult()
-        if (ua.browser.name == "Safari")
-        {
-                $("#res").html("<button class='btn btn-success' onclick='begin_reg()'>Start...</button>")
-        }
-        else
-        {
-            setTimeout(begin_reg, 500)
-        }
-    })
-    </script>
+    <script type="application/javascript" src="{% static 'mfa/js/FIDO2/add.js' %}"></script>
 
 {% endblock %}
 {% block content %}
@@ -61,13 +13,19 @@
      <div class="container">
      <div class="panel panel-default">
       <div class="panel-heading">
-	      <strong> FIDO2 Security Key</strong>
+	      <strong> {% trans 'FIDO2 Security Key' %}</strong>
       </div>
       <div class="panel-body">
+        <form action="#" id="fido2_form" method="post" hidden>
+          <input type=hidden value="{{ redirect_html }}" id="id_redirect" name="redirect">
+          <input type=hidden value="{% trans 'Your device is added successfully.' %}" id="id_success" name="success">
+          <input type=hidden value="{% url 'fido2_begin_reg' %}" id="id_begin" name="rbegin">
+          <input type=hidden value="{% url 'fido2_complete_reg' %}" id="id_complete" name="complete">
+          
+      </form>
 
-
-    <div class="row alert alert-pr" id="res" align="center">
-    <p style="color: green">Your browser should ask you to confirm you identity.</p>
+    <div class="row alert alert-pr" id="res">
+    <p class="success">{% trans 'Your browser should ask you to confirm you identity.' %}</p>
 
     </div>
         </div>

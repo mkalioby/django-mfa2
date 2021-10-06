@@ -2,16 +2,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% block head %}
-<style>
-    #two-factor-steps {
-	border: 1px solid #ccc;
-	border-radius: 3px;
-	padding: 15px;
-}
-    .row{
-        margin: 0px;
-    }
-    </style>
+
 <script src="{% static 'mfa/js/qrious.min.js' %}" type="text/javascript"></script>
 <script type="text/javascript">
     var key="";
