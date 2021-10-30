@@ -20,6 +20,8 @@ For FIDO2, the following are supported
  * **Apple's Touch ID/Face ID** (Chrome 70+ on Mac OS X, Safari on macOS Big Sur, Safari on iOS 14.0+ ),
  * **android-safetynet** (Chrome 70+, Firefox 68+)
  * **NFC devices using PCSC** (Not Tested, but as supported in fido2)
+ * **Soft Tokens** 
+    * [krypt.co](https://krypt.co/): Login by a notification on your phone.
 
 In English :), It allows you to verify the user by security keys on PC, Laptops or Mobiles, Windows Hello (Fingerprint, PIN) on Windows 10 Build 1903+ (May 2019 Update) Touch/Face ID on Macbooks (Chrome, Safari), Touch/Face ID on iPhone and iPad and Fingerprint/Face/Iris/PIN on Android Phones.
 
