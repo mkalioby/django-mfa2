@@ -12,7 +12,7 @@ A Django app that handles MFA, it supports TOTP, U2F, FIDO2 U2F (Web Authn), Ema
 
 Web Authencation API (WebAuthn) is state-of-the art techology that is expected to replace passwords.
 
-![Andriod Fingerprint](https://cdn-images-1.medium.com/max/800/1*1FWkRE8D7NTA2Kn1DrPjPA.png)
+![Android Fingerprint](https://cdn-images-1.medium.com/max/800/1*1FWkRE8D7NTA2Kn1DrPjPA.png)
 
 For FIDO2, the following are supported
  * **security keys** (Firefox 60+, Chrome 67+, Edge 18+, Safari 13 on Mac OS, Chrome on Andriod, Safari on iOS 13.3+),
@@ -75,6 +75,7 @@ Depends on
    MFA_RECHECK_MIN=10         # Minimum interval in seconds
    MFA_RECHECK_MAX=30         # Maximum in seconds
    MFA_QUICKLOGIN=True        # Allow quick login for returning users by provide only their 2FA
+   MFA_RESIDENT_KEY = None    # Use Resident Key (Only supported in Chromimum based browsers)
    MFA_HIDE_DISABLE=('FIDO2',)     # Can the user disable his key (Added in 1.2.0).
    MFA_OWNED_BY_ENTERPRISE = FALSE  # Who owns security keys   
 

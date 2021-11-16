@@ -58,8 +58,11 @@
     }).then(CBOR.decode).then(function(options) {
         console.log(options)
       return navigator.credentials.get(options);
+
     }).then(function(assertion) {
+        console.log(assertion)
         res=CBOR.encode({
+            "userHandle":assertion.id,
           "credentialId": new Uint8Array(assertion.rawId),
           "authenticatorData": new Uint8Array(assertion.response.authenticatorData),
           "clientDataJSON": new Uint8Array(assertion.response.clientDataJSON),

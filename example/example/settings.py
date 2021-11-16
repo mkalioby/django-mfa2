@@ -142,9 +142,10 @@ MFA_QUICKLOGIN=True        # Allow quick login for returning users by provide on
 MFA_HIDE_DISABLE=('',)     # Can the user disable his key (Added in 1.2.0).
 MFA_REDIRECT_AFTER_REGISTRATION="registered"
 MFA_SUCCESS_REGISTRATION_MSG="Go to Home"
+MFA_RESIDENT_KEY = True
 
 TOKEN_ISSUER_NAME="PROJECT_NAME"      #TOTP Issuer name
 
 U2F_APPID="https://localhost"    #URL For U2F
-FIDO_SERVER_ID=u"local.mkalioby.com"      # Server rp id for FIDO2, it the full domain of your project
+FIDO_SERVER_ID=u"localhost"      # Server rp id for FIDO2, it the full domain of your project
 FIDO_SERVER_NAME=u"TestApp"

@@ -17,10 +17,12 @@
 
       return navigator.credentials.create(options);
     }).then(function(attestation) {
+        console.log(attestation)
       return fetch('{% url 'fido2_complete_reg' %}', {
         method: 'POST',
         headers: {'Content-Type': 'application/cbor'},
         body: CBOR.encode({
+            "userHandle":attestation.id,
           "attestationObject": new Uint8Array(attestation.response.attestationObject),
           "clientDataJSON": new Uint8Array(attestation.response.clientDataJSON),
         })

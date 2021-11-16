@@ -39,7 +39,7 @@ def begin_registeration(request):
         u'id': request.user.username.encode("utf8"),
         u'name': (request.user.first_name + " " + request.user.last_name),
         u'displayName': request.user.username,
-    }, getUserCredentials(request.user.username))
+    }, getUserCredentials(request.user.username),resident_key=getattr(settings,'MFA_RESIDENT_KEY',None))
     request.session['fido_state'] = state
 
     return HttpResponse(cbor.encode(registration_data), content_type = 'application/octet-stream')
@@ -63,6 +63,8 @@ def complete_reg(request):
         uk = User_Keys()
         uk.username = request.user.username
         uk.properties = {"device": encoded, "type": att_obj.fmt, }
+        if data.get('userHandle'):
+            uk.properties["userHandle"] = data['userHandle']
         uk.owned_by_enterprise = getattr(settings, "MFA_OWNED_BY_ENTERPRISE", False)
         uk.key_type = "FIDO2"
         uk.save()
@@ -97,7 +99,9 @@ def auth(request):
 
 def authenticate_begin(request):
     server = getServer()
-    credentials = getUserCredentials(request.session.get("base_username", request.user.username))
+    credentials=None
+    if not getattr(settings,'MFA_RESIDENT_KEY',None):
+        credentials = getUserCredentials(request.session.get("base_username", request.user.username))
     auth_data, state = server.authenticate_begin(credentials)
     request.session['fido_state'] = state
     return HttpResponse(cbor.encode(auth_data), content_type = "application/octet-stream")
@@ -107,13 +111,26 @@ def authenticate_begin(request):
 def authenticate_complete(request):
     try:
         credentials = []
-        username = request.session.get("base_username", request.user.username)
+        data = cbor.decode(request.body)
+
+        if data.get("userHandle"):
+            keys = User_Keys.objects.filter(key_type="FIDO2", properties__icontains='"userHandle": "%s"'%data["userHandle"])
+            if keys.count()==1:
+                username = keys[0].username
+                request.session["base_username"]=username
+                request.session.update = 1
+
+        else:
+            username = request.session.get("base_username", request.user.username)
+
+
         server = getServer()
         credentials = getUserCredentials(username)
-        data = cbor.decode(request.body)
+        auth_data = AuthenticatorData(data['authenticatorData'])
+
         credential_id = data['credentialId']
         client_data = ClientData(data['clientDataJSON'])
-        auth_data = AuthenticatorData(data['authenticatorData'])
+        
         signature = data['signature']
         try:
             cred = server.authenticate_complete(
