@@ -1,36 +1,11 @@
 {% extends "mfa_auth_base.html" %}
 {% block head %}
     <link href="{% static 'mfa/css/mfa.css' %}" rel="stylesheet">
-    <script type="application/javascript">
-        function checkFlag() {
-            if ($("#agree").is(":checked"))
-                return true;
-            else
-                alert("Please agree to the statement first");
-            return false;
-        }
-
-        function checkTrusted() {
-            $.ajax({
-                url: "{% url 'td_checkTrusted' %}",
-                success: function (data) {
-                    if (data == "OK")
-                        window.location.href = "{% url 'td_securedevice' %}";
-                    else
-                        setTimeout('checkTrusted()', 2000)
-                }
-
-            })
-
-        }
-
-        $(document).ready(checkTrusted())
-    </script>
+    <script src="{% static 'mfa/js/TrustedDevice/add.js' %}" type="text/javascript"></script>
 {% endblock %}
 {% block content %}
     <br/>
     <br/>
-
     <div class="row">
 
         <div class="col-sm-10 col-sm-offset-1 col-xs-12 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
