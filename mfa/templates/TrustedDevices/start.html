@@ -2,13 +2,13 @@
 {% load static %}
 {% load i18n %}
 {% block head %}
-<script type="application/javascript" src="{% static 'mfa/css/mfa.css'%}"></script>
-<script type="application/javascript" src="{% static 'mfa/js/ua-parser.min.js'%}"></script>
-<script type="application/javascript" src="{% static 'mfa/js/TrustedDevice/start.js' %}"></script>
+    <script type="application/javascript" src="{% static 'mfa/css/mfa.css' %}"></script>
+    <script type="application/javascript" src="{% static 'mfa/js/ua-parser.min.js' %}"></script>
+    <script type="application/javascript" src="{% static 'mfa/js/TrustedDevice/start.js' %}"></script>
 
 {% endblock %}
 {% block content %}
-      <br/>
+    <br/>
     <br/>
     <div class="container">
         <div class="col-md-6 col-md-offset-3" id="two-factor-steps">
@@ -16,23 +16,28 @@
                 <h4>{% trans 'Add Trusted Device' %}</h4>
             </div>
 
-    <div class="row" >
-        {%  if not_allowed %}
-            <div class="alert alert-danger">{% trans 'You can't add any more devices, you need to remove previously trusted devices first.' %}</div>
-        {% else %}
-    <p class="green">{% trans 'Allow access from mobile phone and tables.' %}</p>
-    <h5>Steps:</h5>
-        <ol>
-            <li>{% trans 'Using your mobile/table, open Chrome/Firefox' %}.</li>
-            <li>{% trans 'Go to' %} <b>{{ HOST }}{{ BASE_URL }}devices/add</b>&nbsp;&nbsp;<button id="#sendMail" td-trust-link="{% url 'td_trust_device' %}" td-link="{% url 'td_sendemail' %}" td-home="{% url 'mfa_home' %}" td-useragent="{% url 'td_get_useragent' %}" title="Send to my email"><i class="fas fa-paper-plane"></i></a></li>
-            <li>{% trans 'Enter your username & following 6 digits' %}<br/>
-                <span style="font-size: 16px;font-weight: bold; margin-left: 50px">{{ key|slice:":3" }} - {{ key|slice:"3:" }}</span>
-            </li>
-            <li>{% trans 'This window will ask to confirm the device.' %}</li>
+            <div class="row">
+                {% if not_allowed %}
+                    <div class="alert alert-danger">{% trans "You can't add any more devices, you need to remove previously trusted devices first." %}</div>
+                {% else %}
+                    <p class="green">{% trans 'Allow access from mobile phone and tables.' %}</p>
+                    <h5>Steps:</h5>
+                    <ol>
+                        <li>{% trans 'Using your mobile/table, open Chrome/Firefox' %}.</li>
+                        <li>{% trans 'Go to' %} <b>{{ HOST }}{{ BASE_URL }}devices/add</b>&nbsp;&nbsp;<button
+                                id="#sendMail" td-trust-link="{% url 'td_trust_device' %}"
+                                td-link="{% url 'td_sendemail' %}" td-home="{% url 'mfa_home' %}"
+                                td-useragent="{% url 'td_get_useragent' %}" title="Send to my email"><i
+                                class="fas fa-paper-plane"></i></button>
+                        </li>
+                        <li>{% trans 'Enter your username & following 6 digits' %}<br/>
+                            <span class="text-key">{{ key|slice:":3" }} - {{ key|slice:"3:" }}</span>
+                        </li>
+                        <li>{% trans 'This window will ask to confirm the device.' %}</li>
 
-        </ol>
-    {% endif %}
-    </div>
+                    </ol>
+                {% endif %}
+            </div>
         </div>
     </div>
     {% include "modal.html" %}
