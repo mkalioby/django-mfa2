@@ -57,9 +57,10 @@ if (location.protocol != 'https:') {
     $("#main_paragraph").html("FIDO2 must work under secure context")
 } else {
     ua=new UAParser().getResult()
-    if (ua.browser.name == "Safari")
+    if (ua.browser.name == "Safari" || ua.browser.name == "Mobile Safari")
         $("#res").html("<button class='btn btn-success' onclick='authen()'>Authenticate...</button>")
     else
         authen()
 }
 });
+

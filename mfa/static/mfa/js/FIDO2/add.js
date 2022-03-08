@@ -29,16 +29,16 @@ function begin_reg(){
       if (res["status"] =='OK')
             $("#res").html("<div class='alert alert-success'>Registered Successfully, <a href='"+formData.get('redirect')+"'> "+formData.get('success')+"</a></div>")
         else
-            $("#res").html("<div class='alert alert-danger'>Registeration Failed as " + res["message"] + ", <a href='javascript:void(0)' onclick='begin_reg()'> try again or <a href='"+formData.get('home')+"'> Go to Security Home</a></div>")
+            $("#res").html("<div class='alert alert-danger'>Registration Failed as " + res["message"] + ", <a href='javascript:void(0)' onclick='begin_reg()'> try again or <a href='"+formData.get('home')+"'> Go to Security Home</a></div>")
 
 
     }, function(reason) {
-       $("#res").html("<div class='alert alert-danger'>Registeration Failed as " +reason +", <a href='javascript:void(0)' onclick='begin_reg()'> try again </a> or <a href='"+formData.get('home')+"'> Go to Security Home</a></div>")
+       $("#res").html("<div class='alert alert-danger'>Registration Failed as " +reason +", <a href='javascript:void(0)' onclick='begin_reg()'> try again </a> or <a href='"+formData.get('home')+"'> Go to Security Home</a></div>")
     })
     }
     $(document).ready(function (){
         ua=new UAParser().getResult()
-        if (ua.browser.name == "Safari")
+        if (ua.browser.name == "Safari" || ua.browser.name == "Mobile Safari" )
         {
                 $("#res").html("<button class='btn btn-success' onclick='begin_reg()'>Start...</button>")
         }
@@ -47,3 +47,6 @@ function begin_reg(){
             setTimeout(begin_reg, 500)
         }
     })
+
+
+    

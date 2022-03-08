@@ -1,18 +1,7 @@
-<script type="application/javascript">
-    function send_totp() {
-        $.ajax({"url":"{% url 'totp_recheck' %}", method:"POST",dataType:"JSON",
-            data:{"csrfmiddlewaretoken":"{{ csrf_token }}","otp":$("#otp").val()},
-         success:function (data) {
-                            if (data["recheck"])
-                                mfa_success_function();
-                            else {
-                                mfa_failed_function();
-                            }
-                        }
-        })
+{%  load static %}
+{% load i18n %}
+<script type="application/javascript" src="{% static 'mfa/js/EMAIL/recheck.js' %}"></script>
 
-    }
-</script>
 <div class="row">
 
 <div class="col-sm-10 col-sm-offset-1 col-xs-12 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">

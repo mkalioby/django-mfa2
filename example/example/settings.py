@@ -25,7 +25,7 @@ SECRET_KEY = '#9)q!_i3@pr-^3oda(e^3$x!kq3b4f33#5l@+=+&vuz+p6gb3g'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -146,5 +146,5 @@ MFA_SUCCESS_REGISTRATION_MSG="Go to Home"
 TOKEN_ISSUER_NAME="PROJECT_NAME"      #TOTP Issuer name
 
 U2F_APPID="https://localhost"    #URL For U2F
-FIDO_SERVER_ID=u"localhost"      # Server rp id for FIDO2, it the full domain of your project
-FIDO_SERVER_NAME=u"PROJECT_NAME"
+FIDO_SERVER_ID=u"local.mkalioby.com"      # Server rp id for FIDO2, it the full domain of your project
+FIDO_SERVER_NAME=u"TestApp"

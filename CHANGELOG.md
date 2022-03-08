@@ -1,4 +1,15 @@
 # Change Log
+## 2.4.0
+
+   * Fixed: issue in the 'Authorize' button don't show on Safari Mobile.
+   * Upgrade to FIDO2 0.9.2, to fix issue with Windows 11.
+   * Fixed: Minor Typos.
+
+
+## 2.3.0
+   * Fixed: A missing import Thanks @AndreasDickow
+   * Fixed: `MFA.html` now call `{{block.super}}` for head and content blocks, thanks @mnelson4
+   * Added: #55 introduced `mfa_base.html` which will be extended by `MFA.html` for better styling 
 
 ## 2.2.0
    * Added: MFA_REDIRECT_AFTER_REGISTRATION settings parameter

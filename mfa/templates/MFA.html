@@ -1,9 +1,11 @@
-{% extends "base.html" %}
+{% extends "mfa_base.html" %}
 {% load static %}
 {% load i18n %}
 {% block head %}
-    <script src="{% static 'mfa/js/delete-token.js' %}"></script>
-    <link href="{% static 'mfa/css/bootstrap-toggle.min.css' %}" rel="stylesheet">
+   
+{{block.super}}
+<script src="{% static 'mfa/js/delete-token.js' %}"></script>
+    <link href="{% static  'mfa/css/bootstrap-toggle.min.css' %}" rel="stylesheet">
     <script src="{% static 'mfa/js/bootstrap-toggle.min.js'%}"></script>
     <link href="{% static 'mfa/css/mfa.css' %}" rel="stylesheet">
 {% endblock %}

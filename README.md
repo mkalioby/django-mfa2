@@ -20,6 +20,8 @@ For FIDO2, the following are supported
  * **Apple's Touch ID/Face ID** (Chrome 70+ on Mac OS X, Safari on macOS Big Sur, Safari on iOS 14.0+ ),
  * **android-safetynet** (Chrome 70+, Firefox 68+)
  * **NFC devices using PCSC** (Not Tested, but as supported in fido2)
+ * **Soft Tokens** 
+    * [krypt.co](https://krypt.co/): Login by a notification on your phone.
 
 In English :), It allows you to verify the user by security keys on PC, Laptops or Mobiles, Windows Hello (Fingerprint, PIN) on Windows 10 Build 1903+ (May 2019 Update) Touch/Face ID on Macbooks (Chrome, Safari), Touch/Face ID on iPhone and iPad and Fingerprint/Face/Iris/PIN on Android Phones.
 
@@ -60,9 +62,9 @@ Depends on
    'mfa',
    '......')
    ```
-1. Collect Static Files
+2. Collect Static Files
 `python manage.py collectstatic`
-1. Add the following settings to your file
+3. Add the following settings to your file
 
    ```python 
    MFA_UNALLOWED_METHODS=()   # Methods that shouldn't be allowed for the user
@@ -95,7 +97,7 @@ Depends on
     * Starting version 1.7.0, Key owners can be specified.
     * Starting version 2.2.0
         * Added: `MFA_SUCCESS_REGISTRATION_MSG` & `MFA_REDIRECT_AFTER_REGISTRATION`
-1. Break your login function
+4. Break your login function
 
    Usually your login function will check for username and password, log the user in if the username and password are correct and create the user session, to support mfa, this has to change
    
@@ -115,7 +117,7 @@ Depends on
             return log_user_in(request,username=user.username) 
             #log_user_in is a function that handles creatung user session, it should be in the setting file as MFA_CALLBACK
      ```
-1. Add mfa to urls.py
+5. Add mfa to urls.py
    ```python 
    import mfa
    import mfa.TrustedDevice
@@ -126,12 +128,13 @@ Depends on
    '....',
     ]
     ```
-1. Provide `mfa_auth_base.html` in your templaes with block called 'head' and 'content'
-    The template will be included during the user login.
+6. Provide `mfa_auth_base.html` in your templates with block called 'head' and 'content', The template will be included during the user login, the template shall be close to the login template.
     If you will use Email Token method, then you have to provide template named `mfa_email_token_template.html` that will content the format of the email with parameter named `user` and `otp`.
-1. To match the look and feel of your project, MFA includes `base.html` but it needs blocks named `head` & `content` to added its content to it.
-1. Somewhere in your app, add a link to 'mfa_home'
+7. To match the look and feel of your project, MFA includes `base.html` but it needs blocks named `head` & `content` to added its content to it.
+   **Note:** Starting v2.3.0, a new template `mfa_base.html` is introduced, this template is used by `MFA.html` so you can control the styling better and current `mfa_base.html` extends `base.html`
+8. Somewhere in your app, add a link to 'mfa_home'
 ```<li><a href="{% url 'mfa_home' %}">Security</a> </li>```
+
 
 For Example, See 'example' app
 
@@ -182,6 +185,8 @@ function some_func() {
 * [swainn](https://github.com/swainn)
 * [unramk](https://github.com/unramk)
 * [willingham](https://github.com/willingham)
+* [AndreasDickow](https://github.com/AndreasDickow)
+* [mnelson4](https://github.com/mnelson4)
 
 
  # Security contact information
