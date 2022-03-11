@@ -7,7 +7,6 @@
     <br/>
     <br/>
     <div class="row">
-
         <div class="col-sm-10 col-sm-offset-1 col-xs-12 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
             <div class="panel panel-default">
                 <div class="panel-heading">
@@ -22,12 +21,10 @@
                         <div class="alert alert-success">
                             Your device is now trusted, please try to <a href="{% url 'login' %}"> login</a>
                         </div>
-
                     {% else %}
                         <div class="alert alert-warning">Please make sure you are not in private (incognito) mode <i
                                 class="fal fa-user-secret"></i></div>
-                        <FORM METHOD="POST" ACTION="{% url 'add_td' %}" Id="formLogin" onSubmit="return checkFlag()"
-                              name="FrontPage_Form1">
+                        <FORM METHOD="POST" ACTION="{% url 'add_td' %}" Id="formLogin" name="FrontPage_Form1">
                             {% csrf_token %}
                             {% if invalid %}
                                 <div class="alert alert-danger">
@@ -48,43 +45,41 @@
                                     <div class="col-sm-12 col-md-12">
                                         <div class="form-group">
                                             <div class="input-group">
-		<span class="input-group-addon">
-		<i class="glyphicon glyphicon-user"></i>
-		</span>
+                                                <span class="input-group-addon">
+                                                <i class="glyphicon glyphicon-user"></i>
+                                                </span>
                                                 <input class="form-control" id="username" size="30" MaxLength="30"
                                                        placeholder="Username" name="username" value="{{ username }}"
                                                        type="text" autofocus autocomplete="on">
-
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             <div class="input-group">
-		<span class="input-group-addon">
-		<i class="fa fa-key"></i>
-		</span>
+                                                <span class="input-group-addon">
+                                                <i class="fa fa-key"></i>
+                                                </span>
                                                 <input class="form-control text-uppercase" placeholder="e.g GAK-Y2M"
                                                        id='key' name="key" type="text" size="9" MaxLength="9"
                                                        value="{{ key }}">
                                             </div>
                                         </div>
                                         <div class="form-group">
-		<span class="input-group">
-            <input id='agree' name="agree" type="checkbox"><span class="color-red"> I confirm that this device is mine and it is only used by me.</span>
-
+                                            <span class="input-group">
+                                                <input id='agree' name="agree" type="checkbox">
+                                                <span class="color-red">I confirm that this device is mine and it is only used by me.</span>
+                                            </span>
                                         </div>
                                         {% comment %}
                                             <div class="form-group">
                                                 <div class="input-group">
-	      <span class="input-group-addon">
-
-
-	      <select size="1" name="Institution_Code" class="font-10-pt font-calibri height-34 width-230">
-              {% for ins in institutes %}
-                  <option value="{{ ins.institution_code }}">{{ ins.alias }}</option>
-              {% endfor %}
-
-		</select>
-	      </span>
+                                                  <span class="input-group-addon">
+                                                      <select size="1" name="Institution_Code"
+                                                              class="font-10-pt font-calibri height-34 width-230">
+                                                          {% for ins in institutes %}
+                                                              <option value="{{ ins.institution_code }}">{{ ins.alias }}</option>
+                                                          {% endfor %}
+                                                        </select>
+                                                  </span>
                                                 </div>
                                             </div>
                                         {% endcomment %}
@@ -99,12 +94,8 @@
                     {% endif %}
                 </div>
                 <div class="panel-footer ">
-
-
                 </div>
             </div>
         </div>
     </div>
-
-
 {% endblock %}

@@ -2,29 +2,28 @@
 {% load i18n %}
 {% block content %}
     <br/>
-<br/>
-<div class="row">
+    <br/>
+    <div class="row">
+        <div class="col-sm-10 col-sm-offset-1 col-xs-12 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <strong> {% trans 'Select Second Verification Method' %}</strong>
+                </div>
+                <div class="panel-body">
+                    <ul>
+                        {% for method in request.session.mfa_methods %}
 
-<div class="col-sm-10 col-sm-offset-1 col-xs-12 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
-<div class="panel panel-default">
-      <div class="panel-heading">
-	      <strong> {% trans 'Select Second Verification Method' %}</strong>
-      </div>
-      <div class="panel-body">
-          <ul>
-              {% for method in request.session.mfa_methods %}
-
-              <li><a href="{% url "mfa_goto" method %}">
-                  {% if method == "TOTP" %}{% trans 'Authenticator App' %}
-                  {% elif method == "Email" %}{% trans 'Send OTP by Email' %}
-                  {% elif method == "U2F" %}{% trans 'Secure Key' %}
-                  {% elif method == "FIDO2" %}{% trans 'FIDO2 Secure Key' %}
-                  {% endif %}
-              </a> </li>
-              {% endfor %}
-          </ul>
-      </div>
-</div>
-</div>
-</div>
+                            <li><a href="{% url "mfa_goto" method %}">
+                                {% if method == "TOTP" %}{% trans 'Authenticator App' %}
+                                    {% elif method == "Email" %}{% trans 'Send OTP by Email' %}
+                                    {% elif method == "U2F" %}{% trans 'Secure Key' %}
+                                    {% elif method == "FIDO2" %}{% trans 'FIDO2 Secure Key' %}
+                                {% endif %}
+                            </a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

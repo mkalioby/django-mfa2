@@ -1,3 +1,7 @@
+$(document).ready(function () {
+    document.getElementById('formLogin').addEventListener('submit', checkFlag);
+})
+
 function checkFlag() {
     if ($("#agree").is(":checked"))
         return true;
