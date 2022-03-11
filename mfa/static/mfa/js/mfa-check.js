@@ -19,9 +19,6 @@ function recheck_mfa(success_func,fail_func,must_mfa) {
                 $("#modal-body").html(data["html"])
                 $("#popUpModal").modal()
             }
-
-
-
         }
     })
 }

@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from .models import *
-
+from django.contrib import messages
 try:
     from django.urls import reverse
 except:
@@ -65,10 +65,11 @@ def login(request):
 
 @login_required
 def delKey(request):
-    key = User_Keys.objects.get(id=request.POST["id"])
+    key = User_Keys.objects.get(id=request.GET["id"])
     if key.username == request.user.username:
         key.delete()
-        return HttpResponse("Deleted Successfully")
+        messages.success(request, 'Der Schlüssel wurde erfolgreich gelöscht.')
+        return HttpResponseRedirect(reverse('mfa_home'))
     else:
         return HttpResponse("Error: You own this token so you can't delete it")
 
