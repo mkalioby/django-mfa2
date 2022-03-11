@@ -15,36 +15,27 @@
             </div>
             <div class="row">
 
-                <p>Scan the image below with the two-factor authentication app on your <a href="javascript:void(0)"
-                                                                                          onclick="showTOTP()">phone/PC</a>.
-                    If you can’t use a barcode,
-                    <a href="javascript:void(0)" onclick="showKey()">enter this text</a> instead. </p>
+                <p>Scan the image below with the two-factor authentication app on your <span
+                        id="show-TOTP">phone/PC</span>. If you can’t use a barcode, <span
+                        id="show-key">enter this text</span> instead. </p>
             </div>
 
             <div class="row">
-
                 <div align="center" class="no-display" id="second_step">
-
                     <img id="qr"/>
-
                 </div>
                 <div class="row">
-
                     <p><b>Enter the six-digit code from the application</b></p>
                     <p class="font-10 color-gray">After scanning the barcode image, the app will display a
                         six-digit code that you can enter below. </p>
-
                 </div>
                 <div class="row">
-
-
                     <input maxlength="6" size="6" class="inline-display width-95-pc form-control" id="answer"
                            placeholder="e.g 785481"/>
-
                 </div>
                 <div class="row padding-top-10">
                     <div class="col-md-6 padding-left-0">
-                        <button class="btn btn-success" onclick="verify()">Enable</button>
+                        <button id="verify" class="btn btn-success">Enable</button>
                     </div>
                     <div class="col-md-6 padding-right-30" align="right">
                         <a href="{% url 'mfa_home' %}">

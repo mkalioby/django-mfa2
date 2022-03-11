@@ -11,6 +11,13 @@ $(document).ready(function addToken() {
             $("#second_step").show()
         }
     })
+
+    // Replace Onclick
+    // $('showTOTP').on('click', showTOTP);
+     document.getElementById('show-TOTP').addEventListener('click', showTOTP);
+     document.getElementById('show-key').addEventListener('click', showKey);
+     document.getElementById('verify').addEventListener('click', verify);
+
 });
 
 function showKey() {
