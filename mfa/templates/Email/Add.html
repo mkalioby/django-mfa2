@@ -1,5 +1,7 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block head %}
+<link href="{% static 'mfa/css/mfa.css' %}" rel="stylesheet">
 {% endblock %}
 {% block content %}
     <br/>
@@ -7,14 +9,14 @@
     <div class="container">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <strong>Activate Token by email</strong>
+                <strong>{% trans 'Activate Token by email' %}</strong>
             </div>
             <div class="panel-body">
                 <FORM METHOD="POST" ACTION="{% url 'start_email' %}" Id="formLogin" name="FrontPage_Form1">
                     {% csrf_token %}
                     {% if invalid %}
                         <div class="alert alert-danger">
-                            Sorry, The provided token is not valid.
+                            {% trans 'Sorry, The provided token is not valid.' %}
                         </div>
                     {% endif %}
                     {% if quota %}
@@ -25,7 +27,7 @@
                     <fieldset>
                         <div class="row">
                             <div class="col-sm-12 col-md-12">
-                                <p>Enter the code sent to your email.</p>
+                                <p>{% trans 'Enter the code sent to your email.' %}</p>
                             </div>
                         </div>
                         <div class="row">

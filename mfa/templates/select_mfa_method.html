@@ -13,7 +13,7 @@
                     <ul>
                         {% for method in request.session.mfa_methods %}
 
-                            <li><a href="{% url "mfa_goto" method %}">
+                            <li><a href='{% url "mfa_goto" method %}'>
                                 {% if method == "TOTP" %}{% trans 'Authenticator App' %}
                                     {% elif method == "Email" %}{% trans 'Send OTP by Email' %}
                                     {% elif method == "U2F" %}{% trans 'Secure Key' %}

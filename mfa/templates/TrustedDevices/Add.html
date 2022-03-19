@@ -1,4 +1,6 @@
 {% extends "mfa_auth_base.html" %}
+{% load i18n %}
+{% load static %}
 {% block head %}
     <link href="{% static 'mfa/css/mfa.css' %}" rel="stylesheet">
     <script src="{% static 'mfa/js/TrustedDevice/add.js' %}" type="text/javascript"></script>
@@ -10,19 +12,19 @@
         <div class="col-sm-10 col-sm-offset-1 col-xs-12 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <strong> Add Trusted Device</strong>
+                    <strong>{% trans 'Add Trusted Device' %}</strong>
                 </div>
                 <div class="panel-body">
                     {% if success %}
                         <div class="alert alert-warning">
-                            Please check your PC window, to continue the process.
+                            {% trans 'Please check your PC window, to continue the process' %}.
                         </div>
                     {% elif added %}
                         <div class="alert alert-success">
-                            Your device is now trusted, please try to <a href="{% url 'login' %}"> login</a>
+                            {% trans 'Your device is now trusted, please try to' %} <a href="{% url 'login' %}"> {% trans 'login' %}</a>
                         </div>
                     {% else %}
-                        <div class="alert alert-warning">Please make sure you are not in private (incognito) mode <i
+                        <div class="alert alert-warning">{% trans 'Please make sure you are not in private (incognito) mode' %} <i
                                 class="fal fa-user-secret"></i></div>
                         <FORM METHOD="POST" ACTION="{% url 'add_td' %}" Id="formLogin" name="FrontPage_Form1">
                             {% csrf_token %}
@@ -66,7 +68,7 @@
                                         <div class="form-group">
                                             <span class="input-group">
                                                 <input id='agree' name="agree" type="checkbox">
-                                                <span class="color-red">I confirm that this device is mine and it is only used by me.</span>
+                                                <span class="color-red">{% trans 'I confirm that this device is mine and it is only used by me' %}.</span>
                                             </span>
                                         </div>
                                         {% comment %}

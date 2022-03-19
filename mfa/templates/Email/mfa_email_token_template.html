@@ -1,10 +1,12 @@
+
+{% load i18n %}
 <html>
 <head>
 </head>
 <body>
-Dear {{ username }},<br/>
-Your OTP is: <b>{{ otp }}</b>
+    {% trans 'Dear' %} {{ username }},<br/>
+    {% trans 'Your OTP is' %}: <b>{{ otp }}</b>
 
-Thanks
+    {% trans 'Thank you' %}
 </body>
 </html>
