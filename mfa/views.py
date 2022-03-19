@@ -1,13 +1,12 @@
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import  HttpResponse, HttpResponseRedirect
 from .models import *
+from django.utils.translation import gettext
 from django.contrib import messages
 try:
     from django.urls import reverse
 except:
     from django.core.urlresolvers import reverse
-from django.template.context_processors import csrf
-from django.template.context import RequestContext
 from django.conf import settings
 from . import TrustedDevice
 from django.contrib.auth.decorators import login_required
@@ -68,23 +67,23 @@ def delKey(request):
     key = User_Keys.objects.get(id=request.GET["id"])
     if key.username == request.user.username:
         key.delete()
-        messages.success(request, 'Der Schlüssel wurde erfolgreich gelöscht.')
+        messages.success(request, gettext('The key was deleted successfully.'))
         return HttpResponseRedirect(reverse('mfa_home'))
     else:
-        return HttpResponse("Error: You own this token so you can't delete it")
+        return HttpResponse(gettext("Error: You own this token so you can't delete it"))
 
 
 def __get_callable_function__(func_path):
     import importlib
     if not '.' in func_path:
-        raise Exception("class Name should include modulename.classname")
+        raise Exception(gettext("class Name should include modulename.classname"))
 
     parsed_str = func_path.split(".")
     module_name, func_name = ".".join(parsed_str[:-1]), parsed_str[-1]
     imported_module = importlib.import_module(module_name)
     callable_func = getattr(imported_module, func_name)
     if not callable_func:
-        raise Exception("Module does not have requested function")
+        raise Exception(gettext("Module does not have requested function"))
     return callable_func
 
 
@@ -97,11 +96,11 @@ def toggleKey(request):
         if not key.key_type in settings.MFA_HIDE_DISABLE:
             key.enabled = not key.enabled
             key.save()
-            return HttpResponse("OK")
+            return HttpResponse(gettext("OK"))
         else:
-            return HttpResponse("You can't change this method.")
+            return HttpResponse(gettext("You can't change this method."))
     else:
-        return HttpResponse("Error")
+        return HttpResponse(gettext("Error"))
 
 
 def goto(request, method):

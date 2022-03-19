@@ -16,7 +16,7 @@ from .views import login, reset_cookie
 import datetime
 from .Common import get_redirect_url
 from django.utils import timezone
-
+from django.utils.translation import gettext
 
 def recheck(request):
     """Starts FIDO2 recheck"""
@@ -73,7 +73,7 @@ def complete_reg(request):
             client.captureException()
         except:
             pass
-        return HttpResponse(simplejson.dumps({'status': 'ERR', "message": "Error on server, please try again later"}))
+        return HttpResponse(simplejson.dumps({'status': 'ERR', "message": gettext("Error on server, please try again later")}))
 
 
 def start(request):
@@ -126,7 +126,7 @@ def authenticate_complete(request):
             )
         except ValueError:
             return HttpResponse(simplejson.dumps({'status': "ERR",
-                                                  "message": "Wrong challenge received, make sure that this is your security and try again."}),
+                                                  "message": gettext("Wrong challenge received, make sure that this is your security and try again.")}),
                                 content_type = "application/json")
         except Exception as excep:
             try:
