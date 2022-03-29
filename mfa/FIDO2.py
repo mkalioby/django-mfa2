@@ -9,14 +9,20 @@ import simplejson
 from fido2 import cbor
 from django.http import HttpResponse
 from django.conf import settings
-from .models import *
 from fido2.utils import websafe_decode, websafe_encode
 from fido2.ctap2 import AttestedCredentialData
+
+from mfa.models import User_Keys
 from .views import login, reset_cookie
 import datetime
 from .Common import get_redirect_url
 from django.utils import timezone
 from django.utils.translation import gettext
+
+import logging
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
+
 
 def recheck(request):
     """Starts FIDO2 recheck"""
@@ -67,12 +73,13 @@ def complete_reg(request):
         uk.key_type = "FIDO2"
         uk.save()
         return HttpResponse(simplejson.dumps({'status': 'OK'}))
-    except Exception as exp:
+    except Exception:
         try:
             from raven.contrib.django.raven_compat.models import client
             client.captureException()
         except:
-            pass
+            logger.error(gettext("Error on server, please try again later"), exc_info=True)
+            
         return HttpResponse(simplejson.dumps({'status': 'ERR', "message": gettext("Error on server, please try again later")}))
 
 
@@ -133,7 +140,8 @@ def authenticate_complete(request):
                 from raven.contrib.django.raven_compat.models import client
                 client.captureException()
             except:
-                pass
+                logger.error(gettext("Error completion of authentification"), exc_info=True)
+                
             return HttpResponse(simplejson.dumps({'status': "ERR",
                                                   "message": excep.message}),
                                 content_type = "application/json")

@@ -7,6 +7,7 @@ try:
     from django.urls import reverse
 except:
     from django.core.urlresolvers import reverse
+    
 from django.conf import settings
 from . import TrustedDevice
 from django.contrib.auth.decorators import login_required
