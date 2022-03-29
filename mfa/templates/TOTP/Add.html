@@ -30,6 +30,8 @@
                     <p class="font-10 color-gray">{% trans 'After scanning the barcode image, the app will display a six-digit code that you can enter below.' %}</p>
                 </div>
                 <div class="row">
+                    <input type=hidden value="{{ redirect_html }}" id="id_redirect" name="redirect">
+                    <input type=hidden value="{% url 'verify_otop' %}" id="id_verify" name="verify">                    
                     <input maxlength="6" size="6" class="inline-display width-95-pc form-control" id="answer"
                            placeholder="e.g 785481"/>
                 </div>

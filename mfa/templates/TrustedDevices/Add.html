@@ -28,6 +28,10 @@
                                 class="fal fa-user-secret"></i></div>
                         <FORM METHOD="POST" ACTION="{% url 'add_td' %}" Id="formLogin" name="FrontPage_Form1">
                             {% csrf_token %}
+                            <input type="hidden" name="begin" id="id_begin" value="{% url 'td_checkTrusted' %}"/>
+                            <input type="hidden" name="secure" id="id_secure" value="{% url 'td_securedevice' %}"/>
+                            
+
                             {% if invalid %}
                                 <div class="alert alert-danger">
                                     {{ invalid }}

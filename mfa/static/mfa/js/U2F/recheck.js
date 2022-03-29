@@ -34,8 +34,9 @@ $(document).ready(function () {
                 $("#u2f_login").submit();
             }
             else if(formData.get('mode') === 'recheck') {
+               var recheckURL = document.getElementById('id_recheck').value;
                 $.ajax({
-                    "url":"{% url 'u2f_recheck' %}",
+                    "url":recheckURL,
                     method: "POST",
                     data: {"csrfmiddlewaretoken":formData.get('csrfmiddlewaretoken'),"response":JSON.stringify(response)},
                     success:function (data) {

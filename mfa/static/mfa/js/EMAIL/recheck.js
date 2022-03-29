@@ -16,8 +16,9 @@ function check_mode() {
 function send_totp() {
     const form = $('#formLogin');
     var formData = new FormData(form);
+
     $.ajax({
-        "url": "{% url 'totp_recheck' %}", method: "POST", dataType: "JSON",
+        "url": formData.get('recheck'), method: "POST", dataType: "JSON",
         data: {"csrfmiddlewaretoken": formData.get('csrf_token'), "otp": $("#otp").val()},
         success: function (data) {
             if (data["recheck"])

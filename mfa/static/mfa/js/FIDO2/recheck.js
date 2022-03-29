@@ -1,6 +1,7 @@
 function authen() {
     const begin_url = document.getElementById('begin').value;
     const complete_url = document.getElementById('u2f_login').getAttribute('action');
+    const recheck_text = document.getElementById('rechecktext')
     const mode = $('u2f_login').attr('name') === 'complete' ? 'auth' : 'recheck';
     fetch(begin_url, {
         method: 'GET',
@@ -17,7 +18,7 @@ function authen() {
             "clientDataJSON": new Uint8Array(assertion.response.clientDataJSON),
             "signature": new Uint8Array(assertion.response.signature)
         });
-
+      
         return fetch(complete_url, {
 
             method: 'POST',
@@ -29,7 +30,7 @@ function authen() {
         }).then(function (res) {
             if (res.status == "OK") {
                 $("#msgdiv").addClass("alert alert-success").removeClass("alert-danger")
-                $("#msgdiv").html("<p>Der Schlüssel wird verifiziert. Bitte warten Sie einen Moment...</p>")
+                $("#msgdiv").html("<p>"+recheck_text+"</p>")
                 if (mode == "auth") {
                     window.location.href = res.redirect;
                 } else if (mode === "recheck") {

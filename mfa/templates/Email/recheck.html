@@ -17,6 +17,7 @@
 
 
                     {% csrf_token %}
+                    <input type=hidden value="{% url 'totp_recheck' %}" id="id_recheck" name="recheck">
                     {% if invalid %}
                         <div class="alert alert-danger">
                             {% trans 'Sorry, The provided token is not valid.' %}
@@ -50,7 +51,7 @@
                                 <div class="form-group">
 
                                     <input id="send-totp"
-                                           type="{% if mode == "auth" %}submit{% elif mode == 'recheck' %}button{% endif %}"
+                                           type="{% if mode == 'auth' %}submit{% elif mode == 'recheck' %}button{% endif %}"
                                            class="btn btn-lg btn-success btn-block" value="Sign in">
                                 </div>
                             </div>

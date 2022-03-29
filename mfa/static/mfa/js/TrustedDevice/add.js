@@ -11,11 +11,13 @@ function checkFlag() {
 }
 
 function checkTrusted() {
+    var trustedURL = document.getElementById("id_begin").value;
+    var secureDeviceURL = document.getElementById('id_secure').value;
     $.ajax({
-        url: "{% url 'td_checkTrusted' %}",
+        url: trustedURL,
         success: function (data) {
             if (data == "OK")
-                window.location.href = "{% url 'td_securedevice' %}";
+                window.location.href =  secureDeviceURL;
             else
                 setTimeout('checkTrusted()', 2000)
         }

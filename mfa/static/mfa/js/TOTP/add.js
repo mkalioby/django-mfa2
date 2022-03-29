@@ -29,13 +29,13 @@ function showKey() {
 function verify() {
     answer = $("#answer").val()
     $.ajax({
-        "url": "{% url 'verify_otop' %}?key=" + key + "&answer=" + answer,
+        "url":  document.getElementById('id_verify').value+"?key=" + key + "&answer=" + answer,
         success: function (data) {
             if (data == "Error")
                 alert("You entered wrong numbers, please try again")
             else {
                 alert("Your authenticator is added successfully.")
-                window.location.href = "{{ redirect_html }}"
+                window.location.href = document.getElementById('id_redirect').value;
             }
         }
     })

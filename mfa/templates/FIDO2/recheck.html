@@ -38,6 +38,7 @@
                         {% csrf_token %}
                         <input type="hidden" name="response" id="response" value=""/>
                         <input type="hidden" name="begin" id="begin" value="{% url 'fido2_begin_auth' %}"/>
+                        <input type="hidden" name="rechecktext" id="rechecktext" value="{% trans 'Der Schlüssel wird verifiziert. Bitte warten Sie einen Moment...' %}"
                         </form>
                     </div>
                 </div>

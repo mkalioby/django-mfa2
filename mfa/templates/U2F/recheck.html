@@ -26,7 +26,7 @@
                         <input type=hidden value="{{ token|safe }}" id="id_token" name="token">
                         <input type=hidden value="{% url 'u2f_recheck' %}" id="id_recheck" name="recheck">
                         <input type=hidden value="{{ mode }}" id="id_recheck" name="mode">
-                        <input type=hidden value="{% trans "U2F must work under secure context" %}"
+                        <input type=hidden value="{% trans 'U2F must work under secure context' %}"
                                id="id_protocol_message" name="protocol_message">
                         </form>
                     </div>

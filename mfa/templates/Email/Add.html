@@ -14,6 +14,7 @@
             <div class="panel-body">
                 <FORM METHOD="POST" ACTION="{% url 'start_email' %}" Id="formLogin" name="FrontPage_Form1">
                     {% csrf_token %}
+                    <input type=hidden value="{{ redirect_html }}" id="id_redirect" name="redirect">
                     {% if invalid %}
                         <div class="alert alert-danger">
                             {% trans 'Sorry, The provided token is not valid.' %}
