@@ -1,8 +1,11 @@
 {% load static %}
 {% load i18n %}
 
-<link href="{% static 'mfa/css/mfa.css' %}" rel="stylesheet">
-
+{% block head %}
+    <link href="{% static 'mfa/css/mfa.css' %}" rel="stylesheet">
+    <script src="{% static 'mfa/js/u2f-api.js' %}" type="text/javascript"></script>
+    <script type="application/javascript" src="{% static 'mfa/js/U2F/recheck.js' %}"></script>
+{% endblock %}
 <div class="row">
 
     <div class="col-sm-10 col-sm-offset-1 col-xs-12 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
@@ -45,4 +48,3 @@
     </div>
 </div>
 </div>
-<script src="{% static 'mfa/js/u2f-api.js' %}" type="text/javascript"></script>

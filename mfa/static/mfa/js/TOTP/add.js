@@ -1,7 +1,8 @@
 var key = "";
 $(document).ready(function addToken() {
+    var start_url = document.getElementById('new_otp');
     $.ajax({
-        "url": "{% url 'get_new_otop' %}", dataType: "JSON",
+        "url": start_url.value, dataType: "JSON",
         success: function (data) {
             window.key = data.secret_key;
             var qr = new QRious({
@@ -27,15 +28,19 @@ function showKey() {
 }
 
 function verify() {
-    answer = $("#answer").val()
+    answer = $("#answer").val();
+    var verify_url = document.getElementById('new_otp');
+    var redirect_url = document.getElementById('id_redirect');
+    var error_text = document.getElementById('id_error');
+    var success_text = document.getElementById('id_success');
     $.ajax({
-        "url":  document.getElementById('id_verify').value+"?key=" + key + "&answer=" + answer,
+        "url": verify_url.value +"?key=" + key + "&answer=" + answer,
         success: function (data) {
             if (data == "Error")
-                alert("You entered wrong numbers, please try again")
+                alert(error_text.value);
             else {
-                alert("Your authenticator is added successfully.")
-                window.location.href = document.getElementById('id_redirect').value;
+                alert(success_text.value);
+                window.location.href = redirect_url.value;
             }
         }
     })
