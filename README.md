@@ -187,6 +187,7 @@ function some_func() {
 * [willingham](https://github.com/willingham)
 * [AndreasDickow](https://github.com/AndreasDickow)
 * [mnelson4](https://github.com/mnelson4)
+* [ezrajrice](https://github.com/ezrajrice)
 
 
  # Security contact information

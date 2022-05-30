@@ -1,4 +1,10 @@
 # Change Log
+## 2.5.0
+
+   * Fixed: issue in the 'Authorize' button don't show on Firefox and Chrome on iOS.
+   * Fixed: Support for bootstrap5
+Thanks to @ezrajrice
+
 ## 2.4.0
 
    * Fixed: issue in the 'Authorize' button don't show on Safari Mobile.
