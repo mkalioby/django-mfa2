@@ -15,7 +15,6 @@ function begin_reg() {
             method: 'POST',
             headers: {'Content-Type': 'application/cbor'},
             body: CBOR.encode({
-                "attestationObject": new Uint8Array(attestation.response.attestationObject),
                 "clientDataJSON": new Uint8Array(attestation.response.clientDataJSON),
             })
         });
