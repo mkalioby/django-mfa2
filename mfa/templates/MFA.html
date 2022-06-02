@@ -98,7 +98,7 @@
                <td>{% if key.key_type in HIDE_DISABLE %}
                    ----
                    {% else %}
-                    <a href="javascript:void(0)" onclick="deleteKey({{ key.id }},'{{ key.key_type }}')"> <span class="fa fa-trash"></span></a></td>
+                    <a href="javascript:void(0)" onclick="deleteKey({{ key.id }},'{{ key.key_type }}')"> <span class="fa fa-trash fa-solid fa-trash-can"></span></a></td>
                     {% endif %}
            </tr>
        {% empty %}
