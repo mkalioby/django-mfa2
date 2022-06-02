@@ -16,6 +16,7 @@
         $("#modal-title").html("Send Link")
         $("#modal-body").html("Sending Email, Please wait....");
         $("#popUpModal").modal();
+        $("#popUpModal").modal('show');
         $.ajax({
             "url":"{% url 'td_sendemail' %}",
             success:function (data) {
@@ -61,6 +62,7 @@
                     $("#modal-footer").prepend("<button id='actionBtn' class='btn btn-success' onclick='checkMFA()'>Trust Device</button>")
                     $("#modal-body").html(data)
                     $("#popUpModal").modal()
+                    $("#popUpModal").modal('show')
                 }
             }
         })

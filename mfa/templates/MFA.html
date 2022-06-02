@@ -20,6 +20,7 @@
         $("#actionBtn").remove()
         $("#modal-footer").prepend("<button id='actionBtn' class='btn btn-danger' onclick='confirmDel("+id+")'>Confirm Deletion</button>")
         $("#popUpModal").modal()
+        $("#popUpModal").modal('show')
     }
 
     function toggleKey(id) {
@@ -98,7 +99,7 @@
                <td>{% if key.key_type in HIDE_DISABLE %}
                    ----
                    {% else %}
-                    <a href="javascript:void(0)" onclick="deleteKey({{ key.id }},'{{ key.key_type }}')"> <span class="fa fa-trash fa-solid fa-trash-can"></span></a></td>
+                    <a href="javascript:void(0)" onclick="deleteKey({{ key.id }},'{{ key.key_type }}')"> <span class="fa fa-trash fa-solid fa-trash-can bi bi-trash-fill"></span></a></td>
                     {% endif %}
            </tr>
        {% empty %}

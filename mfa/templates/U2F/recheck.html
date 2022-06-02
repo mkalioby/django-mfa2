@@ -24,7 +24,7 @@
           </div>
 
           <div class="row">
-          <div style="padding-left: 15px">
+          <div class="col-md-12 mb-3" style="padding-left: 15px">
 
             {% if request.session.mfa_methods|length > 1 %}
                 <a href="{%  url 'mfa_methods_list' %}">Select Another Method</a>
