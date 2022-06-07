@@ -19,7 +19,6 @@
         $("#modal-body").html("Are you sure you want to delete '"+name+"'? you may lose access to your system if this your only 2FA.");
         $("#actionBtn").remove()
         $("#modal-footer").prepend("<button id='actionBtn' class='btn btn-danger' onclick='confirmDel("+id+")'>Confirm Deletion</button>")
-        $("#popUpModal").modal()
         $("#popUpModal").modal('show')
     }
 
