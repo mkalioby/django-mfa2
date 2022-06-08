@@ -24,7 +24,7 @@ setup(
         'ua-parser',
         'user-agents',
         'python-jose',
-        'fido2 == 0.93',
+        'fido2 == 0.9.3',
         'jsonLookup'
       ],
     python_requires=">=3.5",
