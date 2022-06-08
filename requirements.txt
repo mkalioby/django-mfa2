@@ -6,5 +6,5 @@ python-u2flib-server
 ua-parser
 user-agents
 python-jose
-fido2 == 0.9.3
+fido2
 jsonLookup
