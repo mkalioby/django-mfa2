@@ -9,6 +9,7 @@ function authen() {
         if (response.ok) return response.arrayBuffer();
         throw new Error('No credential available to authenticate!');
     }).then(CBOR.decode).then(function (options) {
+        options.publicKey.userVerification = 'required'
         console.log(options)
         return navigator.credentials.get(options);
     }).then(function (assertion) {
