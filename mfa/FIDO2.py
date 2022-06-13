@@ -1,6 +1,6 @@
-from fido2.client import ClientData
+from fido2.client import Fido2Client
 from fido2.server import Fido2Server, PublicKeyCredentialRpEntity
-from fido2.ctap2 import AttestationObject, AuthenticatorData
+from fido2.webauthn import AttestationObject, AuthenticatorData
 from django.template.context_processors import csrf
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render
@@ -11,7 +11,7 @@ from django.http import HttpResponse
 from django.conf import settings
 from .models import *
 from fido2.utils import websafe_decode, websafe_encode
-from fido2.ctap2 import AttestedCredentialData
+from fido2.webauthn import AttestedCredentialData
 from .views import login, reset_cookie
 import datetime
 from .Common import get_redirect_url
@@ -51,7 +51,7 @@ def complete_reg(request):
     try:
         data = cbor.decode(request.body)
 
-        client_data = ClientData(data['clientDataJSON'])
+        client_data = Fido2Client(data['clientDataJSON'])
         att_obj = AttestationObject((data['attestationObject']))
         server = getServer()
         auth_data = server.register_complete(
@@ -112,7 +112,7 @@ def authenticate_complete(request):
         credentials = getUserCredentials(username)
         data = cbor.decode(request.body)
         credential_id = data['credentialId']
-        client_data = ClientData(data['clientDataJSON'])
+        client_data = Fido2Client(data['clientDataJSON'])
         auth_data = AuthenticatorData(data['authenticatorData'])
         signature = data['signature']
         try:
