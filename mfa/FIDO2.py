@@ -1,6 +1,6 @@
 from fido2.client import Fido2Client
 from fido2.server import Fido2Server, PublicKeyCredentialRpEntity
-from fido2.webauthn import AttestationObject, AuthenticatorData
+from fido2.webauthn import AttestationObject, AuthenticatorData, CollectedClientData
 from django.template.context_processors import csrf
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render
@@ -28,7 +28,7 @@ def recheck(request):
 
 def getServer():
     """Get Server Info from settings and returns a Fido2Server"""
-    rp = PublicKeyCredentialRpEntity(settings.FIDO_SERVER_ID, settings.FIDO_SERVER_NAME)
+    rp = PublicKeyCredentialRpEntity(id=settings.FIDO_SERVER_ID, name=settings.FIDO_SERVER_NAME)
     return Fido2Server(rp)
 
 
@@ -51,7 +51,7 @@ def complete_reg(request):
     try:
         data = cbor.decode(request.body)
 
-        client_data = Fido2Client(data['clientDataJSON'])
+        client_data = CollectedClientData(data['clientDataJSON'])
         att_obj = AttestationObject((data['attestationObject']))
         server = getServer()
         auth_data = server.register_complete(
@@ -68,6 +68,8 @@ def complete_reg(request):
         uk.save()
         return HttpResponse(simplejson.dumps({'status': 'OK'}))
     except Exception as exp:
+        import traceback
+        print(traceback.format_exc())
         try:
             from raven.contrib.django.raven_compat.models import client
             client.captureException()
@@ -112,7 +114,7 @@ def authenticate_complete(request):
         credentials = getUserCredentials(username)
         data = cbor.decode(request.body)
         credential_id = data['credentialId']
-        client_data = Fido2Client(data['clientDataJSON'])
+        client_data = CollectedClientData(data['clientDataJSON'])
         auth_data = AuthenticatorData(data['authenticatorData'])
         signature = data['signature']
         try:
