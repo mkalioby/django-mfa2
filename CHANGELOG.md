@@ -1,6 +1,7 @@
 # Change Log
 ## 2.5.0
 
+   * Bumped fido2 version to 1.0
    * Fixed: issue in the 'Authorize' button don't show on Firefox and Chrome on iOS.
      Note: It seems Firefox doesn't support WebAuthn on iOS
    * Fixed: Support for bootstrap5
