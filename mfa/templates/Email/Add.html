@@ -4,12 +4,12 @@
 {% block content %}
 <br/>
 <br/>
-<div class="container">
-  <div class="panel panel-default">
-    <div class="panel-heading">
+<div class="container d-flex justify-content-center">
+  <div class="panel panel-default card">
+    <div class="panel-heading card-header">
       <strong> Activate Token by email</strong>
     </div>
-    <div class="panel-body">
+    <div class="panel-body card-body">
       <FORM METHOD="POST" ACTION="{% url 'start_email' %}" Id="formLogin"  onSubmit="" name="FrontPage_Form1">
         {% csrf_token %}
         {%  if invalid %}
@@ -31,14 +31,14 @@
           <div class="row">
             <div class="col-sm-12 col-md-12">
               <div class="form-group">
-                <div class="input-group">
-                  <span class="input-group-addon">
-                  <i class="glyphicon glyphicon-lock"></i>
+                <div class="input-group mb-3">
+                  <span class="input-group-addon input-group-text">
+                  <i class="glyphicon glyphicon-lock bi bi-lock"></i>
                   </span>
                   <input class="form-control" size="6" MaxLength="6" value="" placeholder="e.g 55552" name="otp" type="text" id="otp" autofocus>
                 </div>
               </div>
-              <div class="form-group">
+              <div class="form-group d-grid gap-2">
                 <input type="submit" class="btn btn-lg btn-success btn-block" value="Verify">
               </div>
             </div>
