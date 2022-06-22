@@ -19,7 +19,7 @@
         $("#modal-body").html("Are you sure you want to delete '"+name+"'? you may lose access to your system if this your only 2FA.");
         $("#actionBtn").remove()
         $("#modal-footer").prepend("<button id='actionBtn' class='btn btn-danger' onclick='confirmDel("+id+")'>Confirm Deletion</button>")
-        $("#popUpModal").modal()
+        $("#popUpModal").modal('show')
     }
 
     function toggleKey(id) {
@@ -47,24 +47,24 @@
     <div class="row">
         <div align="center">
             <div class="btn-group">
-            <button class="btn btn-success dropdown-toggle" data-toggle="dropdown">
+            <button class="btn btn-success dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown">
                 Add Method&nbsp;<span class="caret"></span>
             </button>
             <ul class="dropdown-menu">
                 {% if not 'TOTP' in UNALLOWED_AUTHEN_METHODS %}
-                    <li><a href="{% url 'start_new_otop' %}">Authenticator app</a></li>
+                    <li><a class="dropdown-item" href="{% url 'start_new_otop' %}">Authenticator app</a></li>
                 {% endif %}
                 {% if not 'Email' in UNALLOWED_AUTHEN_METHODS %}
-                    <li><a href="{% url 'start_email' %}">Email Token</a></li>
+                    <li><a class="dropdown-item" href="{% url 'start_email' %}">Email Token</a></li>
                 {% endif %}
                 {% if not 'U2F' in UNALLOWED_AUTHEN_METHODS %}
-                    <li><a href="{% url 'start_u2f' %}">Security Key</a></li>
+                    <li><a class="dropdown-item" href="{% url 'start_u2f' %}">Security Key</a></li>
                 {% endif %}
             {% if not 'FIDO2' in UNALLOWED_AUTHEN_METHODS %}
-                    <li><a href="{% url 'start_fido2' %}">FIDO2 Security Key</a></li>
+                    <li><a class="dropdown-item" href="{% url 'start_fido2' %}">FIDO2 Security Key</a></li>
                 {% endif %}
             {% if not 'Trusted_Devices' in UNALLOWED_AUTHEN_METHODS %}
-                    <li><a href="{% url 'start_td' %}">Trusted Device</a></li>
+                    <li><a class="dropdown-item" href="{% url 'start_td' %}">Trusted Device</a></li>
                 {% endif %}
             </ul>
             </div>
@@ -98,7 +98,7 @@
                <td>{% if key.key_type in HIDE_DISABLE %}
                    ----
                    {% else %}
-                    <a href="javascript:void(0)" onclick="deleteKey({{ key.id }},'{{ key.key_type }}')"> <span class="fa fa-trash"></span></a></td>
+                    <a href="javascript:void(0)" onclick="deleteKey({{ key.id }},'{{ key.key_type }}')"> <span class="fa fa-trash fa-solid fa-trash-can bi bi-trash-fill"></span></a></td>
                     {% endif %}
            </tr>
        {% empty %}
