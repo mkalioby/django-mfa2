@@ -5,7 +5,7 @@
      Note: It seems Firefox doesn't support WebAuthn on iOS
    * Fixed: Support for bootstrap5
      Thanks to @ezrajrice
-   * Upgraded to fido==1.0.0
+   * Upgraded to fido2==1.0.0
   
 ## 2.4.0
 
