@@ -41,6 +41,7 @@ def check_errors(request, data):
         if data["errorCode"] == 1:
             return auth(request)
     return True
+
 def validate(request,username):
     import datetime, random
 
@@ -53,7 +54,9 @@ def validate(request,username):
     challenge = request.session.pop('_u2f_challenge_')
     device, c, t = complete_authentication(challenge, data, [settings.U2F_APPID])
 
-    key=User_Keys.objects.get(username=username,properties__shas="$.device.publicKey=%s"%device["publicKey"])
+
+    key = User_Keys.objects.filter(username=username, properties__iregex=rf'{device["publicKey"]}')
+    #key=User_Keys.objects.get(username=username,properties__shas="$.device.publicKey=%s"%device["publicKey"])
     key.last_used=timezone.now()
     key.save()
     mfa = {"verified": True, "method": "U2F","id":key.id}
@@ -70,7 +73,7 @@ def auth(request):
     request.session["_u2f_challenge_"]=s[0]
     context["token"]=s[1]
 
-    return render(request,"U2F/Auth.html")
+    return render(request,"U2F/Auth.html", context)
 
 def start(request):
     enroll = begin_registration(settings.U2F_APPID, [])
