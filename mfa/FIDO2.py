@@ -73,14 +73,14 @@ def complete_reg(request):
         uk.key_type = "FIDO2"
         uk.save()
         return HttpResponse(simplejson.dumps({'status': 'OK'}))
-    except Exception:
+    except Exception as e:
         try:
             from raven.contrib.django.raven_compat.models import client
             client.captureException()
         except:
             logger.error(gettext("Error on server, please try again later"), exc_info=True)
             
-        return HttpResponse(simplejson.dumps({'status': 'ERR', "message": gettext("Error on server, please try again later")}))
+        return HttpResponse(simplejson.dumps({'status': 'ERR', "message": str(e)}))
 
 
 def start(request):
