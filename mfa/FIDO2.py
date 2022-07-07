@@ -1,97 +1,173 @@
-from django.shortcuts import render
-from django.http import HttpResponse,HttpResponseRedirect
-from .models import *
-try:
-    from django.urls import reverse
-except:
-    from django.core.urlresolvers import reverse
+from fido2.client import Fido2Client
+from fido2.server import Fido2Server, PublicKeyCredentialRpEntity
+from fido2.webauthn import AttestationObject, AuthenticatorData, CollectedClientData
 from django.template.context_processors import csrf
-from django.template.context import RequestContext
+from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import render
+# from django.template.context import RequestContext
+import simplejson
+from fido2 import cbor
+from django.http import HttpResponse
 from django.conf import settings
-from . import TrustedDevice
-from django.contrib.auth.decorators import login_required
-from user_agents import parse
-from django.utils.translation import gettext
-
-@login_required
-def index(request):
-    keys=[]
-    context={"keys":User_Keys.objects.filter(username=request.user.username),"UNALLOWED_AUTHEN_METHODS":settings.MFA_UNALLOWED_METHODS
-             ,"HIDE_DISABLE":getattr(settings,"MFA_HIDE_DISABLE",[])}
-    for k in context["keys"]:
-        if k.key_type =="Trusted Device" :
-            setattr(k,"device",parse(k.properties.get("user_agent","-----")))
-        elif k.key_type == "FIDO2":
-            setattr(k,"device",k.properties.get("type","----"))
-        keys.append(k)
-    context["keys"]=keys
-    return render(request,"MFA.html",context)
-
-def verify(request,username):
-    request.session["base_username"] = username
-    #request.session["base_password"] = password
-    keys=User_Keys.objects.filter(username=username,enabled=1)
-    methods=list(set([k.key_type for k in keys]))
-
-    if "Trusted Device" in methods and not request.session.get("checked_trusted_device",False):
-        if TrustedDevice.verify(request):
-            return login(request)
-        methods.remove("Trusted Device")
-    request.session["mfa_methods"] = methods
-    if len(methods)==1:
-        return HttpResponseRedirect(reverse(methods[0].lower()+"_auth"))
-    return show_methods(request)
-
-def show_methods(request):
-    return render(request,"select_mfa_method.html", {})
-
-def reset_cookie(request):
-    response=HttpResponseRedirect(settings.LOGIN_URL)
-    response.delete_cookie("base_username")
-    return response
-def login(request):
-    from django.contrib import auth
-    from django.conf import settings
-    callable_func = __get_callable_function__(settings.MFA_LOGIN_CALLBACK)
-    return callable_func(request,username=request.session["base_username"])
+from .models import *
+from fido2.utils import websafe_decode, websafe_encode
+from fido2.webauthn import AttestedCredentialData
+from .views import login, reset_cookie
+import datetime
+from .Common import get_redirect_url
+from django.utils import timezone
 
 
-@login_required
-def delKey(request):
-    key=User_Keys.objects.get(id=request.GET["id"])
-    if key.username == request.user.username:
-        key.delete()
-        return HttpResponse(gettext("Deleted Successfully"))
-    else:
-        return HttpResponse(gettext("Error: You own this token so you can't delete it"))
+def recheck(request):
+    """Starts FIDO2 recheck"""
+    context = csrf(request)
+    context["mode"] = "recheck"
+    request.session["mfa_recheck"] = True
+    return render(request, "FIDO2/recheck.html", context)
 
-def __get_callable_function__(func_path):
-    import importlib
-    if not '.' in func_path:
-        raise Exception(gettext("class Name should include modulename.classname"))
 
-    parsed_str = func_path.split(".")
-    module_name , func_name = ".".join(parsed_str[:-1]) , parsed_str[-1]
-    imported_module = importlib.import_module(module_name)
-    callable_func = getattr(imported_module,func_name)
-    if not callable_func:
-        raise Exception(gettext("Module does not have requested function"))
-    return callable_func
+def getServer():
+    """Get Server Info from settings and returns a Fido2Server"""
+    rp = PublicKeyCredentialRpEntity(id=settings.FIDO_SERVER_ID, name=settings.FIDO_SERVER_NAME)
+    return Fido2Server(rp)
 
-@login_required
-def toggleKey(request):
-    id=request.GET["id"]
-    q=User_Keys.objects.filter(username=request.user.username, id=id)
-    if q.count()==1:
-        key=q[0]
-        if not key.key_type in settings.MFA_HIDE_DISABLE:
-            key.enabled=not key.enabled
-            key.save()
-            return HttpResponse(gettext("OK"))
+
+def begin_registeration(request):
+    """Starts registering a new FIDO Device, called from API"""
+    server = getServer()
+    registration_data, state = server.register_begin({
+        u'id': request.user.username.encode("utf8"),
+        u'name': (request.user.first_name + " " + request.user.last_name),
+        u'displayName': request.user.username,
+    }, getUserCredentials(request.user.username))
+    request.session['fido_state'] = state
+
+    return HttpResponse(cbor.encode(registration_data), content_type = 'application/octet-stream')
+
+
+@csrf_exempt
+def complete_reg(request):
+    """Completes the registeration, called by API"""
+    try:
+        data = cbor.decode(request.body)
+
+        client_data = CollectedClientData(data['clientDataJSON'])
+        att_obj = AttestationObject((data['attestationObject']))
+        server = getServer()
+        auth_data = server.register_complete(
+            request.session['fido_state'],
+            client_data,
+            att_obj
+        )
+        encoded = websafe_encode(auth_data.credential_data)
+        uk = User_Keys()
+        uk.username = request.user.username
+        uk.properties = {"device": encoded, "type": att_obj.fmt, }
+        uk.owned_by_enterprise = getattr(settings, "MFA_OWNED_BY_ENTERPRISE", False)
+        uk.key_type = "FIDO2"
+        uk.save()
+        return HttpResponse(simplejson.dumps({'status': 'OK'}))
+    except Exception as exp:
+        import traceback
+        print(traceback.format_exc())
+        try:
+            from raven.contrib.django.raven_compat.models import client
+            client.captureException()
+        except:
+            pass
+        return HttpResponse(simplejson.dumps({'status': 'ERR', "message": "Error on server, please try again later"}))
+
+
+def start(request):
+    """Start Registeration a new FIDO Token"""
+    context = csrf(request)
+    context.update(get_redirect_url())
+    return render(request, "FIDO2/Add.html", context)
+
+
+def getUserCredentials(username):
+    credentials = []
+    for uk in User_Keys.objects.filter(username = username, key_type = "FIDO2"):
+        credentials.append(AttestedCredentialData(websafe_decode(uk.properties["device"])))
+    return credentials
+
+
+def auth(request):
+    context = csrf(request)
+    return render(request, "FIDO2/Auth.html", context)
+
+
+def authenticate_begin(request):
+    server = getServer()
+    credentials = getUserCredentials(request.session.get("base_username", request.user.username))
+    auth_data, state = server.authenticate_begin(credentials)
+    request.session['fido_state'] = state
+    return HttpResponse(cbor.encode(auth_data), content_type = "application/octet-stream")
+
+
+@csrf_exempt
+def authenticate_complete(request):
+    try:
+        credentials = []
+        username = request.session.get("base_username", request.user.username)
+        server = getServer()
+        credentials = getUserCredentials(username)
+        data = cbor.decode(request.body)
+        credential_id = data['credentialId']
+        client_data = CollectedClientData(data['clientDataJSON'])
+        auth_data = AuthenticatorData(data['authenticatorData'])
+        signature = data['signature']
+        try:
+            cred = server.authenticate_complete(
+                request.session.pop('fido_state'),
+                credentials,
+                credential_id,
+                client_data,
+                auth_data,
+                signature
+            )
+        except ValueError:
+            return HttpResponse(simplejson.dumps({'status': "ERR",
+                                                  "message": "Wrong challenge received, make sure that this is your security and try again."}),
+                                content_type = "application/json")
+        except Exception as excep:
+            try:
+                from raven.contrib.django.raven_compat.models import client
+                client.captureException()
+            except:
+                pass
+            return HttpResponse(simplejson.dumps({'status': "ERR",
+                                                  "message": excep.message}),
+                                content_type = "application/json")
+
+        if request.session.get("mfa_recheck", False):
+            import time
+            request.session["mfa"]["rechecked_at"] = time.time()
+            return HttpResponse(simplejson.dumps({'status': "OK"}),
+                                content_type = "application/json")
         else:
-            return HttpResponse(gettext("You can't change this method."))
-    else:
-        return HttpResponse(gettext("Error"))
-
-def goto(request,method):
-    return HttpResponseRedirect(reverse(method.lower()+"_auth"))
+            import random
+            keys = User_Keys.objects.filter(username = username, key_type = "FIDO2", enabled = 1)
+            for k in keys:
+                if AttestedCredentialData(websafe_decode(k.properties["device"])).credential_id == cred.credential_id:
+                    k.last_used = timezone.now()
+                    k.save()
+                    mfa = {"verified": True, "method": "FIDO2", 'id': k.id}
+                    if getattr(settings, "MFA_RECHECK", False):
+                        mfa["next_check"] = datetime.datetime.timestamp((datetime.datetime.now() + datetime.timedelta(
+                            seconds = random.randint(settings.MFA_RECHECK_MIN, settings.MFA_RECHECK_MAX))))
+                    request.session["mfa"] = mfa
+                    try:
+                        authenticated = request.user.is_authenticated
+                    except:
+                        authenticated = request.user.is_authenticated()
+                    if not authenticated:
+                        res = login(request)
+                        if not "location" in res: return reset_cookie(request)
+                        return HttpResponse(simplejson.dumps({'status': "OK", "redirect": res["location"]}),
+                                            content_type = "application/json")
+                    return HttpResponse(simplejson.dumps({'status': "OK"}),
+                                        content_type = "application/json")
+    except Exception as exp:
+        return HttpResponse(simplejson.dumps({'status': "ERR", "message": exp.message}),
+                            content_type = "application/json")
