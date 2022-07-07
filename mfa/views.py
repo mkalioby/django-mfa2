@@ -11,6 +11,7 @@ from django.conf import settings
 from . import TrustedDevice
 from django.contrib.auth.decorators import login_required
 from user_agents import parse
+from django.utils.translation import gettext
 
 @login_required
 def index(request):
@@ -60,9 +61,9 @@ def delKey(request):
     key=User_Keys.objects.get(id=request.POST["id"])
     if key.username == request.user.username:
         key.delete()
-        return HttpResponse("Deleted Successfully")
+        return HttpResponse(gettext("Deleted Successfully"))
     else:
-        return HttpResponse("Error: You own this token so you can't delete it")
+        return HttpResponse(gettext("Error: You own this token so you can't delete it"))
 
 def __get_callable_function__(func_path):
     import importlib
@@ -74,7 +75,7 @@ def __get_callable_function__(func_path):
     imported_module = importlib.import_module(module_name)
     callable_func = getattr(imported_module,func_name)
     if not callable_func:
-        raise Exception("Module does not have requested function")
+        raise Exception(gettext("Module does not have requested function"))
     return callable_func
 
 @login_required
@@ -86,11 +87,11 @@ def toggleKey(request):
         if not key.key_type in settings.MFA_HIDE_DISABLE:
             key.enabled=not key.enabled
             key.save()
-            return HttpResponse("OK")
+            return HttpResponse(gettext("OK"))
         else:
-            return HttpResponse("You can't change this method.")
+            return HttpResponse(gettext("You can't change this method."))
     else:
-        return HttpResponse("Error")
+        return HttpResponse(gettext("Error"))
 
 def goto(request,method):
     return HttpResponseRedirect(reverse(method.lower()+"_auth"))

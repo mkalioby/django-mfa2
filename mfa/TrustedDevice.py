@@ -7,6 +7,7 @@ from django.template.context_processors import csrf
 from .models import *
 import user_agents
 from django.utils import timezone
+from django.utils.translation import gettext
 
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
     x=''.join(random.choice(chars) for _ in range(size))
@@ -28,7 +29,7 @@ def trust_device(request):
     tk.properties["status"]="trusted"
     tk.save()
     del request.session["td_id"]
-    return HttpResponse("OK")
+    return HttpResponse(gettext("OK"))
 
 def checkTrusted(request):
     res = ""
@@ -70,7 +71,7 @@ def add(request):
             ua=request.META['HTTP_USER_AGENT']
             agent=user_agents.parse(ua)
             if agent.is_pc:
-                context["invalid"]="This is a PC, it can't used as a trusted device."
+                context["invalid"]=gettext("This is a PC, it can't used as a trusted device.")
             else:
                 tk.properties["user_agent"]=ua
                 tk.save()
@@ -80,7 +81,7 @@ def add(request):
             # context["success"]=True
 
         else:
-            context["invalid"]="The username or key is wrong, please check and try again."
+            context["invalid"]=gettext("The username or key is wrong, please check and try again.")
 
         return  render(request,"TrustedDevices/Add.html", context)
 
@@ -110,11 +111,11 @@ def send_email(request):
     if e=="":
         e=request.session.get("user",{}).get("email","")
     if e=="":
-        res = "User has no email on the system."
-    elif send([e],"Add Trusted Device Link",body):
-        res="Sent Successfully"
+        res = gettext("User has no email on the system.")
+    elif send([e],gettext("Add Trusted Device Link"),body):
+        res=gettext("Sent Successfully")
     else:
-        res="Error occured, please try again later."
+        res=gettext("Error occured, please try again later.")
     return HttpResponse(res)
 
 
