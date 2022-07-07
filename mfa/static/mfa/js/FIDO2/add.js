@@ -27,7 +27,7 @@ function begin_reg(){
     }).then(function (res)
         {
       if (res["status"] =='OK')
-            $("#res").html("<div class='alert alert-success'>Registered Successfully, <a href='"+formData.get('redirect')+"'> "+formData.get('success')+"</a></div>")
+            window.navigator.href = formData.get('redirect');
         else
             $("#res").html("<div class='alert alert-danger'>Registeration Failed as " + res["message"] + ", <a href='javascript:void(0)' onclick='begin_reg()'> try again or <a href='"+formData.get('home')+"'> Go to Security Home</a></div>")
 
