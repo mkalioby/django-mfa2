@@ -336,7 +336,7 @@ msgstr "FIDO2 Secure Key"
 
 #: mfa/views.py:72
 msgid "The key was deleted successfully."
-msgstr "Der Key wyrde erfolgreich gelöscht"
+msgstr "Der Key wurde erfolgreich gelöscht."
 
 #: mfa/views.py:75
 msgid "Error: You own this token so you can't delete it"
