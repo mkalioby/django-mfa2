@@ -1,7 +1,8 @@
 function authen()
 {
-const begin_url = $('#begin').value;
-const complete_url = $('u2f_login').attr('action');
+const begin_url = document.getElementById('begin').value;
+const complete_url = document.getElementById('u2f_login').getAttribute('action');
+const recheck_text = document.getElementById('rechecktext')
 const mode = $('u2f_login').attr('name') === 'complete'?'auth':'recheck';
 fetch(begin_url, {
 method: 'GET',
@@ -30,11 +31,11 @@ body:res,
   {
     $("#msgdiv").addClass("alert alert-success").removeClass("alert-danger")
     $("#msgdiv").html("Verified....please wait")
-    if(mode == "auth"){
-      window.location.href=res.redirect;
-    }
-    else if(mode === "recheck"){
-      mfa_success_function();
+    $("#msgdiv").html("<p>"+recheck_text+"</p>")
+    if (mode == "auth") {
+        window.location.href = res.redirect;
+    } else if (mode === "recheck") {
+        window.location.href = '/'
     }
   
   }
