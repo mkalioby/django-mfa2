@@ -6,53 +6,47 @@
 <script type="application/javascript" src="{% static 'mfa/js/FIDO2/recheck.js' %}"></script>
 <div class="row">
 
-    <div class="col-sm-10 col-sm-offset-1 col-xs-12 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <strong>{% trans 'Security Key' %}</strong>
-            </div>
-            <div class="panel-body">
+<div class="col-sm-10 col-sm-offset-1 col-xs-12 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
+<div class="panel panel-default card">
+      <div class="panel-heading card-header">
+	      <strong>{% trans 'Security Key' %}</strong>
+      </div>
+      <div class="panel-body card-body">
 
-                <div class="row">
-                    <div class="col-md-10 col-md-offset-1 paragraph" id="main_paragraph">
-                        {% if mode == "auth" %}
-                            {% trans 'Welcome back' %} {% comment %}
-                            <img src="{% url 'getUserImage' request.session.base_username %}"
-                                 title="{{ request.session.base_username }}" class="padding-3 height-50 img-circle"/>
-                        {% endcomment %} {{ request.session.base_username }}<br/>
-                            <a href="{% url 'mfa_reset_cookie' %}">{% trans 'Not me' %}</a>
-                            <br/>
+              <div class="row">
+            <div class="col-md-10 col-md-offset-1 paragraph" id="main_paragraph">
+                {% if mode == "auth" %}
+                {% trans 'Welcome back' %} {% comment %}<img src="{% url 'getUserImage' request.session.base_username  %}" title="{{ request.session.base_username }}" style="padding: 3px;height: 50px" class="img-circle"/>{% endcomment %} {{ request.session.base_username }}<br/>
+                    <a href="{% url 'mfa_reset_cookie' %}">{% trans 'Not me' %}</a>
+                    <br/>
 
-                        {% endif %}
-                        <div id="res">
-                            <p class="success">{% trans 'please press the button on your security key to prove it is you.' %}</p>
-                        </div>
-                        <div id="msgdiv"></div>
-                        {% if mode == "auth" %}
-                            <form id="u2f_login" action="{% url 'fido2_complete_auth' %}" method="post"
-                                  enctype="multipart/form-data" name="complete">
-                        {% elif mode == "recheck" %}
-                            <form id="u2f_login" action="{% url 'fido2_recheck' %}" method="post"
-                                  enctype="multipart/form-data" name="recheck">
-                        {% endif %}
-                        {% csrf_token %}
-                        <input type="hidden" name="response" id="response" value=""/>
-                        <input type="hidden" name="begin" id="begin" value="{% url 'fido2_begin_auth' %}"/>
-                        <input type="hidden" name="rechecktext" id="rechecktext" value="{% trans 'Der Schlüssel wird verifiziert. Bitte warten Sie einen Moment...' %}"
-                        </form>
-                    </div>
+            {% endif %}
+                <div id="res">
+                    <p class="success">{% trans 'please press the button on your security key to prove it is you.' %}</p>
                 </div>
-            </div>
+                <div id="msgdiv"></div>
+                {% if mode == "auth" %}
+                    <form id="u2f_login" action="{% url 'fido2_complete_auth' %}" method="post" enctype="multipart/form-data" name="complete">
+                {% elif mode == "recheck" %}
+                    <form id="u2f_login" action="{% url 'fido2_recheck' %}" method="post" enctype="multipart/form-data" name="recheck">
+                {% endif %}
+              {% csrf_token %}
+              <input type="hidden" name="response" id="response" value=""/>
+              <input type="hidden" name="begin" id="begin" value="{% url 'fido2_begin_auth' %}"/>
+          </form>
+      </div>
+                  </div>
+          </div>
 
-            <div class="row">
-                <div class="paragraph">
+          <div class="row">
+          <div class="col-md-12 mb-3" style="padding-left: 15px">
 
-                    {% if request.session.mfa_methods|length > 1 %}
-                        <a href="{% url 'mfa_methods_list' %}">{% trans 'Select Another Method' %}</a>
-                    {% endif %}
-                </div>
-            </div>
+            {% if request.session.mfa_methods|length > 1 %}
+                <a href="{%  url 'mfa_methods_list' %}">{% trans 'Select Another Method' %}</a>
+            {% endif %}
+          </div>
         </div>
     </div>
+</div>
 </div>
 </div>

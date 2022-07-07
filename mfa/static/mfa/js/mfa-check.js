@@ -1,5 +1,8 @@
 mfa_success_function=null;
 mfa_failed_function=null;
+function is_mfa() {
+    return $("#is_mfa").value;
+}
 
 function recheck_mfa(success_func,fail_func,must_mfa) {
     if (!must_mfa) success_func()
@@ -19,6 +22,9 @@ function recheck_mfa(success_func,fail_func,must_mfa) {
                 $("#modal-body").html(data["html"])
                 $("#popUpModal").modal()
             }
+
+
+            
         }
     })
 }

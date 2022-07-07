@@ -14,72 +14,68 @@
     <br/>
     <br/>
     <div class="container">
-        <div class="row">
-            <div align="center">
-                <div class="btn-group">
-                    <button class="btn btn-success dropdown-toggle" data-toggle="dropdown">
-                        {% trans 'Add Method' %}&nbsp;<span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu">
-                        {% if not 'TOTP' in UNALLOWED_AUTHEN_METHODS %}
-                            <li><a href="{% url 'start_new_otop' %}">{% trans 'Authenticator app' %}</a></li>
-                        {% endif %}
-                        {% if not 'Email' in UNALLOWED_AUTHEN_METHODS %}
-                            <li><a href="{% url 'start_email' %}">{% trans 'Email Token' %}</a></li>
-                        {% endif %}
-                        {% if not 'U2F' in UNALLOWED_AUTHEN_METHODS %}
-                            <li><a href="{% url 'start_u2f' %}">{% trans 'Security Key' %}</a></li>
-                        {% endif %}
-                        {% if not 'FIDO2' in UNALLOWED_AUTHEN_METHODS %}
-                            <li><a href="{% url 'start_fido2' %}">{% trans 'FIDO2 Security Key' %}</a></li>
-                        {% endif %}
-                        {% if not 'Trusted_Devices' in UNALLOWED_AUTHEN_METHODS %}
-                            <li><a href="{% url 'start_td' %}">{% trans 'Trusted Device' %}</a></li>
-                        {% endif %}
-                    </ul>
-                </div>
+    <div class="row">
+        <div align="center">
+            <div class="btn-group">
+            <button class="btn btn-success dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown">
+                {% trans 'Add Method' %}&nbsp;<span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+                {% if not 'TOTP' in UNALLOWED_AUTHEN_METHODS %}
+                    <li><a class="dropdown-item" href="{% url 'start_new_otop' %}">{% trans 'Authenticator app' %}</a></li>
+                {% endif %}
+                {% if not 'Email' in UNALLOWED_AUTHEN_METHODS %}
+                    <li><a class="dropdown-item" href="{% url 'start_email' %}">{% trans 'Email Token' %}</a></li>
+                {% endif %}
+                {% if not 'U2F' in UNALLOWED_AUTHEN_METHODS %}
+                    <li><a class="dropdown-item" href="{% url 'start_u2f' %}">{% trans 'Security Key' %}</a></li>
+                {% endif %}
+            {% if not 'FIDO2' in UNALLOWED_AUTHEN_METHODS %}
+                    <li><a class="dropdown-item" href="{% url 'start_fido2' %}">{% trans 'FIDO2 Security Key' %}</a></li>
+                {% endif %}
+            {% if not 'Trusted_Devices' in UNALLOWED_AUTHEN_METHODS %}
+                    <li><a class="dropdown-item" href="{% url 'start_td' %}">{% trans 'Trusted Device' %}</a></li>
+                {% endif %}
+            </ul>
             </div>
-            <br/>
-            <br/>
-            <table class="table table-striped">
-                <tr>
-                    <th>{% trans 'Type' %}</th>
-                    <th>{% trans 'Date Added' %}</th>
-                    <th>{% trans 'Expires On' %}</th>
-                    <th>{% trans 'Device' %}</th>
-                    <th>{% trans 'Last Used' %}</th>
-                    <th>{% trans 'Status' %}</th>
-                    <th>{% trans 'Delete' %}</th>
-                </tr>
-                {% for key in keys %}
-                    <tr>
-                        <td>{{ key.key_type }}</td>
-                        <td>{{ key.added_on }}</td>
-                        <td>{{ key.expires }}</td>
-                        <td>{% if key.device %}{{ key.device }}{% endif %}</td>
-                        <td>{{ key.last_used }}</td>
-                        {% if key.key_type in HIDE_DISABLE %}
-                            <td>{% if key.enabled %}{% trans 'On' %}{% else %} {% trans 'Off' %}{% endif %}</td>
-                        {% else %}
-                            <td><input type="checkbox" id="toggle_{{ key.id }}" {% if key.enabled %}checked{% endif %}
-                                       data-onstyle="success" data-offstyle="danger"
-                                       data-toggle="toggle" class="status_chk"></td>
-                        {% endif %}
-                        <td>
-                            {% if key.key_type in HIDE_DISABLE %}
-                                ----
-                            {% else %}
-                                <span id="delete-key"><span class="fa fa-trash"></span></span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="7" align="center">{% trans "You didn't have any keys yet." %}</td>
-                    </tr>
-                {% endfor %}
-            </table>
-        </div>
+         
+    <br/>
+    <br/>
+       <table class="table table-striped">
+           <tr>
+
+               <th>{% trans 'Type' %}</th>
+               <th>{% trans 'Date Added' %}</th>
+               <th>{% trans 'Expires On' %}</th>
+               <th>{% trans 'Device' %}</th>
+               <th>{% trans 'Last Used' %}</th>
+               <th>{% trans 'Status' %}</th>
+               <th>{% trans 'Delete' %}</th>
+           </tr>
+        {% for key in keys %}
+           <tr>
+
+               <td>{{ key.key_type }}</td>
+               <td>{{ key.added_on }}</td>
+               <td>{{ key.expires }}</td>
+               <td>{% if key.device %}{{ key.device }}{% endif %}</td>
+               <td>{{ key.last_used }}</td>
+                {% if key.key_type in HIDE_DISABLE %}
+                    <td>{% if key.enabled %}{% trans 'On' %}{% else %} {% trans 'Off' %}{% endif %}</td>
+                {% else %}
+                    <td><input type="checkbox" id="toggle_{{ key.id }}" {% if key.enabled %}checked{% endif %} data-onstyle="success" data-offstyle="danger"  onchange="toggleKey({{ key.id }},'{% url 'toggle_key' %}?id={{key.id}}')" data-toggle="toggle" class="status_chk"></td>
+                {% endif %}
+               <td>{% if key.key_type in HIDE_DISABLE %}
+                   ----
+                   {% else %}
+                    <a href="javascript:void(0)" onclick="deleteKey({{ key.id }},'{{ key.key_type }}','{% url 'mfa_delKey' %}')"> <span class="fa fa-trash fa-solid fa-trash-can bi bi-trash-fill"></span></a></td>
+                    {% endif %}
+           </tr>
+       {% empty %}
+           <tr><td colspan="7" align="center">{% trans "You didn't have any keys yet." %}</td> </tr>
+       {% endfor %}
+        </table>
+    </div>
     </div>
     {% include "modal.html" %}
 {% endblock %}

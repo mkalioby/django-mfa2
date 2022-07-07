@@ -7,6 +7,7 @@ from django.template.context_processors import csrf
 from .models import *
 import user_agents
 from django.utils import timezone
+from django.utils.translation import gettext
 
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
     x=''.join(random.choice(chars) for _ in range(size))
@@ -28,7 +29,7 @@ def trust_device(request):
     tk.properties["status"]="trusted"
     tk.save()
     del request.session["td_id"]
-    return HttpResponse("OK")
+    return HttpResponse(gettext("OK"))
 
 def checkTrusted(request):
     res = ""
@@ -111,10 +112,10 @@ def send_email(request):
         e=request.session.get("user",{}).get("email","")
     if e=="":
         res = gettext("User has no email on the system.")
-    elif send([e],"Add Trusted Device Link",body):
-        res= gettext("Sent Successfully")
+    elif send([e],gettext("Add Trusted Device Link"),body):
+        res=gettext("Sent Successfully")
     else:
-        res= gettext("Error occured, please try again later.")
+        res=gettext("Error occured, please try again later.")
     return HttpResponse(res)
 
 

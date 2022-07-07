@@ -1,50 +1,43 @@
 {% load static %}
 {% load i18n %}
-
-{% block head %}
-    <link href="{% static 'mfa/css/mfa.css' %}" rel="stylesheet">
-    <script src="{% static 'mfa/js/u2f-api.js' %}" type="text/javascript"></script>
-    <script type="application/javascript" src="{% static 'mfa/js/U2F/recheck.js' %}"></script>
-{% endblock %}
 <div class="row">
 
-    <div class="col-sm-10 col-sm-offset-1 col-xs-12 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <strong> Security Key</strong>
-            </div>
-            <div class="panel-body">
+<div class="col-sm-10 col-sm-offset-1 col-xs-12 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
+<div class="panel panel-default card">
+      <div class="panel-heading card-header">
+	      <strong> Security Key</strong>
+      </div>
+      <div class="panel-body card-body">
 
-                <div class="row">
-                    <div class="padding-left-15 col-md-10 col-md-offset-1" id="main_paragraph"
-                         align="center">
-                        <p class="success">{% trans "Your key should be flashing now, please press the button." %}</p>
-                        {% if mode == "auth" %}
-                            <form id="u2f_login" action="{% url 'u2f_verify' %}" method="post">
-                        {% elif mode == "recheck" %}
-                            <form id="u2f_login" action="{% url 'u2f_recheck' %}" method="post">
-                        {% endif %}
-                        {% csrf_token %}
-                        <input type="hidden" name="response" id="response" value=""/>
-                        <input type=hidden value="{{ token|safe }}" id="id_token" name="token">
-                        <input type=hidden value="{% url 'u2f_recheck' %}" id="id_recheck" name="recheck">
-                        <input type=hidden value="{{ mode }}" id="id_recheck" name="mode">
-                        <input type=hidden value="{% trans 'U2F must work under secure context' %}"
-                               id="id_protocol_message" name="protocol_message">
-                        </form>
-                    </div>
-                </div>
-            </div>
+              <div class="row">
+            <div style="padding-left: 15px" class="col-md-10 col-md-offset-1" id="main_paragraph" align="center">
+                <p class="success" >{% trans "Your key should be flashing now, please press the button." %}</p>
+                {% if mode == "auth" %}
+                    <form id="u2f_login" action="{% url 'u2f_verify' %}" method="post">
+                {% elif mode == "recheck" %}
+                    <form id="u2f_login" action="{% url 'u2f_recheck' %}" method="post">
+                {% endif %}
+              {% csrf_token %}
+              <input type="hidden" name="response" id="response" value=""/>
+              <input type=hidden value="{{ token|safe }}" id="id_token" name="token">
+              <input type=hidden value="{% url 'u2f_recheck' %}" id="id_recheck" name="recheck">
+              <input type=hidden value="{{ mode }}" id="id_recheck" name="mode">
+              <input type=hidden value="{% trans "U2F must work under secure context" %}" id="id_protocol_message" name="protocol_message">
+          </form>
+      </div>
+                  </div>
+          </div>
 
-            <div class="row">
-                <div class="padding-left-15">
+          <div class="row">
+          <div class="col-md-12 mb-3" style="padding-left: 15px">
 
-                    {% if request.session.mfa_methods|length > 1 %}
-                        <a href="{% url 'mfa_methods_list' %}">{% trans "Select Another Method" %}</a>
-                    {% endif %}
-                </div>
-            </div>
+            {% if request.session.mfa_methods|length > 1 %}
+                <a href="{%  url 'mfa_methods_list' %}">{% trans "Select Another Method" %}</a>
+            {% endif %}
+          </div>
         </div>
     </div>
 </div>
 </div>
+</div>
+    <script src="{% static 'mfa/js/u2f-api.js' %}" type="text/javascript"></script>

@@ -11,11 +11,11 @@
       <br/>
     <br/>
      <div class="container">
-     <div class="panel panel-default">
-      <div class="panel-heading">
+     <div class="panel panel-default card">
+      <div class="panel-heading card-header">
 	      <strong> {% trans 'FIDO2 Security Key' %}</strong>
       </div>
-      <div class="panel-body">
+      <div class="panel-body card-body">
         <form action="#" id="fido2_form" method="post" hidden>
           <input type=hidden value="{{ redirect_html }}" id="id_redirect" name="redirect">
           <input type=hidden value="{% trans 'Your device is added successfully.' %}" id="id_success" name="success">

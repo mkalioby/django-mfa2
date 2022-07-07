@@ -38,7 +38,7 @@ Depends on
 * ua-parser
 * user-agents
 * python-jose
-* fido2==0.9.0
+* fido2==1.0.0
 
 # Installation
 1. using pip 
@@ -187,6 +187,7 @@ function some_func() {
 * [willingham](https://github.com/willingham)
 * [AndreasDickow](https://github.com/AndreasDickow)
 * [mnelson4](https://github.com/mnelson4)
+* [ezrajrice](https://github.com/ezrajrice)
 
 
  # Security contact information

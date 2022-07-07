@@ -1,3 +1,6 @@
+
 {% load static %}
+<input type="hidden" id="is_mfa" name="is_mfa" value={% if request.session.mfa.verified  %}"true"{% else %}"false"{% endif %}/>
 <script src="{% static 'mfa/js/mfa_check.js' %}"></script>
+
 {% include "modal.html" %}

@@ -10,6 +10,7 @@ import simplejson
 from django.template.context_processors import csrf
 from django.conf import settings
 from django.http import HttpResponse
+from django.utils.translation import gettext
 from .models import *
 from .views import login
 from .Common import get_redirect_url
@@ -37,7 +38,7 @@ def check_errors(request, data):
     if "errorCode" in data:
         if data["errorCode"] == 0: return True
         if data["errorCode"] == 4:
-            return HttpResponse("Invalid Security Key")
+            return HttpResponse(gettext("Invalid Security Key"))
         if data["errorCode"] == 1:
             return auth(request)
     return True

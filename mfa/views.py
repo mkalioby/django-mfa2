@@ -12,6 +12,7 @@ from django.conf import settings
 from . import TrustedDevice
 from django.contrib.auth.decorators import login_required
 from user_agents import parse
+from django.utils.translation import gettext
 
 
 @login_required
@@ -65,7 +66,7 @@ def login(request):
 
 @login_required
 def delKey(request):
-    key = User_Keys.objects.get(id=request.GET["id"])
+    key = User_Keys.objects.get(id=request.POST["id"])
     if key.username == request.user.username:
         key.delete()
         messages.success(request, gettext('The key was deleted successfully.'))
