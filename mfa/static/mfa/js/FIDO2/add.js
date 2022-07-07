@@ -1,6 +1,6 @@
 function begin_reg(){
-    var formData = new FormData($('#fido2_form')) 
-    fetch(formData.get('begin'),{}).then(function(response) {
+    var formData = new FormData($('#fido2_form')[0]);
+    fetch(formData.get('rbegin'),{}).then(function(response) {
       if(response.ok)
       {
           return response.arrayBuffer();
