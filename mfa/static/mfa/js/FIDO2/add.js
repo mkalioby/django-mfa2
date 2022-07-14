@@ -7,8 +7,8 @@ function begin_reg(){
       }
       throw new Error('Error getting registration data!');
     }).then(CBOR.decode).then(function(options) {
-        options.publicKey.attestation="direct"
-        console.log(options)
+        //options.publicKey.attestation="direct"
+        options.publicKey.attestation="none"
 
       return navigator.credentials.create(options);
     }).then(function(attestation) {
