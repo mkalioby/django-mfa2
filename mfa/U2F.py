@@ -10,11 +10,12 @@ import simplejson
 from django.template.context_processors import csrf
 from django.conf import settings
 from django.http import HttpResponse
+from django.utils.translation import gettext
 from .models import *
 from .views import login
 from .Common import get_redirect_url
-import datetime
 from django.utils import timezone
+from django.utils.translation import gettext
 
 def recheck(request):
     context = csrf(request)
@@ -37,7 +38,7 @@ def check_errors(request, data):
     if "errorCode" in data:
         if data["errorCode"] == 0: return True
         if data["errorCode"] == 4:
-            return HttpResponse("Invalid Security Key")
+            return HttpResponse(gettext("Invalid Security Key"))
         if data["errorCode"] == 1:
             return auth(request)
     return True
@@ -90,7 +91,7 @@ def bind(request):
     cert_hash=hashlib.md5(cert.public_bytes(Encoding.PEM)).hexdigest()
     q=User_Keys.objects.filter(key_type="U2F", properties__icontains= cert_hash)
     if q.exists():
-        return HttpResponse("This key is registered before, it can't be registered again.")
+        return HttpResponse(gettext("This key is registered before, it can't be registered again."))
     User_Keys.objects.filter(username=request.user.username,key_type="U2F").delete()
     uk = User_Keys()
     uk.username = request.user.username

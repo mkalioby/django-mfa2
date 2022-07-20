@@ -5,7 +5,6 @@ from .Common import get_redirect_url
 from .models import *
 from django.template.context_processors import csrf
 import simplejson
-from django.template.context import RequestContext
 from django.conf import settings
 import pyotp
 from .views import login

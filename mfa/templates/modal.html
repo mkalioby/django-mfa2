@@ -1,5 +1,6 @@
-<div class="modal " tabindex="-1" role="dialog" id="popUpModal" style=" top: 40px;">
-  <div class="modal-dialog" style="height: 80%;width: 80%;">
+{% load i18n %}
+<div class="modal" tabindex="-1" role="dialog" id="popUpModal">
+  <div class="modal-dialog">
     <div class="modal-content" >
       <div class="modal-header">
         <h4 class="modal-title" id="modal-title"></h4>
@@ -10,7 +11,7 @@
 
           </div>
       <div class="modal-footer" id="modal-footer">
-        <button type="button" class="btn btn-default btn-secondary" id='btnModalClose' data-dismiss="modal" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-default btn-secondary" id='btnModalClose' data-dismiss="modal" data-bs-dismiss="modal">{% trans 'Close' %}</button>
       </div>
 
     </div><!-- /.modal-content -->

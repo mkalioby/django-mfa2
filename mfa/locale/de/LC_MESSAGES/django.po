@@ -1,0 +1,359 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-07-07 14:18+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: mfa/TrustedDevice.py:32 mfa/views.py:101
+msgid "OK"
+msgstr "OK"
+
+#: mfa/TrustedDevice.py:74
+msgid "This is a PC, it can't used as a trusted device."
+msgstr "Dies ist ein PC, Sie können diesen nicht als Trusted Device verwenden"
+
+#: mfa/TrustedDevice.py:84
+msgid "The username or key is wrong, please check and try again."
+msgstr "Ihr Username oder Key ist falsch, bitte prüfen Sie diese und probieren es erneut"
+
+#: mfa/TrustedDevice.py:114
+msgid "User has no email on the system."
+msgstr "Der Nutzer hat keine Email auf dem System hinterlegt"
+
+#: mfa/TrustedDevice.py:115
+msgid "Add Trusted Device Link"
+msgstr "Link zu Trusted Device hinzufügen"
+
+#: mfa/TrustedDevice.py:116
+msgid "Sent Successfully"
+msgstr "erfolgreich gesendet"
+
+#: mfa/TrustedDevice.py:118
+msgid "Error occured, please try again later."
+msgstr "Ein Fehler trat auf, bitte versuchen Sie es erneut"
+
+#: mfa/U2F.py:41
+msgid "Invalid Security Key"
+msgstr "Ungültiger Sicherheitsschlüssel"
+
+#: mfa/U2F.py:94
+msgid "This key is registered before, it can't be registered again."
+msgstr "Dieser Schlüssel wurde bereits registriert"
+
+#: mfa/templates/ApproveLogin/Add.html:6
+msgid "Title"
+msgstr "Titel"
+
+#: mfa/templates/Email/mfa_email_token_template.html:7
+#: mfa/templates/TrustedDevices/email.html:2
+msgid "Dear"
+msgstr "Sehr geehrte/r"
+
+#: mfa/templates/Email/mfa_email_token_template.html:8
+msgid "Your OTP is"
+msgstr "Ihr OTP ist"
+
+#: mfa/templates/Email/mfa_email_token_template.html:10
+msgid "Thank you"
+msgstr "Danke sehr"
+
+#: mfa/templates/Email/recheck.html:13
+msgid "Email One Time Password"
+msgstr "Email Einmal Passwort"
+
+#: mfa/templates/Email/recheck.html:31 mfa/templates/TOTP/recheck.html:25
+msgid "Sorry, The provided token is not valid."
+msgstr "Entschuldigung, der angegebene Token ist nicht validiert"
+
+#: mfa/templates/Email/recheck.html:42
+msgid "Enter the code sent to your email."
+msgstr "Bitte geben Sie den Code aus der Email ein"
+
+#: mfa/templates/FIDO2/Add.html:16 mfa/templates/MFA.html:34
+msgid "FIDO2 Security Key"
+msgstr "FIDO2 Security Key"
+
+#: mfa/templates/FIDO2/Add.html:21 mfa/templates/TOTP/Add.html:16
+#: mfa/templates/U2F/Add.html:20
+msgid "Your device is added successfully."
+msgstr "Ihr Gerät wurde erfolgreich hinzugefügt"
+
+#: mfa/templates/FIDO2/Add.html:28
+msgid "Your browser should ask you to confirm you identity."
+msgstr "Ihr Browsser sollte Sie nun um eine Identitätsbestätigung fragen"
+
+#: mfa/templates/FIDO2/recheck.html:12 mfa/templates/MFA.html:31
+msgid "Security Key"
+msgstr "Security Key"
+
+#: mfa/templates/FIDO2/recheck.html:19
+msgid "Welcome back"
+msgstr "Wilkommen zurück"
+
+#: mfa/templates/FIDO2/recheck.html:21
+msgid "Not me"
+msgstr "Nicht ich"
+
+#: mfa/templates/FIDO2/recheck.html:26
+msgid "please press the button on your security key to prove it is you."
+msgstr "Bitte bestätigen Sie Ihre Identität indem Sie auf den Knopf auf Ihrem Securty Key drücken"
+
+#: mfa/templates/FIDO2/recheck.html:46 mfa/templates/TOTP/recheck.html:63
+#: mfa/templates/U2F/recheck.html:35
+msgid "Select Another Method"
+msgstr "Weitere Methode auswählen"
+
+#: mfa/templates/MFA.html:21
+msgid "Add Method"
+msgstr "Methode hinzufügen"
+
+#: mfa/templates/MFA.html:25
+msgid "Authenticator app"
+msgstr "Authenticator app"
+
+#: mfa/templates/MFA.html:28
+msgid "Email Token"
+msgstr "Email Token"
+
+#: mfa/templates/MFA.html:37
+msgid "Trusted Device"
+msgstr "Trusted Device"
+
+#: mfa/templates/MFA.html:47
+msgid "Type"
+msgstr "Typ"
+
+#: mfa/templates/MFA.html:48
+msgid "Date Added"
+msgstr "Hinzufügedatum"
+
+#: mfa/templates/MFA.html:49
+msgid "Expires On"
+msgstr "läuft ab am"
+
+#: mfa/templates/MFA.html:50 mfa/templates/TrustedDevices/user-agent.html:12
+msgid "Device"
+msgstr "Gerät"
+
+#: mfa/templates/MFA.html:51
+msgid "Last Used"
+msgstr "Zuletzt verwendet"
+
+#: mfa/templates/MFA.html:52
+msgid "Status"
+msgstr "Status"
+
+#: mfa/templates/MFA.html:53
+msgid "Delete"
+msgstr "Löschen"
+
+#: mfa/templates/MFA.html:64
+msgid "On"
+msgstr "An"
+
+#: mfa/templates/MFA.html:64
+msgid "Off"
+msgstr "Aus"
+
+#: mfa/templates/MFA.html:75
+msgid "You didn't have any keys yet."
+msgstr "Sie haben noch keine Sicherheitsschlüssel"
+
+#: mfa/templates/TOTP/Add.html:17
+msgid "You entered wrong numbers, please try again"
+msgstr "Die Eingabe ist ungültig, bitte versuchen Sie es erneut"
+
+#: mfa/templates/TOTP/Add.html:94
+msgid "Adding Authenticator"
+msgstr "Authenticator hinzufügen"
+
+#: mfa/templates/TOTP/Add.html:98
+msgid "Scan the image below with the two-factor authentication app on your"
+msgstr "Scannen Sie das Bild mit einer 2 Faktor Authenticator App"
+
+#: mfa/templates/TOTP/Add.html:99
+msgid "phone/P"
+msgstr "Telfon"
+
+#: mfa/templates/TOTP/Add.html:99
+msgid "If you can’t use a barcode,"
+msgstr "Wenn Sie keinene Barcode verwenden können,"
+
+#: mfa/templates/TOTP/Add.html:100
+msgid "enter this text"
+msgstr "geben Sie diesen Text ein"
+
+#: mfa/templates/TOTP/Add.html:100
+msgid "instead."
+msgstr "stattdessen."
+
+#: mfa/templates/TOTP/Add.html:109
+msgid "Enter the six-digit code from the application"
+msgstr "Geben Sie den 6 stelligen Code aus Ihrer App ein"
+
+#: mfa/templates/TOTP/Add.html:110
+msgid ""
+"After scanning the barcode image, the app will display a six-digit code that "
+"you can enter below."
+msgstr "Nach dem Scannen des Bildes wird Ihre App Ihnen einen 6 stelligen Code zeigen, den sie hier unten eingeben können"
+
+#: mfa/templates/TOTP/Add.html:120
+msgid "Enable"
+msgstr "Erlauben"
+
+#: mfa/templates/TOTP/Add.html:124
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: mfa/templates/TOTP/recheck.html:15
+msgid "One Time Password"
+msgstr "One Time Passwort"
+
+#: mfa/templates/TOTP/recheck.html:36
+msgid "Enter the 6-digits on your authenticator."
+msgstr "Bitte 6 stelligen Code aus Ihrer Authenticator App eingeben"
+
+#: mfa/templates/TrustedDevices/Add.html:15
+#: mfa/templates/TrustedDevices/Done.html:15
+#: mfa/templates/TrustedDevices/start.html:16
+msgid "Add Trusted Device"
+msgstr "vertrauenswürdiges Gerät hinzufügen"
+
+#: mfa/templates/TrustedDevices/Add.html:20
+msgid "Please check your PC window, to continue the process"
+msgstr "Bitte prüfen Sie Ihren Browser Bildschirm um fortzufahren"
+
+#: mfa/templates/TrustedDevices/Add.html:24
+#: mfa/templates/TrustedDevices/Done.html:19
+msgid "Your device is now trusted, please try to"
+msgstr "Ihr Gerät gilt nun als vertrauenswürdig, bitte versuchen Sie"
+
+#: mfa/templates/TrustedDevices/Add.html:24
+#: mfa/templates/TrustedDevices/Done.html:20
+msgid "login"
+msgstr "login"
+
+#: mfa/templates/TrustedDevices/Add.html:27
+msgid "Please make sure you are not in private (incognito) mode"
+msgstr "Bitte stellen Sie sicher, dass Sie nicht im incognito Modus sind"
+
+#: mfa/templates/TrustedDevices/Add.html:75
+msgid "I confirm that this device is mine and it is only used by me"
+msgstr "Ich bestätige, dass dieses Gerät meins ist und nur von mir verwendet wird"
+
+#: mfa/templates/TrustedDevices/email.html:3
+msgid ""
+"You requested the link to add a new trusted device, please follow the link "
+"below"
+msgstr "Sie haben einen Link für eine neues vertrauenswürdiges Gerät angefordert, bitte folgen Sie dem Link"
+
+#: mfa/templates/TrustedDevices/start.html:21
+msgid ""
+"You can't add any more devices, you need to remove previously trusted "
+"devices first."
+msgstr "Sie können nicht mehr als ein vertrauenswürdiges Gerät hinzufügen, bitte entfernen Sie bisher hinzugefügte Geräte zuvor"
+
+#: mfa/templates/TrustedDevices/start.html:23
+msgid "Allow access from mobile phone and tables."
+msgstr "Zugang vom Mobilgerät oder Tablet erlauben"
+
+#: mfa/templates/TrustedDevices/start.html:26
+msgid "Using your mobile/table, open Chrome/Firefox"
+msgstr "Auf Ihrem Mobilen Gerät, öffnen Sie Chrome/Firefox"
+
+#: mfa/templates/TrustedDevices/start.html:27
+msgid "Go to"
+msgstr "Gehe zu"
+
+#: mfa/templates/TrustedDevices/start.html:33
+msgid "Enter your username & following 6 digits"
+msgstr "Geben Sie Ihren Usernamen und den 6 Stelligen Code ein"
+
+#: mfa/templates/TrustedDevices/start.html:36
+msgid "This window will ask to confirm the device."
+msgstr "Dieser Dialog wird Sie um eine Bestätigung des Geräts bitten"
+
+#: mfa/templates/TrustedDevices/user-agent.html:4
+msgid "Browser"
+msgstr "Browser"
+
+#: mfa/templates/TrustedDevices/user-agent.html:8
+msgid "Version"
+msgstr "Version"
+
+#: mfa/templates/U2F/Add.html:14
+msgid "Adding Security Key"
+msgstr "Sicherheitsschlüssel hinzufügen"
+
+#: mfa/templates/U2F/Add.html:23
+msgid "Your secure Key should be flashing now, please press on button."
+msgstr "Ihr Sicherheitsschlüssel sollte nun blinken, bitte drücken Sie auf den Knopf"
+
+#: mfa/templates/U2F/recheck.html:14
+msgid "Your key should be flashing now, please press the button."
+msgstr "Ihr Key sollte nun blinken, bitte drücken Sie auf den Knopf"
+
+#: mfa/templates/U2F/recheck.html:25
+msgid "U2F must work under secure context"
+msgstr "U2F muss unter einem sicheren context (SSL) verwendet werden"
+
+#: mfa/templates/modal.html:14
+msgid "Close"
+msgstr "Schliessen"
+
+#: mfa/templates/select_mfa_method.html:12
+msgid "Select Second Verification Method"
+msgstr "Wählen Sie eine zweite Verifikations Methode"
+
+#: mfa/templates/select_mfa_method.html:19
+msgid "Authenticator App"
+msgstr "Authenticator App"
+
+#: mfa/templates/select_mfa_method.html:20
+msgid "Send OTP by Email"
+msgstr "OTP über Email versenden"
+
+#: mfa/templates/select_mfa_method.html:21
+msgid "Secure Key"
+msgstr "Sicherheitsschlüssel"
+
+#: mfa/templates/select_mfa_method.html:22
+msgid "FIDO2 Secure Key"
+msgstr "FIDO2 Secure Key"
+
+#: mfa/views.py:72
+msgid "The key was deleted successfully."
+msgstr "Der Key wurde erfolgreich gelöscht."
+
+#: mfa/views.py:75
+msgid "Error: You own this token so you can't delete it"
+msgstr "Fehler: Da Sie diesen Token besitzen, können Sie Ihn nicht löschen"
+
+#: mfa/views.py:81
+msgid "class Name should include modulename.classname"
+msgstr "der Klassenname sollte modulename.classname beinhalten"
+
+#: mfa/views.py:88
+msgid "Module does not have requested function"
+msgstr "Das Modul beinhaltet die angefragte Funktion nicht"
+
+#: mfa/views.py:103
+msgid "You can't change this method."
+msgstr "Sie können diese Methode nicht verändern"
+
+#: mfa/views.py:105
+msgid "Error"
+msgstr "Fehler"

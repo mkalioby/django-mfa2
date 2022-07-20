@@ -1,14 +1,15 @@
+{% load i18n %}
 <table>
     <tr>
-        <th>Browser: </th>
+        <th>{% trans 'Browser' %}: </th>
         <td>{{ ua.browser.family }}</td>
     </tr>
     <tr>
-        <th>Version: </th>
+        <th>{% trans 'Version' %}: </th>
         <td>{{ ua.browser.version_string }}</td>
     </tr>
     <tr>
-        <th>Device: </th>
+        <th>{% trans 'Device' %}: </th>
         <td>{{ ua.device.brand }} / {{ ua.device.model }}</td>
     </tr>
 </table>

@@ -1,5 +1,7 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block head %}
+<link href="{% static 'mfa/css/mfa.css' %}" rel="stylesheet">
 {% endblock %}
 {% block content %}
 <br/>
@@ -42,9 +44,7 @@
                 <input type="submit" class="btn btn-lg btn-success btn-block" value="Verify">
               </div>
             </div>
-          </div>
-        </fieldset>
-      </FORM>
+        </div>
     </div>
   </div>
 </div>

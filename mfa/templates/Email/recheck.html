@@ -1,20 +1,18 @@
-<script type="application/javascript">
-    function send_totp() {
-        $.ajax({"url":"{% url 'totp_recheck' %}", method:"POST",dataType:"JSON",
-            data:{"csrfmiddlewaretoken":"{{ csrf_token }}","otp":$("#otp").val()},
-         success:function (data) {
-                            if (data["recheck"])
-                                mfa_success_function();
-                            else {
-                                mfa_failed_function();
-                            }
-                        }
-        })
-
-    }
+{% load static %}
+{% load i18n %}
+<link href="{% static 'mfa/css/mfa.css' %}" rel="stylesheet">
+{# https://docs.djangoproject.com/en/3.2/ref/templates/builtins/#json-script #}
+{{ mode|json_script:"recheck-js" }}
+<script id="recheck-js" type="application/javascript" src="{% static 'mfa/js/EMAIL/recheck.js' %}"></script>
 </script>
 <div class='container'>
 <div class="row">
+    <div class="col-sm-10 col-sm-offset-1 col-xs-12 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <strong> {% trans 'Email One Time Password' %} </strong>
+            </div>
+            <div class="panel-body">
 
 <div class="col-sm-10 col-sm-offset-1 col-xs-12 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
 <div class="panel panel-default card">
@@ -26,23 +24,24 @@
       <FORM METHOD="POST" ACTION="{% url 'email_auth' %}" Id="formLogin" onSubmit="" name="FrontPage_Form1">
 
 
-      {% csrf_token %}
-          {%  if invalid %}
-          <div class="alert alert-danger">
-              Sorry, The provided token is not valid.
-          </div>
-          {% endif %}
-      {% if quota %}
-          <div class="alert alert-warning">
-              {{ quota }}
-          </div>
-      {% endif %}
-      <fieldset>
-      <div class="row">
-      <div class="col-sm-12 col-md-12">
-        <p>Enter the code sent to your email.</p>
-      </div>
-      </div>
+                    {% csrf_token %}
+                    <input type=hidden value="{% url 'totp_recheck' %}" id="id_recheck" name="recheck">
+                    {% if invalid %}
+                        <div class="alert alert-danger">
+                            {% trans 'Sorry, The provided token is not valid.' %}
+                        </div>
+                    {% endif %}
+                    {% if quota %}
+                        <div class="alert alert-warning">
+                            {{ quota }}
+                        </div>
+                    {% endif %}
+                    <fieldset>
+                        <div class="row">
+                            <div class="col-sm-12 col-md-12">
+                                <p>{% trans 'Enter the code sent to your email.' %}</p>
+                            </div>
+                        </div>
 
       <div class="row">
 	  <div class="col-sm-12 col-md-12">
@@ -53,8 +52,8 @@
 		</span>
 		<input class="form-control" size="6" MaxLength="6" value="" placeholder="e.g 55552" name="otp" type="text" id="otp" autofocus>
 
-	      </div>
-	    </div>
+                                    </div>
+                                </div>
 
           <div class="form-group d-grid gap-2">
 

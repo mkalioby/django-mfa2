@@ -1,100 +1,43 @@
 {% extends "base.html" %}
+{% load static %}
+{% load i18n %}
 {% block head %}
-    <style>
-    #two-factor-steps {
-	border: 1px solid #ccc;
-	border-radius: 3px;
-	padding: 15px;
-}
-    .row{
-        margin: 0px;
-    }
-    </style>
+    <link href="{% static 'mfa/css/mfa.css' %}" rel="stylesheet">
+    <script type="application/javascript" src="{% static 'mfa/js/ua-parser.min.js' %}"></script>
+    <script type="application/javascript" src="{% static 'mfa/js/TrustedDevice/start.js' %}"></script>
 
-    <script type="text/javascript">
-    function sendEmail() {
-        $("#modal-title").html("Send Link")
-        $("#modal-body").html("Sending Email, Please wait....");
-        $("#popUpModal").modal('show');
-        $.ajax({
-            "url":"{% url 'td_sendemail' %}",
-            success:function (data) {
-                alert(data);
-                $("#popUpModal").modal('toggle')
-
-            }
-        })
-    }
-    function failedMFA() {
-        $("#modal-body").html("<div class='alert alert-danger'>Failed to validate you, please <a href='javascript:void(0)' onclick='getUserAgent()'>try again</a></div>")
-    }
-    function checkMFA() {
-        recheck_mfa(trustDevice,failedMFA,true)
-    }
-    function trustDevice() {
-
-        $.ajax(
-            {
-
-                "url":"{% url 'td_trust_device' %}",
-                success: function (data) {
-                    if (data == "OK")
-                    {
-                        alert("Your are done, your device should show final confirmation")
-                        window.location.href="{% url 'mfa_home' %}"
-
-                    }
-                }
-            }
-        )
-    }
-    function getUserAgent() {
-        $.ajax({
-            "url":"{% url 'td_get_useragent' %}",success: function(data)
-            {
-                if (data == "")
-                    setTimeout('getUserAgent()',5000)
-                else
-                {
-                    $("#modal-title").html("Confirm Trusted Device")
-                    $("#actionBtn").remove();
-                    $("#modal-footer").prepend("<button id='actionBtn' class='btn btn-success' onclick='checkMFA()'>Trust Device</button>")
-                    $("#modal-body").html(data)
-                    $("#popUpModal").modal('show');
-                }
-            }
-        })
-
-    }
-    $(document).ready(getUserAgent())
-    </script>
 {% endblock %}
 {% block content %}
-      <br/>
+    <br/>
     <br/>
     <div class="container">
         <div class="col-md-6 col-md-offset-3" id="two-factor-steps">
             <div class="row" align="center">
-                <h4>Add Trusted Device</h4>
+                <h4>{% trans 'Add Trusted Device' %}</h4>
             </div>
 
-    <div class="row" >
-        {%  if not_allowed %}
-            <div class="alert alert-danger">You can't add any more devices, you need to remove previously trusted devices first.</div>
-        {% else %}
-    <p style="color: green">Allow access from mobile phone and tables.</p>
-    <h5>Steps:</h5>
-        <ol>
-            <li>Using your mobile/table, open Chrome/Firefox.</li>
-            <li>Go to <b>{{ HOST }}{{ BASE_URL }}devices/add</b>&nbsp;&nbsp;<a href="javascript:void(0)" onclick="sendEmail()" title="Send to my email"><i class="fas fa-paper-plane"></i></a></li>
-            <li>Enter your username & following 6 digits<br/>
-                <span style="font-size: 16px;font-weight: bold; margin-left: 50px">{{ key|slice:":3" }} - {{ key|slice:"3:" }}</span>
-            </li>
-            <li>This window will ask to confirm the device.</li>
+            <div class="row">
+                {% if not_allowed %}
+                    <div class="alert alert-danger">{% trans "You can't add any more devices, you need to remove previously trusted devices first." %}</div>
+                {% else %}
+                    <p class="green">{% trans 'Allow access from mobile phone and tables.' %}</p>
+                    <h5>Steps:</h5>
+                    <ol>
+                        <li>{% trans 'Using your mobile/table, open Chrome/Firefox' %}.</li>
+                        <li>{% trans 'Go to' %} <b>{{ HOST }}{{ BASE_URL }}devices/add</b>&nbsp;&nbsp;<button
+                                id="#sendMail" td-trust-link="{% url 'td_trust_device' %}"
+                                td-link="{% url 'td_sendemail' %}" td-home="{% url 'mfa_home' %}"
+                                td-useragent="{% url 'td_get_useragent' %}" title="Send to my email"><i
+                                class="fas fa-paper-plane"></i></button>
+                        </li>
+                        <li>{% trans 'Enter your username & following 6 digits' %}<br/>
+                            <span class="font-16 bold margin-left-50">{{ key|slice:":3" }} - {{ key|slice:"3:" }}</span>
+                        </li>
+                        <li>{% trans 'This window will ask to confirm the device.' %}</li>
 
-        </ol>
-    {% endif %}
-    </div>
+                    </ol>
+                {% endif %}
+            </div>
         </div>
     </div>
     {% include "modal.html" %}
