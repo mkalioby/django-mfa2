@@ -55,7 +55,7 @@ def auth(request):
                 return login(request)
         elif tokenLength == 10 and "RECOVERY" not in settings.MFA_UNALLOWED_METHODS:
             #Backup code check
-            resBackup=recovery.verify_login(request.session["base_username"], token=request.POST["otp"])
+            resBackup=recovery.verify_login(request, request.session["base_username"], token=request.POST["otp"])
             if resBackup[0]:
                 mfa = {"verified": True, "method": "RECOVERY","id":resBackup[1]}
                 if getattr(settings, "MFA_RECHECK", False):

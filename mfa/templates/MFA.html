@@ -103,6 +103,7 @@
                         {% endif %}
             </tr>
             {% endfor %}
+            {% if "RECOVERY" not in UNALLOWED_AUTHEN_METHODS %}
             <tr>
 
                 <td>RECOVERY</td>
@@ -113,6 +114,7 @@
                 <td>On</td>
                 <td><a href="{% url 'manage_recovery_codes' %}"> <span class="fa fa-wrench fa-solid fa-wrench bi bi-wrench-fill"></span></a></td>
             </tr>
+            {% endif %}
         {% else %}
            <tr><td colspan="7" align="center">You didn't have any keys yet.</td> </tr>
        {% endif %}
