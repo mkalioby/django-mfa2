@@ -4,35 +4,42 @@ from django.http import HttpResponse
 from .Common import get_redirect_url
 from .models import *
 import simplejson
-from django.conf import settings
 import random
 import string
-import logging
 
-def invalidate_token(key):
-    key.enabled = 0
-    key.save()
 
-def token_left(request, username=None):
-    if not username:
-        username = request.user.username
-    return len(User_Keys.objects.filter(username=username, key_type="RECOVERY", enabled=True))
+#TODO : 
+# - Show authtificator panel on login everytime if RECOVERY is not deactivated
+# - Generation abuse checks
+
+def token_left(request):
+    uk = User_Keys.objects.filter(username=request.user.username, key_type="RECOVERY", enabled=True)
+    keyLeft=0
+    for key in uk:
+        keyEnabled = key.properties["enabled"]
+        for i in range(len(keyEnabled)):
+            if keyEnabled[i]:
+                keyLeft += 1
+    return keyLeft
 
 def delTokens(request):
     #Only when all MFA have been deactivated, or to generate new !
+    #We iterate only to clean if any error happend and multiple entry of RECOVERY created for one user
     for key in User_Keys.objects.filter(username=request.user.username, key_type = "RECOVERY"):
         if key.username == request.user.username:
             key.delete()
 
 def newTokens(username):
-    for newkey in range(5):
-            token = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(6))
-            uk=User_Keys()
-            uk.username=username
-            uk.properties={"secret_key":token}
-            uk.key_type="RECOVERY"
-            uk.enabled=True
-            uk.save()
+    # Separated from genTokens to be able to regenerate codes after login if last code has been used
+    newKeys = []
+    for i in range(5):
+            token = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(10))
+            newKeys.append(token)
+    uk=User_Keys()
+    uk.username=username
+    uk.properties={"secret_keys":newKeys, "enabled":[True for j in range(5)]}
+    uk.key_type="RECOVERY"
+    uk.save()
 
 def genTokens(request, softGen=False):
     if not softGen or (softGen and token_left(request) == 0):
@@ -44,24 +51,26 @@ def genTokens(request, softGen=False):
     return HttpResponse("Success")
 
 
-def verify_login(username,token):
+def verify_login(request, username,token):
     for key in User_Keys.objects.filter(username=username, key_type = "RECOVERY"):
-        logging.critical(key.properties["secret_key"])
-        if key.properties["secret_key"] == token and key.enabled:
-            invalidate_token(key)
-            newRecoveryGen = False 
-            if token_left(None, username) == 0:
-                newRecoveryGen = True
-                newTokens(username)
-            return [True, key.id, newRecoveryGen]
+        secret_keys = key.properties["secret_keys"]
+        for i in range(len(secret_keys)):
+            if token == secret_keys[i] and key.properties["enabled"][i]:
+                key.properties["enabled"][i] = False
+                key.save()
+                if token_left(request) == 0:
+                    newTokens(username)
+                return [True, key.id]
     return [False]
 
 def getTokens(request):
     tokens = []
     enable = []
     for key in User_Keys.objects.filter(username=request.user.username, key_type = "RECOVERY"):
-        tokens.append(key.properties["secret_key"])
-        enable.append(1 if key.enabled else 0)
+        secret_keys = key.properties["secret_keys"]
+        for i in range(len(secret_keys)):
+            tokens.append(secret_keys[i])
+            enable.append(key.properties["enabled"][i])
     return HttpResponse(simplejson.dumps({"keys":tokens, "enable":enable}))
 
 @never_cache
