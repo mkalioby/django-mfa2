@@ -1,5 +1,5 @@
 # django-mfa2
-A Django app that handles MFA, it supports TOTP, U2F, FIDO2 U2F (Web Authn), Email Tokens , and Trusted Devices
+A Django app that handles MFA, it supports TOTP, U2F, FIDO2 U2F (Web Authn), Email Tokens , Trusted  Devices and backup codes.
 
 ### Pip Stats
 [![PyPI version](https://badge.fury.io/py/django-mfa2.svg)](https://badge.fury.io/py/django-mfa2)
@@ -91,6 +91,7 @@ Depends on
    * TOTP
    * Trusted_Devices
    * Email
+   * RECOVERY
    
    **Notes**:
     * Starting version 1.1, ~~FIDO_LOGIN_URL~~ isn't required for FIDO2 anymore.
@@ -136,7 +137,7 @@ Depends on
 ```<li><a href="{% url 'mfa_home' %}">Security</a> </li>```
 
 
-For Example, See 'example' app
+For Example, See 'example' app and look at EXAMPLE.md to see how to set it up.
 
 # Going Passwordless
 
