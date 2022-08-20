@@ -7,6 +7,7 @@ from .models import *
 #from django.template.context import RequestContext
 from .views import login
 from .Common import send
+from . import recovery
 
 def sendEmail(request,username,secret):
     """Send Email to the user after rendering `mfa_email_token_template`"""
@@ -34,6 +35,7 @@ def start(request):
                 from django.core.urlresolvers import reverse
             except:
                 from django.urls import reverse
+            recovery.genTokens(request, True) #recovery tokens
             return HttpResponseRedirect(reverse(getattr(settings,'MFA_REDIRECT_AFTER_REGISTRATION','mfa_home')))
         context["invalid"] = True
     else:

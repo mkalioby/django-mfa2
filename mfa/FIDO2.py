@@ -16,6 +16,7 @@ from .views import login, reset_cookie
 import datetime
 from .Common import get_redirect_url
 from django.utils import timezone
+from . import recovery
 
 
 def recheck(request):
@@ -66,6 +67,7 @@ def complete_reg(request):
         uk.owned_by_enterprise = getattr(settings, "MFA_OWNED_BY_ENTERPRISE", False)
         uk.key_type = "FIDO2"
         uk.save()
+        recovery.genTokens(request, True) #recovery tokens
         return HttpResponse(simplejson.dumps({'status': 'OK'}))
     except Exception as exp:
         import traceback

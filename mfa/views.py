@@ -22,6 +22,8 @@ def index(request):
             setattr(k,"device",parse(k.properties.get("user_agent","-----")))
         elif k.key_type == "FIDO2":
             setattr(k,"device",k.properties.get("type","----"))
+        elif k.key_type == "RECOVERY":
+            continue
         keys.append(k)
     context["keys"]=keys
     return render(request,"MFA.html",context)
@@ -30,7 +32,7 @@ def verify(request,username):
     request.session["base_username"] = username
     #request.session["base_password"] = password
     keys=User_Keys.objects.filter(username=username,enabled=1)
-    methods=list(set([k.key_type for k in keys]))
+    methods=list(set([k.key_type for k in keys if k.key_type != "RECOVERY"]))
 
     if "Trusted Device" in methods and not request.session.get("checked_trusted_device",False):
         if TrustedDevice.verify(request):

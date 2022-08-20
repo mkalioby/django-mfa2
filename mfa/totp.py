@@ -11,7 +11,10 @@ import pyotp
 from .views import login
 import datetime
 from django.utils import timezone
+from . import recovery
 import random
+
+
 def verify_login(request,username,token):
     for key in User_Keys.objects.filter(username=username,key_type = "TOTP"):
         totp = pyotp.TOTP(key.properties["secret_key"])
@@ -28,6 +31,7 @@ def recheck(request):
         if verify_login(request,request.user.username, token=request.POST["otp"]):
             import time
             request.session["mfa"]["rechecked_at"] = time.time()
+            recovery.genTokens(request, True) #recovery tokens
             return HttpResponse(simplejson.dumps({"recheck": True}), content_type="application/json")
         else:
             return HttpResponse(simplejson.dumps({"recheck": False}), content_type="application/json")
@@ -38,8 +42,17 @@ def auth(request):
     context=csrf(request)
     if request.method=="POST":
         res=verify_login(request,request.session["base_username"],token = request.POST["otp"])
+        resBackup=recovery.verify_login(request.session["base_username"], token=request.POST["otp"])
         if res[0]:
             mfa = {"verified": True, "method": "TOTP","id":res[1]}
+            if getattr(settings, "MFA_RECHECK", False):
+                mfa["next_check"] = datetime.datetime.timestamp((datetime.datetime.now()
+                                         + datetime.timedelta(
+                            seconds=random.randint(settings.MFA_RECHECK_MIN, settings.MFA_RECHECK_MAX))))
+            request.session["mfa"] = mfa
+            return login(request)      
+        elif resBackup[0]:
+            mfa = {"verified": True, "method": "TOTP","id":resBackup[1], "newRecoveryGen":resBackup[2]}
             if getattr(settings, "MFA_RECHECK", False):
                 mfa["next_check"] = datetime.datetime.timestamp((datetime.datetime.now()
                                          + datetime.timedelta(

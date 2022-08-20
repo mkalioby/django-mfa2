@@ -15,6 +15,7 @@ from .views import login
 from .Common import get_redirect_url
 import datetime
 from django.utils import timezone
+from . import recovery
 
 def recheck(request):
     context = csrf(request)
@@ -98,6 +99,7 @@ def bind(request):
     uk.properties = {"device":simplejson.loads(device.json),"cert":cert_hash}
     uk.key_type = "U2F"
     uk.save()
+    recovery.genTokens(request, True) #recovery tokens
     return HttpResponse("OK")
 
 def sign(username):

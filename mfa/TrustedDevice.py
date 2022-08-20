@@ -7,6 +7,7 @@ from django.template.context_processors import csrf
 from .models import *
 import user_agents
 from django.utils import timezone
+from . import recovery
 
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
     x=''.join(random.choice(chars) for _ in range(size))
@@ -75,6 +76,7 @@ def add(request):
                 tk.properties["user_agent"]=ua
                 tk.save()
                 context["success"]=True
+                recovery.genTokens(request, True) #recovery tokens
             # tk.properties["user_agent"]=ua
             # tk.save()
             # context["success"]=True

@@ -1,4 +1,4 @@
-from . import views,totp,U2F,TrustedDevice,helpers,FIDO2,Email
+from . import views,totp,U2F,TrustedDevice,helpers,FIDO2,Email,recovery
 #app_name='mfa'
 
 try:
@@ -11,6 +11,10 @@ urlpatterns = [
     url(r'totp/verify', totp.verify, name="verify_otop"),
     url(r'totp/auth', totp.auth, name="totp_auth"),
     url(r'totp/recheck', totp.recheck, name="totp_recheck"),
+
+    url(r'recovery/start', recovery.start, name="manage_recovery_codes"),
+    url(r'recovery/getTokens', recovery.getTokens, name="get_recovery_tokens"),
+    url(r'recovery/genTokens', recovery.genTokens, name="regen_recovery_tokens"),
 
     url(r'email/start/', Email.start , name="start_email"),
     url(r'email/auth/', Email.auth , name="email_auth"),

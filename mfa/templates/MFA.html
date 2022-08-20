@@ -82,28 +82,40 @@
                <th>Status</th>
                <th>Delete</th>
            </tr>
-        {% for key in keys %}
-           <tr>
+        {% if keys %}
+            {% for key in keys %}
+            <tr>
 
-               <td>{{ key.key_type }}</td>
-               <td>{{ key.added_on }}</td>
-               <td>{{ key.expires }}</td>
-               <td>{% if key.device %}{{ key.device }}{% endif %}</td>
-               <td>{{ key.last_used }}</td>
-                {% if key.key_type in HIDE_DISABLE %}
-                    <td>{% if key.enabled %}On{% else %} Off{% endif %}</td>
-                {% else %}
-                    <td><input type="checkbox" id="toggle_{{ key.id }}" {% if key.enabled %}checked{% endif %} data-onstyle="success" data-offstyle="danger"  onchange="toggleKey({{ key.id }})" data-toggle="toggle" class="status_chk"></td>
-                {% endif %}
-               <td>{% if key.key_type in HIDE_DISABLE %}
-                   ----
-                   {% else %}
-                    <a href="javascript:void(0)" onclick="deleteKey({{ key.id }},'{{ key.key_type }}')"> <span class="fa fa-trash fa-solid fa-trash-can bi bi-trash-fill"></span></a></td>
+                <td>{{ key.key_type }}</td>
+                <td>{{ key.added_on }}</td>
+                <td>{{ key.expires }}</td>
+                <td>{% if key.device %}{{ key.device }}{% endif %}</td>
+                <td>{{ key.last_used }}</td>
+                    {% if key.key_type in HIDE_DISABLE %}
+                        <td>{% if key.enabled %}On{% else %} Off{% endif %}</td>
+                    {% else %}
+                        <td><input type="checkbox" id="toggle_{{ key.id }}" {% if key.enabled %}checked{% endif %} data-onstyle="success" data-offstyle="danger"  onchange="toggleKey({{ key.id }})" data-toggle="toggle" class="status_chk"></td>
                     {% endif %}
-           </tr>
-       {% empty %}
+                <td>{% if key.key_type in HIDE_DISABLE %}
+                    ----
+                    {% else %}
+                        <a href="javascript:void(0)" onclick="deleteKey({{ key.id }},'{{ key.key_type }}')"> <span class="fa fa-trash fa-solid fa-trash-can bi bi-trash-fill"></span></a></td>
+                        {% endif %}
+            </tr>
+            {% endfor %}
+            <tr>
+
+                <td>RECOVERY</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>On</td>
+                <td><a href="{% url 'manage_recovery_codes' %}"> <span class="fa fa-wrench fa-solid fa-wrench bi bi-wrench-fill"></span></a></td>
+            </tr>
+        {% else %}
            <tr><td colspan="7" align="center">You didn't have any keys yet.</td> </tr>
-       {% endfor %}
+       {% endif %}
         </table>
     </div>
     </div>
