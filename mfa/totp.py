@@ -53,17 +53,6 @@ def auth(request):
                                 seconds=random.randint(settings.MFA_RECHECK_MIN, settings.MFA_RECHECK_MAX))))
                 request.session["mfa"] = mfa
                 return login(request)
-        elif tokenLength == 10 and "RECOVERY" not in settings.MFA_UNALLOWED_METHODS:
-            #Backup code check
-            resBackup=recovery.verify_login(request, request.session["base_username"], token=request.POST["otp"])
-            if resBackup[0]:
-                mfa = {"verified": True, "method": "RECOVERY","id":resBackup[1]}
-                if getattr(settings, "MFA_RECHECK", False):
-                    mfa["next_check"] = datetime.datetime.timestamp((datetime.datetime.now()
-                                            + datetime.timedelta(
-                                seconds=random.randint(settings.MFA_RECHECK_MIN, settings.MFA_RECHECK_MAX))))
-                request.session["mfa"] = mfa
-                return login(request)
         context["invalid"]=True
     return render(request,"TOTP/Auth.html", context)
 

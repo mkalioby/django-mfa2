@@ -55,6 +55,7 @@ def reset_cookie(request):
     response=HttpResponseRedirect(settings.LOGIN_URL)
     response.delete_cookie("base_username")
     return response
+
 def login(request):
     from django.contrib import auth
     from django.conf import settings

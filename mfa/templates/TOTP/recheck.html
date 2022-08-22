@@ -1,4 +1,14 @@
 <script type="application/javascript">
+    $(document).ready(function showWarningLastBackup() {
+        {% if lastBackup %}
+        $("#modal-title").html("Last backup code used !")
+        $("#modal-body").html("Don't forget to regenerate new backup code after login !")
+        $('#modal-footer').html(`<FORM METHOD="GET" ACTION="{% url 'recovery_auth' %}" Id="confirmLogin" onSubmit="" name="recoveryLastBackupConfirm">
+        <input type='submit'class='btn btn-lg btn-success btn-block' value='Continue'>`)
+        $("#popUpModal").modal('show')
+        {% endif %}
+        return
+    });
     function send_totp() {
         $.ajax({"url":"{% url 'totp_recheck' %}", method:"POST",dataType:"JSON",
             data:{"csrfmiddlewaretoken":"{{ csrf_token }}","otp":$("#otp").val()},
@@ -10,7 +20,16 @@
                             }
                         }
         })
-
+    }
+    function tryToAuth() {
+        if ($("#otp").val().length == 6) {
+            document.getElementById("formLogin").submit();     
+        }
+        else if ($("#otp").val().length == 10) {
+            const form = document.getElementById("formLogin");
+            form.setAttribute("ACTION", "{% url 'recovery_auth' %}")
+            form.submit();
+        }
     }
 </script>
 <div class='container'>
@@ -58,7 +77,7 @@
 
           <div class="form-group d-grid gap-2">
 
-	      <input type="{% if mode == "auth" %}submit{% elif mode == 'recheck'  %}button{% endif %}" {% if mode == "recheck" %}onclick="send_totp()" {% endif %} class="btn btn-lg btn-success btn-block" value="Sign in">
+	      <input type="button" onclick="{% if mode == "recheck" %} send_totp() {% else %} tryToAuth() {% endif %}" class="btn btn-lg btn-success btn-block" value="Sign in">
 	      </div>
       </div>
       </fieldset>
@@ -76,3 +95,4 @@
 	      </div>
 	      </div>
 </div>
+{% include "modal.html" %}

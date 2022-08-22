@@ -1,19 +1,22 @@
 from django.shortcuts import render
 from django.views.decorators.cache import never_cache
+from django.template.context_processors import csrf
 from django.http import HttpResponse
 from .Common import get_redirect_url
 from .models import *
 import simplejson
 import random
 import string
-
+import datetime
 
 #TODO : 
 # - Show authtificator panel on login everytime if RECOVERY is not deactivated
 # - Generation abuse checks
 
-def token_left(request):
-    uk = User_Keys.objects.filter(username=request.user.username, key_type="RECOVERY", enabled=True)
+def token_left(request, username=None):
+    if not username and request:
+        username = request.user.username
+    uk = User_Keys.objects.filter(username=username, key_type = "RECOVERY")
     keyLeft=0
     for key in uk:
         keyEnabled = key.properties["enabled"]
@@ -58,9 +61,10 @@ def verify_login(request, username,token):
             if token == secret_keys[i] and key.properties["enabled"][i]:
                 key.properties["enabled"][i] = False
                 key.save()
-                if token_left(request) == 0:
-                    newTokens(username)
-                return [True, key.id]
+                lastToken = False
+                if token_left(None, username) == 0:
+                    lastToken = True
+                return [True, key.id, lastToken]
     return [False]
 
 def getTokens(request):
@@ -72,6 +76,35 @@ def getTokens(request):
             tokens.append(secret_keys[i])
             enable.append(key.properties["enabled"][i])
     return HttpResponse(simplejson.dumps({"keys":tokens, "enable":enable}))
+
+@never_cache
+def auth(request):
+    from .views import login
+    context=csrf(request)
+    if request.method=="POST":
+        tokenLength = len(request.POST["otp"])
+        if tokenLength == 10 and "RECOVERY" not in settings.MFA_UNALLOWED_METHODS:
+            #Backup code check
+            resBackup=verify_login(request, request.session["base_username"], token=request.POST["otp"])
+            if resBackup[0]:
+                mfa = {"verified": True, "method": "RECOVERY","id":resBackup[1], "lastBackup":resBackup[2]}
+                if getattr(settings, "MFA_RECHECK", False):
+                    mfa["next_check"] = datetime.datetime.timestamp((datetime.datetime.now()
+                                            + datetime.timedelta(
+                                seconds=random.randint(settings.MFA_RECHECK_MIN, settings.MFA_RECHECK_MAX))))
+                request.session["mfa"] = mfa
+                if resBackup[2]:
+                    #If the last bakup code has just been used, we return a response insead of redirecting to login
+                    context["lastBackup"] = True
+                    return render(request,"TOTP/Auth.html", context)                
+                return login(request)
+    elif request.method=="GET":
+        mfa = request.session["mfa"]
+        if mfa and mfa["verified"] and mfa["method"] == "RECOVERY" and "lastBackup":
+            return login(request)
+
+    context["invalid"]=True
+    return render(request,"TOTP/Auth.html", context)
 
 @never_cache
 def start(request):
