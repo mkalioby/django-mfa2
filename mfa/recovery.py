@@ -9,9 +9,6 @@ import random
 import string
 import datetime
 
-#TODO : 
-# - Show authtificator panel on login everytime if RECOVERY is not deactivated
-# - Generation abuse checks
 
 def token_left(request, username=None):
     if not username and request:
@@ -32,17 +29,8 @@ def delTokens(request):
         if key.username == request.user.username:
             key.delete()
 
-def newTokens(username):
-    # Separated from genTokens to be able to regenerate codes after login if last code has been used
-    newKeys = []
-    for i in range(5):
-            token = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(10))
-            newKeys.append(token)
-    uk=User_Keys()
-    uk.username=username
-    uk.properties={"secret_keys":newKeys, "enabled":[True for j in range(5)]}
-    uk.key_type="RECOVERY"
-    uk.save()
+def randomGen(n):
+    return ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(n))
 
 def genTokens(request, softGen=False):
     if not softGen or (softGen and token_left(request) == 0):
@@ -50,7 +38,15 @@ def genTokens(request, softGen=False):
         delTokens(request)
         number = 5
         #Then generate new one
-        newTokens(request.user.username)
+        newKeys = []
+        for i in range(5):
+                token = randomGen(5) + "-" + randomGen(5)
+                newKeys.append(token)
+        uk=User_Keys()
+        uk.username = request.user.username
+        uk.properties={"secret_keys":newKeys, "enabled":[True for j in range(5)]}
+        uk.key_type="RECOVERY"
+        uk.save()
     return HttpResponse("Success")
 
 
@@ -100,7 +96,7 @@ def auth(request):
                 return login(request)
     elif request.method=="GET":
         mfa = request.session["mfa"]
-        if mfa and mfa["verified"] and mfa["method"] == "RECOVERY" and "lastBackup":
+        if mfa and mfa["verified"] and mfa["lastBackup"]:
             return login(request)
 
     context["invalid"]=True
