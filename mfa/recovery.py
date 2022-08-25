@@ -38,26 +38,25 @@ def randomGen(n):
 
 
 @never_cache
-def genTokens(request, softGen=False):
-    if not softGen or (softGen and token_left(request) == 0):
-        #Delete old ones
-        delTokens(request)
-        number = 5
-        #Then generate new one
-        salt = randomGen(15)
-        hashedKeys = []
-        clearKeys = []
-        for i in range(5):
-                token = randomGen(5) + "-" + randomGen(5)
-                hashedToken = make_password(token, salt, 'pbkdf2_sha256_custom')
-                hashedKeys.append(hashedToken)
-                clearKeys.append(token)
-        uk=User_Keys()
-        uk.username = request.user.username
-        uk.properties={"secret_keys":hashedKeys, "enabled":[True for j in range(5)], "salt":salt}
-        uk.key_type="RECOVERY"
-        uk.enabled = False
-        uk.save()
+def genTokens(request):
+    #Delete old ones
+    delTokens(request)
+    number = 5
+    #Then generate new one
+    salt = randomGen(15)
+    hashedKeys = []
+    clearKeys = []
+    for i in range(5):
+            token = randomGen(5) + "-" + randomGen(5)
+            hashedToken = make_password(token, salt, 'pbkdf2_sha256_custom')
+            hashedKeys.append(hashedToken)
+            clearKeys.append(token)
+    uk=User_Keys()
+    uk.username = request.user.username
+    uk.properties={"secret_keys":hashedKeys, "enabled":[True for j in range(5)], "salt":salt}
+    uk.key_type="RECOVERY"
+    uk.enabled = False
+    uk.save()
     return HttpResponse(simplejson.dumps({"keys":clearKeys}))
 
 
