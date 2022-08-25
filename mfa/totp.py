@@ -11,7 +11,6 @@ import pyotp
 from .views import login
 import datetime
 from django.utils import timezone
-from . import recovery
 import random
 
 
@@ -31,7 +30,6 @@ def recheck(request):
         if verify_login(request,request.user.username, token=request.POST["otp"]):
             import time
             request.session["mfa"]["rechecked_at"] = time.time()
-            recovery.genTokens(request, True) #recovery tokens
             return HttpResponse(simplejson.dumps({"recheck": True}), content_type="application/json")
         else:
             return HttpResponse(simplejson.dumps({"recheck": False}), content_type="application/json")

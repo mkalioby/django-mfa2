@@ -66,7 +66,8 @@ Depends on
 `python manage.py collectstatic`
 3. Add the following settings to your file
 
-   ```python 
+   ```python
+   from django.conf.global_settings import PASSWORD_HASHERS as DEFAULT_PASSWORD_HASHERS #Preferably at the same place where you import your other modules
    MFA_UNALLOWED_METHODS=()   # Methods that shouldn't be allowed for the user
    MFA_LOGIN_CALLBACK=""      # A function that should be called by username to login the user in session
    MFA_RECHECK=True           # Allow random rechecking of the user
@@ -77,6 +78,9 @@ Depends on
    MFA_QUICKLOGIN=True        # Allow quick login for returning users by provide only their 2FA
    MFA_HIDE_DISABLE=('FIDO2',)     # Can the user disable his key (Added in 1.2.0).
    MFA_OWNED_BY_ENTERPRISE = FALSE  # Who owns security keys   
+   PASSWORD_HASHERS = DEFAULT_PASSWORD_HASHERS #Comment if PASSWORD_HASHER already set
+   PASSWORD_HASHERS += ['mfa.recovery.Hash']
+   RECOVERY_ITERATION = 350000 #Number of iteration for recovery code, higher is more secure, but uses more resources for generation and check...
 
    TOKEN_ISSUER_NAME="PROJECT_NAME"      #TOTP Issuer name
 

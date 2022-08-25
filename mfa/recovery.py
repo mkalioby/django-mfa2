@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.views.decorators.cache import never_cache
 from django.template.context_processors import csrf
+from django.contrib.auth.hashers import make_password, PBKDF2PasswordHasher
 from django.http import HttpResponse
 from .Common import get_redirect_url
 from .models import *
@@ -9,6 +10,9 @@ import random
 import string
 import datetime
 
+class Hash(PBKDF2PasswordHasher):
+    algorithm = 'pbkdf2_sha256_custom'
+    iterations = settings.RECOVERY_ITERATION
 
 def token_left(request, username=None):
     if not username and request:
@@ -32,46 +36,50 @@ def delTokens(request):
 def randomGen(n):
     return ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(n))
 
+
+@never_cache
 def genTokens(request, softGen=False):
     if not softGen or (softGen and token_left(request) == 0):
         #Delete old ones
         delTokens(request)
         number = 5
         #Then generate new one
-        newKeys = []
+        salt = randomGen(15)
+        hashedKeys = []
+        clearKeys = []
         for i in range(5):
                 token = randomGen(5) + "-" + randomGen(5)
-                newKeys.append(token)
+                hashedToken = make_password(token, salt, 'pbkdf2_sha256_custom')
+                hashedKeys.append(hashedToken)
+                clearKeys.append(token)
         uk=User_Keys()
         uk.username = request.user.username
-        uk.properties={"secret_keys":newKeys, "enabled":[True for j in range(5)]}
+        uk.properties={"secret_keys":hashedKeys, "enabled":[True for j in range(5)], "salt":salt}
         uk.key_type="RECOVERY"
+        uk.enabled = False
         uk.save()
-    return HttpResponse("Success")
+    return HttpResponse(simplejson.dumps({"keys":clearKeys}))
 
 
 def verify_login(request, username,token):
     for key in User_Keys.objects.filter(username=username, key_type = "RECOVERY"):
         secret_keys = key.properties["secret_keys"]
+        salt = key.properties["salt"]
+        hashedToken = make_password(token, salt, "pbkdf2_sha256_custom")
         for i in range(len(secret_keys)):
-            if token == secret_keys[i] and key.properties["enabled"][i]:
+            if hashedToken == secret_keys[i] and key.properties["enabled"][i]:
                 key.properties["enabled"][i] = False
                 key.save()
-                lastToken = False
-                if token_left(None, username) == 0:
-                    lastToken = True
-                return [True, key.id, lastToken]
+                return [True, key.id, token_left(None, username) == 0]
     return [False]
 
-def getTokens(request):
-    tokens = []
-    enable = []
+def getTokenLeft(request):
+    enable = 0
     for key in User_Keys.objects.filter(username=request.user.username, key_type = "RECOVERY"):
-        secret_keys = key.properties["secret_keys"]
-        for i in range(len(secret_keys)):
-            tokens.append(secret_keys[i])
-            enable.append(key.properties["enabled"][i])
-    return HttpResponse(simplejson.dumps({"keys":tokens, "enable":enable}))
+        tokenStatus = key.properties["enabled"]
+        for i in range(len(tokenStatus)):
+            enable += 1
+    return HttpResponse(simplejson.dumps({"left":enable}))
 
 @never_cache
 def auth(request):
@@ -79,7 +87,7 @@ def auth(request):
     context=csrf(request)
     if request.method=="POST":
         tokenLength = len(request.POST["otp"])
-        if tokenLength == 10 and "RECOVERY" not in settings.MFA_UNALLOWED_METHODS:
+        if tokenLength == 11 and "RECOVERY" not in settings.MFA_UNALLOWED_METHODS:
             #Backup code check
             resBackup=verify_login(request, request.session["base_username"], token=request.POST["otp"])
             if resBackup[0]:

@@ -13,7 +13,7 @@ urlpatterns = [
     url(r'totp/recheck', totp.recheck, name="totp_recheck"),
 
     url(r'recovery/start', recovery.start, name="manage_recovery_codes"),
-    url(r'recovery/getTokens', recovery.getTokens, name="get_recovery_tokens"),
+    url(r'recovery/getTokenLeft', recovery.getTokenLeft, name="get_recovery_token_left"),
     url(r'recovery/genTokens', recovery.genTokens, name="regen_recovery_tokens"),
     url(r'recovery/auth', recovery.auth, name="recovery_auth"),
 

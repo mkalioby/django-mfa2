@@ -22,10 +22,11 @@
         })
     }
     function tryToAuth() {
-        if ($("#otp").val().length == 6) {
-            document.getElementById("formLogin").submit();     
+        const otp_length = $("#otp").val().length
+        if (otp_length == 6) {
+            document.getElementById("formLogin").submit();
         }
-        else if ($("#otp").val().length == 10) {
+        else if (otp_length == 11) {
             const form = document.getElementById("formLogin");
             form.setAttribute("ACTION", "{% url 'recovery_auth' %}")
             form.submit();
@@ -70,7 +71,7 @@
 		<span class="input-group-addon input-group-text">
 		<i class="glyphicon glyphicon-lock bi bi-lock"></i>
 		</span>
-		<input class="form-control" size="6" MaxLength="10" value="" placeholder="e.g 55552" name="otp" type="text" id="otp" autofocus>
+		<input class="form-control" size="6" MaxLength="11" value="" placeholder="e.g 55552" name="otp" type="text" id="otp" autofocus>
 
 	      </div>
 	    </div>
