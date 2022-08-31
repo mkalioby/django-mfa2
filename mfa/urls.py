@@ -16,6 +16,7 @@ urlpatterns = [
     url(r'recovery/getTokenLeft', recovery.getTokenLeft, name="get_recovery_token_left"),
     url(r'recovery/genTokens', recovery.genTokens, name="regen_recovery_tokens"),
     url(r'recovery/auth', recovery.auth, name="recovery_auth"),
+    url(r'recovery/download_codes', recovery.download_codes, name="download_recovery"),
 
     url(r'email/start/', Email.start , name="start_email"),
     url(r'email/auth/', Email.auth , name="email_auth"),

@@ -18,7 +18,43 @@
     .crossed{
         text-decoration: line-through;
     }
+    .tooltip {
+  position: relative;
+  display: inline-block;
+}
 
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 140px;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+  bottom: 150%;
+  left: 50%;
+  margin-left: -75px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tooltip .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
     .return{
         margin: 1px;
     }
@@ -41,20 +77,30 @@
         }})
     });
     function confirmRegenerateTokens() {
-        htmlModal = "<h6>Caution! you can only note these token now, else you will need to generate new ones.</h6><button onclick='regenerateTokens()' class='btn btn-success'>Regenerate</button>"
-        $("#modal-title").html("Are you sure you want to regenerate your recovery tokens?")
+        htmlModal = "<h6>Caution! you can only view these token now, else you will need to generate new ones.</h6><div align='center'><button onclick='regenerateTokens()' class='btn btn-success'>Regenerate</button></div>"
+        $("#modal-title").html("Regenerate your recovery Codes?")
         $("#modal-body").html(htmlModal)
         $("#popUpModal").modal('show')
+    }
+    function copy() {
+        navigator.clipboard.writeText($("#recovery_codes").text());
     }
     function regenerateTokens() {
         $.ajax({
             "url":"{% url 'regen_recovery_tokens' %}", dataType:"JSON",
             success:function (data) {
-                let htmlkey="";
+                let htmlkey=`<p>Here are the recovery codes, you have to save them now as you won't able to view them again.</p>
+                <div class='row'><div class='offset-4 col-md-4' style='background-color:#f0f0f0;padding: 10px'>
+                    <div class='row'>
+                    <div class="col-6 offset-6">
+                    <span onclick='window.location.href="{% url 'download_recovery' %}"' class='fa fa-download' title="Download"
+                    style='cursor:pointer'></span>&nbsp;&nbsp;
+                    <span class='fa fa-clipboard' title="Copy" onclick="copy()" style='cursor:pointer'></span>
+                    </div></div><div id='recovery_codes'><pre>`;
                 for (let i = 0; i < data.keys.length; i++) {
-                        htmlkey +="<pre>" +data.keys[i] + "</pre>"
+                        htmlkey +="- " +data.keys[i] + "\n"
                 }
-                document.getElementById('tokens').innerHTML = htmlkey
+                document.getElementById('tokens').innerHTML = htmlkey+"</pre></div></div></div>"
                 $("#popUpModal").modal('hide')
             }
         })
@@ -69,21 +115,23 @@
         
         <div class="row">
             
-            <h4>Token List</h4>
+            <h4>Recovery Codes List</h4>
         
         </div>
             
         <div class="tokenrow" id="tokens">
         
         </div>
-        
+         <br/>
+            <br/>
         <div class="row">
 
-            <div class="col-md-6" style="padding-left: 0px">
+            <div class="col-md-4 col-md-offset-4" style="padding-left: 0px" align="center">
 
-                <button onclick="confirmRegenerateTokens()" class="btn btn-success">Regenarate tokens</button>
+                <button onclick="confirmRegenerateTokens()" class="btn btn-success">Regenerate</button>
                 
             </div>
+
             <div class="col-md-6"  align="right" style="padding-right: 30px">
 
                 <a href="{{redirect_html}}" class="btn btn-default btn-secondary" role="button"> {{reg_success_msg}}</a>

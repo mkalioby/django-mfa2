@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.views.decorators.cache import never_cache
 from django.template.context_processors import csrf
 from django.contrib.auth.hashers import make_password, PBKDF2PasswordHasher
-from django.http import HttpResponse
+from django.http import HttpResponse,FileResponse,HttpResponseNotFound
 from .Common import get_redirect_url
 from .models import *
 import simplejson
@@ -57,19 +57,26 @@ def genTokens(request):
     uk.key_type="RECOVERY"
     uk.enabled = False
     uk.save()
+    request.session["recovery_keys"]=clearKeys
     return HttpResponse(simplejson.dumps({"keys":clearKeys}))
 
+def download_codes(request):
+    if not "recovery_keys" in request.session:
+        return HttpResponseNotFound("This page isn't valid anymore.")
+    response = HttpResponse('\n'.join(request.session["recovery_keys"]),content_type='text/text')
+    response['Content-Disposition'] = 'attachment; filename = Recovery Codes.txt'
+    return response
 
 def verify_login(request, username,token):
-    for key in User_Keys.objects.filter(username=username, key_type = "RECOVERY"):
-        secret_keys = key.properties["secret_keys"]
-        salt = key.properties["salt"]
-        hashedToken = make_password(token, salt, "pbkdf2_sha256_custom")
-        for i in range(len(secret_keys)):
-            if hashedToken == secret_keys[i] and key.properties["enabled"][i]:
-                key.properties["enabled"][i] = False
-                key.save()
-                return [True, key.id, token_left(None, username) == 0]
+    key =  User_Keys.objects.filter(username=username, key_type = "RECOVERY")
+    secret_keys = key.properties["secret_keys"]
+    salt = key.properties["salt"]
+    hashedToken = make_password(token, salt, "pbkdf2_sha256_custom")
+    if hashedToken == secret_keys[0]:
+        secret_keys.pop(0)
+        key.properties["secret_keys"] = secret_keys
+        key.save()
+        return [True, key.id, len(secret_keys) == 0]
     return [False]
 
 def getTokenLeft(request):
