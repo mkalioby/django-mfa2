@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.views.decorators.cache import never_cache
 from django.template.context_processors import csrf
 from django.contrib.auth.hashers import make_password, PBKDF2PasswordHasher
-from django.http import HttpResponse,HttpResponseNotFound
+from django.http import HttpResponse
 from .Common import get_redirect_url
 from .models import *
 import simplejson
@@ -23,7 +23,6 @@ def delTokens(request):
 
 def randomGen(n):
     return ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for _ in range(n))
-
 
 @never_cache
 def genTokens(request):
@@ -58,9 +57,6 @@ def verify_login(request, username, token):
                 key.properties["secret_keys"] = secret_keys
                 key.save()
                 return [True, key.id, len(secret_keys) == 0]
-        if len(secret_keys) == 0:
-            #Show a message ?
-            return [False]
     return [False]
 
 def getTokenLeft(request):
