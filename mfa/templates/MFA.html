@@ -60,10 +60,10 @@
                 {% if not 'U2F' in UNALLOWED_AUTHEN_METHODS %}
                     <li><a class="dropdown-item" href="{% url 'start_u2f' %}">Security Key</a></li>
                 {% endif %}
-            {% if not 'FIDO2' in UNALLOWED_AUTHEN_METHODS %}
+                {% if not 'FIDO2' in UNALLOWED_AUTHEN_METHODS %}
                     <li><a class="dropdown-item" href="{% url 'start_fido2' %}">FIDO2 Security Key</a></li>
                 {% endif %}
-            {% if not 'Trusted_Devices' in UNALLOWED_AUTHEN_METHODS %}
+                {% if not 'Trusted_Devices' in UNALLOWED_AUTHEN_METHODS %}
                     <li><a class="dropdown-item" href="{% url 'start_td' %}">Trusted Device</a></li>
                 {% endif %}
             </ul>

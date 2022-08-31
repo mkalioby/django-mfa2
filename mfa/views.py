@@ -32,17 +32,13 @@ def verify(request,username):
     request.session["base_username"] = username
     #request.session["base_password"] = password
     keys=User_Keys.objects.filter(username=username,enabled=1)
-    methods=list(set([k.key_type for k in keys if k.key_type != "RECOVERY"]))
+    methods=list(set([k.key_type for k in keys]))
 
     if "Trusted Device" in methods and not request.session.get("checked_trusted_device",False):
         if TrustedDevice.verify(request):
             return login(request)
         methods.remove("Trusted Device")
     request.session["mfa_methods"] = methods
-
-    if "TOTP" not in methods and "RECOVERY" not in settings.MFA_UNALLOWED_METHODS:
-        #Add the "totp" option if user doesn't have totp auth (case with fido auth and backup code for instace)
-        methods.append("TOTP")
 
     if len(methods)==1:
         return HttpResponseRedirect(reverse(methods[0].lower()+"_auth"))

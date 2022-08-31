@@ -1,14 +1,4 @@
 <script type="application/javascript">
-    $(document).ready(function showWarningLastBackup() {
-        {% if lastBackup %}
-        $("#modal-title").html("Last backup code used !")
-        $("#modal-body").html("Don't forget to regenerate new backup code after login !")
-        $('#modal-footer').html(`<FORM METHOD="GET" ACTION="{% url 'recovery_auth' %}" Id="confirmLogin" onSubmit="" name="recoveryLastBackupConfirm">
-        <input type='submit'class='btn btn-lg btn-success btn-block' value='Continue'>`)
-        $("#popUpModal").modal('show')
-        {% endif %}
-        return
-    });
     function send_totp() {
         $.ajax({"url":"{% url 'totp_recheck' %}", method:"POST",dataType:"JSON",
             data:{"csrfmiddlewaretoken":"{{ csrf_token }}","otp":$("#otp").val()},
@@ -20,17 +10,6 @@
                             }
                         }
         })
-    }
-    function tryToAuth() {
-        const otp_length = $("#otp").val().length
-        if (otp_length == 6) {
-            document.getElementById("formLogin").submit();
-        }
-        else if (otp_length == 11) {
-            const form = document.getElementById("formLogin");
-            form.setAttribute("ACTION", "{% url 'recovery_auth' %}")
-            form.submit();
-        }
     }
 </script>
 <div class='container'>
@@ -60,7 +39,7 @@
       <fieldset>
       <div class="row">
       <div class="col-sm-12 col-md-12">
-        <p>Enter the 6-digits on your authenticator. Or input a recovery code</p>
+        <p>Enter the 6-digits on your authenticator</p>
       </div>
       </div>
 
@@ -71,15 +50,14 @@
 		<span class="input-group-addon input-group-text">
 		<i class="glyphicon glyphicon-lock bi bi-lock"></i>
 		</span>
-		<input class="form-control" size="6" MaxLength="11" value="" placeholder="e.g 55552" name="otp" type="text" id="otp" autofocus>
+		<input class="form-control" size="6" MaxLength="6" value="" placeholder="e.g 55552" name="otp" type="text" id="otp" autofocus>
 
 	      </div>
 	    </div>
 
           <div class="form-group d-grid gap-2">
 
-	      <input type="button" onclick="{% if mode == "recheck" %} send_totp() {% else %} tryToAuth() {% endif %}" class="btn btn-lg btn-success btn-block" value="Sign in">
-	      </div>
+            <input type="{% if mode == "auth" %}submit{% elif mode == 'recheck'  %}button{% endif %}" {% if mode == "recheck" %}onclick="send_totp()" {% endif %} class="btn btn-lg btn-success btn-block" value="Sign in">	      </div>
       </div>
       </fieldset>
       </FORM>

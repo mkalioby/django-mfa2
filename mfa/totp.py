@@ -5,7 +5,6 @@ from .Common import get_redirect_url
 from .models import *
 from django.template.context_processors import csrf
 import simplejson
-from django.template.context import RequestContext
 from django.conf import settings
 import pyotp
 from .views import login
@@ -27,7 +26,7 @@ def recheck(request):
     context = csrf(request)
     context["mode"]="recheck"
     if request.method == "POST":
-        if verify_login(request,request.user.username, token=request.POST["otp"]):
+        if verify_login(request,request.user.username, token=request.POST["otp"])[0]:
             import time
             request.session["mfa"]["rechecked_at"] = time.time()
             return HttpResponse(simplejson.dumps({"recheck": True}), content_type="application/json")
