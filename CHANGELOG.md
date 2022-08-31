@@ -1,4 +1,8 @@
 # Change Log
+## 2.6.0 (dev)
+   * Adding Backup Recovery Codes (Recovery) as a method.
+     Thanks to @Spitfireap for work, and  @peterthomassen for guidance.
+
 ## 2.5.0
 
    * Fixed: issue in the 'Authorize' button don't show on Firefox and Chrome on iOS.
