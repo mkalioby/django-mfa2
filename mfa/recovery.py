@@ -14,18 +14,6 @@ class Hash(PBKDF2PasswordHasher):
     algorithm = 'pbkdf2_sha256_custom'
     iterations = settings.RECOVERY_ITERATION
 
-def token_left(request, username=None):
-    if not username and request:
-        username = request.user.username
-    uk = User_Keys.objects.filter(username=username, key_type = "RECOVERY")
-    keyLeft=0
-    for key in uk:
-        keyEnabled = key.properties["enabled"]
-        for i in range(len(keyEnabled)):
-            if keyEnabled[i]:
-                keyLeft += 1
-    return keyLeft
-
 def delTokens(request):
     #Only when all MFA have been deactivated, or to generate new !
     #We iterate only to clean if any error happend and multiple entry of RECOVERY created for one user
@@ -41,7 +29,6 @@ def randomGen(n):
 def genTokens(request):
     #Delete old ones
     delTokens(request)
-    number = 5
     #Then generate new one
     salt = randomGen(15)
     hashedKeys = []
@@ -53,7 +40,7 @@ def genTokens(request):
             clearKeys.append(token)
     uk=User_Keys()
     uk.username = request.user.username
-    uk.properties={"secret_keys":hashedKeys, "enabled":[True for j in range(5)], "salt":salt}
+    uk.properties={"secret_keys":hashedKeys, "salt":salt}
     uk.key_type="RECOVERY"
     uk.enabled = False
     uk.save()
@@ -80,12 +67,11 @@ def verify_login(request, username,token):
     return [False]
 
 def getTokenLeft(request):
-    enable = 0
-    for key in User_Keys.objects.filter(username=request.user.username, key_type = "RECOVERY"):
-        tokenStatus = key.properties["enabled"]
-        for i in range(len(tokenStatus)):
-            enable += 1
-    return HttpResponse(simplejson.dumps({"left":enable}))
+    uk = User_Keys.objects.filter(username=request.user.username, key_type = "RECOVERY")
+    keyLeft=0
+    for key in uk:
+        keyLeft += len(key.properties["secret_keys"])
+    return HttpResponse(simplejson.dumps({"left":keyLeft}))
 
 @never_cache
 def auth(request):
