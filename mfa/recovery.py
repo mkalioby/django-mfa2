@@ -9,6 +9,9 @@ import simplejson
 import random
 import string
 import datetime
+from django.utils import timezone
+
+USER_FRIENDLY_NAME = "Recovery Codes"
 
 class Hash(PBKDF2PasswordHasher):
     algorithm = 'pbkdf2_sha256_custom'
@@ -38,6 +41,7 @@ def genTokens(request):
             hashedKeys.append(hashedToken)
             clearKeys.append(token)
     uk=User_Keys()
+
     uk.username = request.user.username
     uk.properties={"secret_keys":hashedKeys, "salt":salt}
     uk.key_type="RECOVERY"
@@ -51,10 +55,11 @@ def verify_login(request, username, token):
         secret_keys = key.properties["secret_keys"]
         salt = key.properties["salt"]
         hashedToken = make_password(token, salt, "pbkdf2_sha256_custom")
-        for i in range(len(secret_keys)):
-            if hashedToken == secret_keys[i]:
+        for i,token in enumerate(secret_keys):
+            if hashedToken == token:
                 secret_keys.pop(i)
                 key.properties["secret_keys"] = secret_keys
+                key.last_used= timezone.now()
                 key.save()
                 return [True, key.id, len(secret_keys) == 0]
     return [False]
@@ -89,10 +94,10 @@ def auth(request):
             resBackup=verify_login(request, request.session["base_username"], token=request.POST["recovery"])
             if resBackup[0]:
                 mfa = {"verified": True, "method": "RECOVERY","id":resBackup[1], "lastBackup":resBackup[2]}
-                if getattr(settings, "MFA_RECHECK", False):
-                    mfa["next_check"] = datetime.datetime.timestamp((datetime.datetime.now()
-                                            + datetime.timedelta(
-                                seconds=random.randint(settings.MFA_RECHECK_MIN, settings.MFA_RECHECK_MAX))))
+                # if getattr(settings, "MFA_RECHECK", False):
+                #     mfa["next_check"] = datetime.datetime.timestamp((datetime.datetime.now()
+                #                             + datetime.timedelta(
+                #                 seconds=random.randint(settings.MFA_RECHECK_MIN, settings.MFA_RECHECK_MAX))))
                 request.session["mfa"] = mfa
                 if resBackup[2]:
                     #If the last bakup code has just been used, we return a response insead of redirecting to login

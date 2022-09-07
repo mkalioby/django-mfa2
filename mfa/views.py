@@ -1,3 +1,5 @@
+import importlib
+
 from django.shortcuts import render
 from django.http import HttpResponse,HttpResponseRedirect
 from .models import *
@@ -16,13 +18,15 @@ from user_agents import parse
 def index(request):
     keys=[]
     context={"keys":User_Keys.objects.filter(username=request.user.username),"UNALLOWED_AUTHEN_METHODS":settings.MFA_UNALLOWED_METHODS
-             ,"HIDE_DISABLE":getattr(settings,"MFA_HIDE_DISABLE",[])}
+             ,"HIDE_DISABLE":getattr(settings,"MFA_HIDE_DISABLE",[]),'RENAME_METHODS':getattr(settings,'MFA_RENAME_METHODS',{})}
     for k in context["keys"]:
-        if k.key_type =="Trusted Device" :
+        k.name = getattr(settings,'MFA_RENAME_METHODS',{}).get(k.key_type,k.key_type)
+        if k.key_type =="Trusted Device":
             setattr(k,"device",parse(k.properties.get("user_agent","-----")))
         elif k.key_type == "FIDO2":
             setattr(k,"device",k.properties.get("type","----"))
         elif k.key_type == "RECOVERY":
+            context["recovery"] = k
             continue
         keys.append(k)
     context["keys"]=keys
@@ -42,10 +46,13 @@ def verify(request,username):
 
     if len(methods)==1:
         return HttpResponseRedirect(reverse(methods[0].lower()+"_auth"))
+    if getattr(settings,"MFA_ALWAYS_GO_TO_LAST_METHOD",False):
+        keys = keys.exclude(last_used__isnull=True).order_by("last_used")
+        return HttpResponseRedirect(reverse(keys[0].key_type.lower() + "_auth"))
     return show_methods(request)
 
 def show_methods(request):
-    return render(request,"select_mfa_method.html", {})
+    return render(request,"select_mfa_method.html", {'RENAME_METHODS':getattr(settings,'MFA_RENAME_METHODS',{})})
 
 def reset_cookie(request):
     response=HttpResponseRedirect(settings.LOGIN_URL)

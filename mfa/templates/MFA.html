@@ -45,31 +45,31 @@
     <br/>
     <div class="container">
     <div class="row">
-        <div align="center">
+        <div class="offset-5 col-2" style="text-align: center">
             <div class="btn-group">
             <button class="btn btn-success dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown">
                 Add Method&nbsp;<span class="caret"></span>
             </button>
             <ul class="dropdown-menu">
                 {% if not 'TOTP' in UNALLOWED_AUTHEN_METHODS %}
-                    <li><a class="dropdown-item" href="{% url 'start_new_otop' %}">Authenticator app</a></li>
+                    <li><a class="dropdown-item" href="{% url 'start_new_otop' %}">{% if 'TOTP' in RENAME_METHODS.keys %}{{ RENAME_METHODS.TOTP }}{% else %}Authenticator app{% endif %}</a></li>
                 {% endif %}
                 {% if not 'Email' in UNALLOWED_AUTHEN_METHODS %}
-                    <li><a class="dropdown-item" href="{% url 'start_email' %}">Email Token</a></li>
+                    <li><a class="dropdown-item" href="{% url 'start_email' %}">{% if 'Email' in RENAME_METHODS.keys %}{{ RENAME_METHODS.Email }}{% else %}Email Token{% endif %}</a></li>
                 {% endif %}
                 {% if not 'U2F' in UNALLOWED_AUTHEN_METHODS %}
-                    <li><a class="dropdown-item" href="{% url 'start_u2f' %}">Security Key</a></li>
+                    <li><a class="dropdown-item" href="{% url 'start_u2f' %}">{% if 'U2F' in RENAME_METHODS.keys %}{{ RENAME_METHODS.U2F }}{% else %}Security Key{% endif %}</a></li>
                 {% endif %}
                 {% if not 'FIDO2' in UNALLOWED_AUTHEN_METHODS %}
-                    <li><a class="dropdown-item" href="{% url 'start_fido2' %}">FIDO2 Security Key</a></li>
+                    <li><a class="dropdown-item" href="{% url 'start_fido2' %}">{% if 'FIDO2' in RENAME_METHODS.keys %}{{ RENAME_METHODS.FIDO2 }}{% else %}FIDO2 Security Key{% endif %}</a></li>
                 {% endif %}
                 {% if not 'Trusted_Devices' in UNALLOWED_AUTHEN_METHODS %}
-                    <li><a class="dropdown-item" href="{% url 'start_td' %}">Trusted Device</a></li>
+                    <li><a class="dropdown-item" href="{% url 'start_td' %}">{% if 'Trusted_Devices' in  RENAME_METHODS.keys %}{{ RENAME_METHODS.Trusted_Devices }}{% else %}Trusted Device{% endif %}</a></li>
                 {% endif %}
             </ul>
             </div>
         </div>
-    <br/>
+    </div>
     <br/>
        <table class="table table-striped">
            <tr>
@@ -86,11 +86,11 @@
             {% for key in keys %}
             <tr>
 
-                <td>{{ key.key_type }}</td>
+                <td>{{ key.name }}</td>
                 <td>{{ key.added_on }}</td>
-                <td>{{ key.expires }}</td>
+                <td>{% if key.expires %}{{ key.expires }}{% else %}N/A{% endif %}</td>
                 <td>{% if key.device %}{{ key.device }}{% endif %}</td>
-                <td>{{ key.last_used }}</td>
+                <td>{% if key.last_used %}{{ key.last_used }}{% else %}Never{% endif %}</td>
                     {% if key.key_type in HIDE_DISABLE %}
                         <td>{% if key.enabled %}On{% else %} Off{% endif %}</td>
                     {% else %}
@@ -106,11 +106,11 @@
             {% if "RECOVERY" not in UNALLOWED_AUTHEN_METHODS %}
             <tr>
 
-                <td>RECOVERY</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td>{{ recovery.name }}</td>
+                <td>{{ recovery.added_on }}</td>
+                <td>N/A</td>
+                <td>N/A</td>
+                <td>{% if recovery.last_used %}{{ recovery.last_used }}{% else %}Never{% endif %}</td>
                 <td>On</td>
                 <td><a href="{% url 'manage_recovery_codes' %}"> <span class="fa fa-wrench fa-solid fa-wrench bi bi-wrench-fill"></span></a></td>
             </tr>

@@ -137,7 +137,7 @@ def authenticate_complete(request):
             except:
                 pass
             return HttpResponse(simplejson.dumps({'status': "ERR",
-                                                  "message": excep.message}),
+                                                  "message": str(excep)}),
                                 content_type = "application/json")
 
         if request.session.get("mfa_recheck", False):

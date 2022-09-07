@@ -3,7 +3,7 @@
 <script type="application/javascript" src="{% static 'mfa/js/ua-parser.min.js' %}"></script>
 <div class="row">
 
-<div class="col-sm-10 col-sm-offset-1 col-xs-12 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
+<div class="col-sm-10 col-sm-offset-1 col-xs-12 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2 offset-2 col-8">
 <div class="panel panel-default card">
       <div class="panel-heading card-header">
 	      <strong> Security Key</strong>
@@ -35,10 +35,10 @@
           </div>
 
           <div class="row">
-          <div class="col-md-12 mb-3" style="padding-left: 15px">
+          <div class="col-md-12 mb-3" style="padding-left: 25px">
 
             {% if request.session.mfa_methods|length > 1 %}
-                <a href="{%  url 'mfa_methods_list' %}">Select Another Method</a>
+               <a href="{%  url 'mfa_methods_list' %}">Select Another Method</a>
             {% endif %}
           </div>
         </div>
