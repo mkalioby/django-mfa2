@@ -68,7 +68,7 @@ Depends on
 
    ```python
    from django.conf.global_settings import PASSWORD_HASHERS as DEFAULT_PASSWORD_HASHERS #Preferably at the same place where you import your other modules
-   MFA_UNALLOWED_METHODS=()   # Methods that shouldn't be allowed for the user
+   MFA_UNALLOWED_METHODS=()   # Methods that shouldn't be allowed for the user e.g ('TOTP','U2F',)
    MFA_LOGIN_CALLBACK=""      # A function that should be called by username to login the user in session
    MFA_RECHECK=True           # Allow random rechecking of the user
    MFA_REDIRECT_AFTER_REGISTRATION="mfa_home"   # Allows Changing the page after successful registeration
@@ -80,16 +80,15 @@ Depends on
    MFA_RENAME_METHODS={} #Rename the methods in a more user-friendly way e.g {"RECOVERY":"Backup Codes"} (Added in 2.6.0)
    MFA_HIDE_DISABLE=('FIDO2',)     # Can the user disable his key (Added in 1.2.0).
    MFA_OWNED_BY_ENTERPRISE = FALSE  # Who owns security keys   
-   PASSWORD_HASHERS = DEFAULT_PASSWORD_HASHERS #Comment if PASSWORD_HASHER already set
-   PASSWORD_HASHERS += ['mfa.recovery.Hash']
+   PASSWORD_HASHERS = DEFAULT_PASSWORD_HASHERS # Comment if PASSWORD_HASHER already set in your settings.py
+   PASSWORD_HASHERS += ['mfa.recovery.Hash'] 
    RECOVERY_ITERATION = 350000 #Number of iteration for recovery code, higher is more secure, but uses more resources for generation and check...
 
    TOKEN_ISSUER_NAME="PROJECT_NAME"      #TOTP Issuer name
 
    U2F_APPID="https://localhost"    #URL For U2F
-   FIDO_SERVER_ID=u"localehost"      # Server rp id for FIDO2, it the full domain of your project
+   FIDO_SERVER_ID=u"localehost"      # Server rp id for FIDO2, it is the full domain of your project
    FIDO_SERVER_NAME=u"PROJECT_NAME"
-   FIDO_LOGIN_URL=BASE_URL
    ```
    **Method Names**
    * U2F
@@ -105,7 +104,7 @@ Depends on
     * Starting version 2.2.0
         * Added: `MFA_SUCCESS_REGISTRATION_MSG` & `MFA_REDIRECT_AFTER_REGISTRATION`
     Start version 2.6.0
-        * Added: `MFA_ALWAYS_GO_TO_LAST_METHOD`, & `MFA_RENAME_METHODS`
+        * Added: `MFA_ALWAYS_GO_TO_LAST_METHOD`, `MFA_RENAME_METHODS`, `MFA_ENFORCE_RECOVERY_METHOD` & `RECOVERY_ITERATION`
 4. Break your login function
 
    Usually your login function will check for username and password, log the user in if the username and password are correct and create the user session, to support mfa, this has to change
