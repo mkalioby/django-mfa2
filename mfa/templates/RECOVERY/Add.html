@@ -35,13 +35,16 @@
         $.ajax({"url":"{% url 'get_recovery_token_left' %}", dataType:"JSON",
         success:function (data) {
             tokenLeft = data.left
-            let html
+            html = ""
+            {% if mfa_redirect %}
+                html += "<div class='alert alert-success'>You have enrolled successfully in {{ mfa_redirect }} method, please generate recovery codes so that you can use in case you lost access to all your verification methods.</div>"
+            {% endif %}
             if (tokenLeft == 0) {
-                html = "<h6>You don't have any backup code left, please generate new ones !</h6>"
+                html += "<h6>You don't have any backup code linked to your account, please generate new ones !</h6>"
                 
             }
             else {
-                html = "<p>You still have "+tokenLeft+" backup code left."
+                html += "<p>You still have "+tokenLeft+" backup code left."
             }
             document.getElementById('tokens').innerHTML = html
         }})

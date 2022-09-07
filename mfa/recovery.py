@@ -15,7 +15,7 @@ USER_FRIENDLY_NAME = "Recovery Codes"
 
 class Hash(PBKDF2PasswordHasher):
     algorithm = 'pbkdf2_sha256_custom'
-    iterations = settings.RECOVERY_ITERATION
+    iterations = getattr(settings,"RECOVERY_ITERATION",1)
 
 def delTokens(request):
     #Only when all MFA have been deactivated, or to generate new !
@@ -116,4 +116,7 @@ def auth(request):
 @never_cache
 def start(request):
     """Start Managing recovery tokens"""
-    return render(request,"RECOVERY/Add.html",get_redirect_url())
+    context = get_redirect_url()
+    if "mfa_reg" in request.session:
+        context["mfa_redirect"] = request.session["mfa_reg"]["name"]
+    return render(request,"RECOVERY/Add.html",context)

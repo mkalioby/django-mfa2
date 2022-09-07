@@ -13,7 +13,7 @@
     </style>
     <script src="{% static 'mfa/js/u2f-api.js' %}" type="text/javascript"></script>
     <script type="text/javascript">
-    $(document).ready(function addToken() {
+    function addToken() {
                 data=JSON.parse('{{ token|safe }}')
                 console.log(data)
                 u2f.register(data.appId,data.registerRequests,data.registeredKeys,function (response) {
@@ -21,15 +21,24 @@
                         "url":"{% url 'bind_u2f' %}",method:"POST",
                         data:{"csrfmiddlewaretoken":"{{ csrf_token }}","response":JSON.stringify(response)},
                         success:function (data) {
-                            if (data == "OK")
-                            {
-                                alert("Your device is added successfully.")
-                                window.location.href="{{ redirect_html }}"
-                            }
+                        if (data =='OK')
+                            $("#res").html("<div class='alert alert-success'>Your device is registered successfully, <a href='{{redirect_html}}'> {{reg_success_msg}}</a></div>")
+                        else if (data == "RECOVERY")
+                        {
+                            setTimeout(function (){location.href="{% url 'manage_recovery_codes' %}"},2500)
+                            $("#res").html("<div class='alert alert-success'>Your device is registered successfully, but <a href='{% url 'manage_recovery_codes' %}'>redirecting to {{ RECOVERY_METHOD }} method</a></div>")
+                        }
+                        else
+                            $("#res").html("<div class='alert alert-danger'>Registration failed, please <a href='javascript:void(0)' onclick='addToken()'>try again</a> or <a href='{% url 'mfa_home' %}'> Go to Security Home</a></div>")
+                    },
+                        error: function (data)
+                        {
+                             $("#res").html("<div class='alert alert-danger'>Registration failed, please <a href='javascript:void(0)' onclick='addToken()'>try again</a> or <a href='{% url 'mfa_home' %}'> Go to Security Home</a></div>")
                         }
                     })
                 },5000)
-            })
+            }
+    $(document).ready(addToken())
 
     </script>
 {% endblock %}
@@ -37,9 +46,11 @@
       <br/>
     <br/>
     <div class="container">
+
         <div class="col-md-6 col-md-offset-3" id="two-factor-steps">
+            <div id="res"></div>
             <div class="row" align="center">
-                <h4>Adding Security Key</h4>
+                <h4>Adding {{ method.name}}</h4>
             </div>
     <div class="row">
     <p style="color: green">Your secure Key should be flashing now, please press on button.</p>

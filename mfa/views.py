@@ -48,7 +48,8 @@ def verify(request,username):
         return HttpResponseRedirect(reverse(methods[0].lower()+"_auth"))
     if getattr(settings,"MFA_ALWAYS_GO_TO_LAST_METHOD",False):
         keys = keys.exclude(last_used__isnull=True).order_by("last_used")
-        return HttpResponseRedirect(reverse(keys[0].key_type.lower() + "_auth"))
+        if keys.count()>0:
+            return HttpResponseRedirect(reverse(keys[0].key_type.lower() + "_auth"))
     return show_methods(request)
 
 def show_methods(request):

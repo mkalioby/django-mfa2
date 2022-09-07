@@ -2,6 +2,11 @@
 ## 2.6.0 (dev)
    * Adding Backup Recovery Codes (Recovery) as a method.
      Thanks to @Spitfireap for work, and  @peterthomassen for guidance.
+   * Added: `RECOVERY_ITERATION` to set the number of iteration when hashing recovery token
+   * Added: `MFA_ENFORCE_RECOVERY_METHOD` to enforce the user to enroll in the recovery code method once, they add any other method,
+   * Added: `MFA_ALWAYS_GO_TO_LAST_METHOD` to the settings which redirects the user automatically to the last used method when logging in
+   * Added: `MFA_RENAME_METHODS` to be able to rename the methods for the user.
+   * Fix: Alot of CSS fixes for the example application
 
 ## 2.5.0
 

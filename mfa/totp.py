@@ -72,10 +72,19 @@ def verify(request):
         #uk.name="Authenticatior #%s"%User_Keys.objects.filter(username=user.username,type="TOTP")
         uk.key_type="TOTP"
         uk.save()
-        return HttpResponse("Success")
+        if getattr(settings, 'MFA_ENFORCE_RECOVERY_METHOD', False) and not User_Keys.objects.filter(key_type="RECOVERY",
+                                                                                                    username=request.user.username).exists():
+            request.session["mfa_reg"] = {"method": "TOTP",
+                                          "name": getattr(settings, "MFA_RENAME_METHODS", {}).get("TOTP", "TOTP")}
+            return HttpResponse("RECOVERY")
+        else:
+            return HttpResponse("Success")
     else: return HttpResponse("Error")
 
 @never_cache
 def start(request):
     """Start Adding Time One Time Password (TOTP)"""
-    return render(request,"TOTP/Add.html",get_redirect_url())
+    context = get_redirect_url()
+    context["RECOVERY_METHOD"] = getattr(settings, "MFA_RENAME_METHODS", {}).get("RECOVERY", "Recovery codes")
+    context["method"] = {"name":getattr(settings,"MFA_RENAME_METHODS",{}).get("TOTP","Authenticator")}
+    return render(request,"TOTP/Add.html",context)

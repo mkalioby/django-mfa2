@@ -66,7 +66,11 @@ def complete_reg(request):
         uk.owned_by_enterprise = getattr(settings, "MFA_OWNED_BY_ENTERPRISE", False)
         uk.key_type = "FIDO2"
         uk.save()
-        return HttpResponse(simplejson.dumps({'status': 'OK'}))
+        if getattr(settings, 'MFA_ENFORCE_RECOVERY_METHOD', False) and not User_Keys.objects.filter(key_type = "RECOVERY", username=request.user.username).exists():
+            request.session["mfa_reg"] = {"method":"FIDO2","name": getattr(settings, "MFA_RENAME_METHODS", {}).get("FIDO2", "FIDO2")}
+            return HttpResponse(simplejson.dumps({'status': 'RECOVERY'}))
+        else:
+            return HttpResponse(simplejson.dumps({'status': 'OK'}))
     except Exception as exp:
         import traceback
         print(traceback.format_exc())
@@ -79,9 +83,11 @@ def complete_reg(request):
 
 
 def start(request):
-    """Start Registeration a new FIDO Token"""
+    """Start Registration a new FIDO Token"""
     context = csrf(request)
     context.update(get_redirect_url())
+    context["method"] = {"name":getattr(settings,"MFA_RENAME_METHODS",{}).get("FIDO2","FIDO2 Security Key")}
+    context["RECOVERY_METHOD"]=getattr(settings,"MFA_RENAME_METHODS",{}).get("RECOVERY","Recovery codes")
     return render(request, "FIDO2/Add.html", context)
 
 

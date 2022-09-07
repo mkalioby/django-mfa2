@@ -34,10 +34,16 @@ def start(request):
                 from django.core.urlresolvers import reverse
             except:
                 from django.urls import reverse
-            return HttpResponseRedirect(reverse(getattr(settings,'MFA_REDIRECT_AFTER_REGISTRATION','mfa_home')))
+            if getattr(settings, 'MFA_ENFORCE_RECOVERY_METHOD', False) and not User_Keys.objects.filter(
+                    key_type="RECOVERY", username=request.user.username).exists():
+                request.session["mfa_reg"] = {"method": "Email",
+                                              "name": getattr(settings, "MFA_RENAME_METHODS", {}).get("Email", "Email")}
+            else:
+                return HttpResponseRedirect(reverse(getattr(settings,'MFA_REDIRECT_AFTER_REGISTRATION','mfa_home')))
         context["invalid"] = True
     else:
         request.session["email_secret"] = str(randint(0,100000))  #generate a random integer
+
         if sendEmail(request, request.user.username, request.session["email_secret"]):
             context["sent"] = True
     return render(request,"Email/Add.html", context)
