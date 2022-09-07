@@ -7,9 +7,20 @@
 	border: 1px solid #ccc;
 	border-radius: 3px;
 	padding: 15px;
-}
+    }
     .row{
         margin: 0px;
+    }
+    .toolbtn {
+        border-radius: 7px;
+    }
+    .toolbtn:hover {
+        background-color: gray;
+        transition: 0.2s;
+    }
+    .toolbtn:active {
+        background-color: green;
+        transition: 0.2s;
     }
     </style>
 <script src="{% static 'mfa/js/qrious.min.js' %}" type="text/javascript"></script>
@@ -29,8 +40,17 @@
         })
     });
     function showKey() {
+        const htmlkey = `
+            <div class="row">
+                <div class="col-11">
+                    <pre id="totp_secret">`+window.key+`</pre>
+                </div>
+                <div class="col-1">
+                    <span onclick=navigator.clipboard.writeText($("#totp_secret").text()) class="fa fa-clipboard toolbtn"></span>
+                </div>
+            </div>`
         $("#modal-title").html("Your Secret Key")
-        $("#modal-body").html("<pre>"+window.key+"</pre")
+        $("#modal-body").html(htmlkey)
         $("#popUpModal").modal('show')
     }
     function verify() {
