@@ -17,6 +17,7 @@
     }
     .toolbtn {
         border-radius: 7px;
+        cursor: pointer;
     }
     .toolbtn:hover {
         background-color: gray;
@@ -66,9 +67,8 @@
                 <div class='row'><div class='offset-4 col-md-4' style='background-color:#f0f0f0;padding: 10px'>
                     <div class='row'>
                     <div class="col-6 offset-6">
-                    <span onclick='download_recovery()' class='fa fa-download toolbtn' title="Download"
-                    style='cursor:pointer'></span>&nbsp;&nbsp;
-                    <span class='fa fa-clipboard toolbtn' title="Copy" onclick="copy()" style='cursor:pointer'></span>
+                    <span onclick='download_recovery()' class='fa fa-download toolbtn' title="Download"></span>&nbsp;&nbsp;
+                    <span class='fa fa-clipboard toolbtn' title="Copy" onclick="copy()"></span>
                     </div></div><div id='recovery_codes'><pre>`;
                 for (let i = 0; i < data.keys.length; i++) {
                         htmlkey +="- " +data.keys[i] + "\n"
