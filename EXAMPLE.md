@@ -7,7 +7,7 @@
 1. cd to example project `cd example`
 1. migrate `python manage.py migrate`
 1. create super user `python manage.py createsuperuser`
-1. start the serveur `python manage.py runserver`
+1. start the server `python manage.py runserver`
 
 # Notes for SSL
 
