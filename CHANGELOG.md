@@ -1,5 +1,5 @@
 # Change Log
-## 2.6.0 (dev)
+## 2.6.0
    * Adding Backup Recovery Codes (Recovery) as a method.
      Thanks to @Spitfireap for work, and  @peterthomassen for guidance.
    * Added: `RECOVERY_ITERATION` to set the number of iteration when hashing recovery token
