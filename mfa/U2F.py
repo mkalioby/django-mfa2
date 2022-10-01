@@ -52,25 +52,29 @@ def validate(request,username):
 
     challenge = request.session.pop('_u2f_challenge_')
     device, c, t = complete_authentication(challenge, data, [settings.U2F_APPID])
+    try:
+        key=User_Keys.objects.get(username=username,properties__icontains='"publicKey": "%s"'%device["publicKey"])
+        key.last_used=timezone.now()
+        key.save()
+        mfa = {"verified": True, "method": "U2F","id":key.id}
+        if getattr(settings, "MFA_RECHECK", False):
+            mfa["next_check"] = datetime.datetime.timestamp((datetime.datetime.now()
+                                     + datetime.timedelta(
+                        seconds=random.randint(settings.MFA_RECHECK_MIN, settings.MFA_RECHECK_MAX))))
+        request.session["mfa"] = mfa
+        return True
+    except:
+        return False
 
-    key=User_Keys.objects.get(username=username,properties__shas="$.device.publicKey=%s"%device["publicKey"])
-    key.last_used=timezone.now()
-    key.save()
-    mfa = {"verified": True, "method": "U2F","id":key.id}
-    if getattr(settings, "MFA_RECHECK", False):
-        mfa["next_check"] = datetime.datetime.timestamp((datetime.datetime.now()
-                                 + datetime.timedelta(
-                    seconds=random.randint(settings.MFA_RECHECK_MIN, settings.MFA_RECHECK_MAX))))
-    request.session["mfa"] = mfa
-    return True
+
 
 def auth(request):
     context=csrf(request)
     s=sign(request.session["base_username"])
     request.session["_u2f_challenge_"]=s[0]
     context["token"]=s[1]
-
-    return render(request,"U2F/Auth.html")
+    context["method"] = {"name": getattr(settings, "MFA_RENAME_METHODS", {}).get("U2F", "Classical Security Key")}
+    return render(request,"U2F/Auth.html",context)
 
 def start(request):
     enroll = begin_registration(settings.U2F_APPID, [])
@@ -78,6 +82,8 @@ def start(request):
     context=csrf(request)
     context["token"]=simplejson.dumps(enroll.data_for_client)
     context.update(get_redirect_url())
+    context["method"] = {"name": getattr(settings, "MFA_RENAME_METHODS", {}).get("U2F", "Classical Security Key")}
+    context["RECOVERY_METHOD"] = getattr(settings, "MFA_RENAME_METHODS", {}).get("RECOVERY", "Recovery codes")
     return render(request,"U2F/Add.html",context)
 
 
@@ -98,6 +104,11 @@ def bind(request):
     uk.properties = {"device":simplejson.loads(device.json),"cert":cert_hash}
     uk.key_type = "U2F"
     uk.save()
+    if getattr(settings, 'MFA_ENFORCE_RECOVERY_METHOD', False) and not User_Keys.objects.filter(key_type="RECOVERY",
+                                                                                                username=request.user.username).exists():
+        request.session["mfa_reg"] = {"method": "U2F",
+                                      "name": getattr(settings, "MFA_RENAME_METHODS", {}).get("U2F", "Classical Security Key")}
+        return HttpResponse('RECOVERY')
     return HttpResponse("OK")
 
 def sign(username):

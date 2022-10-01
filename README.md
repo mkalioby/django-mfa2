@@ -1,5 +1,5 @@
 # django-mfa2
-A Django app that handles MFA, it supports TOTP, U2F, FIDO2 U2F (Web Authn), Email Tokens , and Trusted Devices
+A Django app that handles MFA, it supports TOTP, U2F, FIDO2 U2F (Web Authn), Email Tokens , Trusted  Devices and backup codes.
 
 ### Pip Stats
 [![PyPI version](https://badge.fury.io/py/django-mfa2.svg)](https://badge.fury.io/py/django-mfa2)
@@ -66,8 +66,9 @@ Depends on
 `python manage.py collectstatic`
 3. Add the following settings to your file
 
-   ```python 
-   MFA_UNALLOWED_METHODS=()   # Methods that shouldn't be allowed for the user
+   ```python
+   from django.conf.global_settings import PASSWORD_HASHERS as DEFAULT_PASSWORD_HASHERS #Preferably at the same place where you import your other modules
+   MFA_UNALLOWED_METHODS=()   # Methods that shouldn't be allowed for the user e.g ('TOTP','U2F',)
    MFA_LOGIN_CALLBACK=""      # A function that should be called by username to login the user in session
    MFA_RECHECK=True           # Allow random rechecking of the user
    MFA_REDIRECT_AFTER_REGISTRATION="mfa_home"   # Allows Changing the page after successful registeration
@@ -75,15 +76,19 @@ Depends on
    MFA_RECHECK_MIN=10         # Minimum interval in seconds
    MFA_RECHECK_MAX=30         # Maximum in seconds
    MFA_QUICKLOGIN=True        # Allow quick login for returning users by provide only their 2FA
+   MFA_ALWAYS_GO_TO_LAST_METHOD = False # Always redirect the user to the last method used to save a click (Added in 2.6.0).
+   MFA_RENAME_METHODS={} #Rename the methods in a more user-friendly way e.g {"RECOVERY":"Backup Codes"} (Added in 2.6.0)
    MFA_HIDE_DISABLE=('FIDO2',)     # Can the user disable his key (Added in 1.2.0).
    MFA_OWNED_BY_ENTERPRISE = FALSE  # Who owns security keys   
+   PASSWORD_HASHERS = DEFAULT_PASSWORD_HASHERS # Comment if PASSWORD_HASHER already set in your settings.py
+   PASSWORD_HASHERS += ['mfa.recovery.Hash'] 
+   RECOVERY_ITERATION = 350000 #Number of iteration for recovery code, higher is more secure, but uses more resources for generation and check...
 
    TOKEN_ISSUER_NAME="PROJECT_NAME"      #TOTP Issuer name
 
    U2F_APPID="https://localhost"    #URL For U2F
-   FIDO_SERVER_ID=u"localehost"      # Server rp id for FIDO2, it the full domain of your project
+   FIDO_SERVER_ID=u"localehost"      # Server rp id for FIDO2, it is the full domain of your project
    FIDO_SERVER_NAME=u"PROJECT_NAME"
-   FIDO_LOGIN_URL=BASE_URL
    ```
    **Method Names**
    * U2F
@@ -91,12 +96,15 @@ Depends on
    * TOTP
    * Trusted_Devices
    * Email
+   * RECOVERY
    
    **Notes**:
     * Starting version 1.1, ~~FIDO_LOGIN_URL~~ isn't required for FIDO2 anymore.
     * Starting version 1.7.0, Key owners can be specified.
     * Starting version 2.2.0
         * Added: `MFA_SUCCESS_REGISTRATION_MSG` & `MFA_REDIRECT_AFTER_REGISTRATION`
+    Start version 2.6.0
+        * Added: `MFA_ALWAYS_GO_TO_LAST_METHOD`, `MFA_RENAME_METHODS`, `MFA_ENFORCE_RECOVERY_METHOD` & `RECOVERY_ITERATION`
 4. Break your login function
 
    Usually your login function will check for username and password, log the user in if the username and password are correct and create the user session, to support mfa, this has to change
@@ -136,7 +144,7 @@ Depends on
 ```<li><a href="{% url 'mfa_home' %}">Security</a> </li>```
 
 
-For Example, See 'example' app
+For Example, See 'example' app and look at EXAMPLE.md to see how to set it up.
 
 # Going Passwordless
 

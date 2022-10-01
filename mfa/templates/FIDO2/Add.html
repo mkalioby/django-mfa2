@@ -32,9 +32,14 @@
     }).then(function (res)
         {
       if (res["status"] =='OK')
-            $("#res").html("<div class='alert alert-success'>Registered Successfully, <a href='{{redirect_html}}'> {{reg_success_msg}}</a></div>")
-        else
-            $("#res").html("<div class='alert alert-danger'>Registration Failed as " + res["message"] + ", <a href='javascript:void(0)' onclick='begin_reg()'> try again or <a href='{% url 'mfa_home' %}'> Go to Security Home</a></div>")
+        $("#res").html("<div class='alert alert-success'>Registered Successfully, <a href='{{redirect_html}}'> {{reg_success_msg}}</a></div>")
+      else if (res['status'] = "RECOVERY")
+      {
+          setTimeout(function (){location.href="{% url 'manage_recovery_codes' %}"},2500)
+        $("#res").html("<div class='alert alert-success'>Registered Successfully, but <a href='{% url 'manage_recovery_codes' %}'>redirecting to {{ RECOVERY_METHOD }} method</a></div>")
+      }
+      else
+        $("#res").html("<div class='alert alert-danger'>Registration Failed as " + res["message"] + ", <a href='javascript:void(0)' onclick='begin_reg()'> try again or <a href='{% url 'mfa_home' %}'> Go to Security Home</a></div>")
 
 
     }, function(reason) {
@@ -61,7 +66,7 @@
      <div class="container">
      <div class="panel panel-default card">
       <div class="panel-heading card-header">
-	      <strong> FIDO2 Security Key</strong>
+	      <strong> Adding a New {{ method.name }}</strong>
       </div>
       <div class="panel-body card-body">
 

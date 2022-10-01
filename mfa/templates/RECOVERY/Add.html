@@ -1,0 +1,134 @@
+
+{% extends "base.html" %}
+{% load static %}
+{% block head %}
+<style>
+    #two-factor-steps {
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	padding: 15px;
+    }
+    .tokenrow{
+        margin-top: 10px;
+        margin-left: 5px;
+    }
+    .row{
+        margin: 3px;
+    }
+    .toolbtn {
+        border-radius: 7px;
+        cursor: pointer;
+    }
+    .toolbtn:hover {
+        background-color: gray;
+        transition: 0.2s;
+    }
+    .toolbtn:active {
+        background-color: green;
+        transition: 0.2s;
+    }
+</style>
+
+<script src="{% static 'mfa/js/qrious.min.js' %}" type="text/javascript"></script>
+<script type="text/javascript">
+    var clearCodes;
+    $(document).ready(function checkTokenLeft() {
+        $.ajax({"url":"{% url 'get_recovery_token_left' %}", dataType:"JSON",
+        success:function (data) {
+            tokenLeft = data.left
+            html = ""
+            {% if mfa_redirect %}
+                html += "<div class='alert alert-success'>You have enrolled successfully in {{ mfa_redirect }} method, please generate recovery codes so that you can use in case you lost access to all your verification methods.</div>"
+            {% endif %}
+            if (tokenLeft == 0) {
+                html += "<h6>You don't have any backup code linked to your account, please generate new ones !</h6>"
+                
+            }
+            else {
+                html += "<p>You still have "+tokenLeft+" backup code left."
+            }
+            document.getElementById('tokens').innerHTML = html
+        }})
+    });
+    function confirmRegenerateTokens() {
+        htmlModal = "<h6>Caution! you can only view these token now, else you will need to generate new ones.</h6><div align='center'><button onclick='regenerateTokens()' class='btn btn-success'>Regenerate</button></div>"
+        $("#modal-title").html("Regenerate your recovery Codes?")
+        $("#modal-body").html(htmlModal)
+        $("#popUpModal").modal('show')
+    }
+    function copy() {
+        navigator.clipboard.writeText($("#recovery_codes").text());
+    }
+    function regenerateTokens() {
+        $.ajax({
+            "url":"{% url 'regen_recovery_tokens' %}", dataType:"JSON",
+            success:function (data) {
+                let htmlkey=`<p>Here are the recovery codes, you have to save them now as you won't able to view them again.</p>
+                <div class='row'><div class='offset-4 col-md-4' style='background-color:#f0f0f0;padding: 10px'>
+                    <div class='row'>
+                    <div class="col-6 offset-6">
+                    <span onclick='download_recovery()' class='fa fa-download toolbtn' title="Download"></span>&nbsp;&nbsp;
+                    <span class='fa fa-clipboard toolbtn' title="Copy" onclick="copy()"></span>
+                    </div></div><div id='recovery_codes'><pre>`;
+                for (let i = 0; i < data.keys.length; i++) {
+                        htmlkey +="- " +data.keys[i] + "\n"
+                }
+                document.getElementById('tokens').innerHTML = htmlkey+"</pre></div></div></div>"
+                $("#popUpModal").modal('hide')
+                clearCodes = data.keys
+            }
+        })
+    }
+    function download_recovery() {
+        var element = document.createElement('a');
+        var text = "";
+        for(let i = 0; i < clearCodes.length; i++)
+        {
+            text = text + clearCodes[i] 
+            if (i < clearCodes.length - 1) { text = text + "\n"}
+        }
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+        element.setAttribute('download', 'Recovery Codes.txt');
+        element.style.display = 'none';
+        document.body.appendChild(element);
+        element.click();
+        console.log(element.innerHTML)
+        document.body.removeChild(element);
+    }
+    </script>
+{% endblock %}
+{% block content %}
+<br/>
+<br/>
+<div class="container d-flex justify-content-center">
+    <div class="col-md-6 col-md-offset-3" id="two-factor-steps">
+        
+        <div class="row">
+            
+            <h4>Recovery Codes List</h4>
+        
+        </div>
+            
+        <div class="tokenrow" id="tokens">
+        
+        </div>
+         <br/>
+            <br/>
+        <div class="row">
+
+            <div class="col-md-4 col-md-offset-4" style="padding-left: 0px" align="center">
+
+                <button onclick="confirmRegenerateTokens()" class="btn btn-success">Regenerate</button>
+                
+            </div>
+
+            <div class="col-md-6"  align="right" style="padding-right: 30px">
+
+                <a href="{{redirect_html}}" class="btn btn-default btn-secondary" role="button"> {{reg_success_msg}}</a>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% include "modal.html" %}
+{% endblock %}

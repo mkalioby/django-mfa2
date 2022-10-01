@@ -5,13 +5,14 @@ from .Common import get_redirect_url
 from .models import *
 from django.template.context_processors import csrf
 import simplejson
-from django.template.context import RequestContext
 from django.conf import settings
 import pyotp
 from .views import login
 import datetime
 from django.utils import timezone
 import random
+
+
 def verify_login(request,username,token):
     for key in User_Keys.objects.filter(username=username,key_type = "TOTP"):
         totp = pyotp.TOTP(key.properties["secret_key"])
@@ -25,7 +26,7 @@ def recheck(request):
     context = csrf(request)
     context["mode"]="recheck"
     if request.method == "POST":
-        if verify_login(request,request.user.username, token=request.POST["otp"]):
+        if verify_login(request,request.user.username, token=request.POST["otp"])[0]:
             import time
             request.session["mfa"]["rechecked_at"] = time.time()
             return HttpResponse(simplejson.dumps({"recheck": True}), content_type="application/json")
@@ -37,15 +38,18 @@ def recheck(request):
 def auth(request):
     context=csrf(request)
     if request.method=="POST":
-        res=verify_login(request,request.session["base_username"],token = request.POST["otp"])
-        if res[0]:
-            mfa = {"verified": True, "method": "TOTP","id":res[1]}
-            if getattr(settings, "MFA_RECHECK", False):
-                mfa["next_check"] = datetime.datetime.timestamp((datetime.datetime.now()
-                                         + datetime.timedelta(
-                            seconds=random.randint(settings.MFA_RECHECK_MIN, settings.MFA_RECHECK_MAX))))
-            request.session["mfa"] = mfa
-            return login(request)
+        tokenLength = len(request.POST["otp"])
+        if tokenLength == 6:
+            #TOTO code check
+            res=verify_login(request,request.session["base_username"],token = request.POST["otp"])
+            if res[0]:
+                mfa = {"verified": True, "method": "TOTP","id":res[1]}
+                if getattr(settings, "MFA_RECHECK", False):
+                    mfa["next_check"] = datetime.datetime.timestamp((datetime.datetime.now()
+                                            + datetime.timedelta(
+                                seconds=random.randint(settings.MFA_RECHECK_MIN, settings.MFA_RECHECK_MAX))))
+                request.session["mfa"] = mfa
+                return login(request)
         context["invalid"]=True
     return render(request,"TOTP/Auth.html", context)
 
@@ -68,10 +72,19 @@ def verify(request):
         #uk.name="Authenticatior #%s"%User_Keys.objects.filter(username=user.username,type="TOTP")
         uk.key_type="TOTP"
         uk.save()
-        return HttpResponse("Success")
+        if getattr(settings, 'MFA_ENFORCE_RECOVERY_METHOD', False) and not User_Keys.objects.filter(key_type="RECOVERY",
+                                                                                                    username=request.user.username).exists():
+            request.session["mfa_reg"] = {"method": "TOTP",
+                                          "name": getattr(settings, "MFA_RENAME_METHODS", {}).get("TOTP", "TOTP")}
+            return HttpResponse("RECOVERY")
+        else:
+            return HttpResponse("Success")
     else: return HttpResponse("Error")
 
 @never_cache
 def start(request):
     """Start Adding Time One Time Password (TOTP)"""
-    return render(request,"TOTP/Add.html",get_redirect_url())
+    context = get_redirect_url()
+    context["RECOVERY_METHOD"] = getattr(settings, "MFA_RENAME_METHODS", {}).get("RECOVERY", "Recovery codes")
+    context["method"] = {"name":getattr(settings,"MFA_RENAME_METHODS",{}).get("TOTP","Authenticator")}
+    return render(request,"TOTP/Add.html",context)

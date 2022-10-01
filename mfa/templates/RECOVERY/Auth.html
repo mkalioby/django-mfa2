@@ -1,0 +1,14 @@
+{% extends "mfa_auth_base.html" %}
+{% block head %}
+    <style>
+    .row{
+        margin-left: 15px;
+    }
+    </style>
+{% endblock %}
+{% block content %}
+<br/>
+<br/>
+{% include "RECOVERY/recheck.html" with mode='auth' %}
+
+  {% endblock %}
