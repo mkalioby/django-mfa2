@@ -1,4 +1,7 @@
 # Change Log
+## 2.5.1
+* Fix: CVE-2022-42731: related to possibility of registration replay attack thanks to 'SSE (Secure Systems Engineering)' 
+   
 ## 2.5.0
 
    * Fixed: issue in the 'Authorize' button don't show on Firefox and Chrome on iOS.
