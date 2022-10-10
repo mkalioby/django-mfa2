@@ -1,5 +1,5 @@
 # Change Log
-## 2.5.1
+## 2.5.2
 * Fix: CVE-2022-42731: related to possibility of registration replay attack thanks to 'SSE (Secure Systems Engineering)' 
    
 ## 2.5.0

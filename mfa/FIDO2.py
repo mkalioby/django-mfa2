@@ -57,7 +57,7 @@ def complete_reg(request):
         att_obj = AttestationObject((data['attestationObject']))
         server = getServer()
         auth_data = server.register_complete(
-            request.session.pop['fido_state'],
+            request.session.pop('fido_state'),
             client_data,
             att_obj
         )
