@@ -1,4 +1,12 @@
 # Change Log
+## 2.6.1
+* Fix: CVE-2022-42731: related to the possibility of registration replay attack.
+  Thanks to 'SSE (Secure Systems Engineering)'
+
+## 2.5.1
+* Fix: CVE-2022-42731: related to the possibility of registration replay attack.
+  Thanks to 'SSE (Secure Systems Engineering)' 
+
 ## 2.6.0
    * Adding Backup Recovery Codes (Recovery) as a method.
      Thanks to @Spitfireap for work, and  @peterthomassen for guidance.
