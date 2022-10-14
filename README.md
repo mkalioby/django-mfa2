@@ -17,7 +17,7 @@ Web Authencation API (WebAuthn) is state-of-the art techology that is expected t
 
 For FIDO2, the following are supported
  * **security keys** (Firefox 60+, Chrome 67+, Edge 18+, Safari 13 on Mac OS, Chrome on Andriod, Safari on iOS 13.3+),
- * **Windows Hello** (Firefox 67+, Chrome 72+ , Edge) ,
+ * **Windows Hello** (Firefox 67+, Chrome 72+ , Edge),
  * **Apple's Touch ID/Face ID** (Chrome 70+ on Mac OS X, Safari on macOS Big Sur, Safari on iOS 14.0+ ),
  * **android-safetynet** (Chrome 70+, Firefox 68+)
  * **NFC devices using PCSC** (Not Tested, but as supported in fido2)
