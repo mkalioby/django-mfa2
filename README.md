@@ -1,4 +1,5 @@
 # django-mfa2
+<<<<<<< Updated upstream
 A Django app that handles MFA, it supports TOTP, U2F, FIDO2 U2F (Web Authn), Email Tokens , Trusted  Devices and backup codes.
 
 ### Pip Stats
