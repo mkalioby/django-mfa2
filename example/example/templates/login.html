@@ -33,7 +33,7 @@
             {% csrf_token %}
           <div class="form-group">
             <div class="form-label-group">
-                  <input type="text" id="inputUsername" name="username" class="form-control" placeholder="username" required="required" autofocus="autofocus" autocomplete="username webauthn">
+                  <input type="text" id="inputUsername" name="username" class="form-control" placeholder="username" required autofocus autocomplete="username webauthn">
               <label for="inputUsername">Username</label>
             </div>
           </div>
@@ -45,7 +45,10 @@
           </div>
 
           <button class="btn btn-primary btn-block" type="submit">Login</button><br/>
+
         </form>
+      <button class="btn btn-primary btn-block" onclick="authen()">Login By PassKeys</button><br/>
+
       </div>
     </div>
   </div>
@@ -58,7 +61,7 @@
   <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js'%}"></script>
 
     {% include 'FIDO2/FormFill.html' %}
-{#    {% include 'FIDO2/Auth_JS.html' %}#}
+{#    {% include 'FIDO2/Auth_JS.html' with delay=True %}#}
 </body>
 
 </html>
