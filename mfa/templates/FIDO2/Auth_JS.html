@@ -2,16 +2,19 @@
 <script type="application/javascript" src="{% static 'mfa/js/cbor.js' %}"></script>
 <script type="application/javascript" src="{% static 'mfa/js/ua-parser.min.js' %}"></script>
 <script type="text/javascript">
-        function authen()
+    function authen()
         {
                          fetch('{% url 'fido2_begin_auth' %}', {
       method: 'GET',
     }).then(function(response) {
       if(response.ok) return response.arrayBuffer();
       throw new Error('No credential available to authenticate!');
-    }).then(CBOR.decode).then(function(options) {
+    }).then(CBOR.decode).then(async function(options) {
         console.log(options)
-      return navigator.credentials.get(options);
+         {% if conditionalUI %}
+         options["mediation"] =  'conditional';
+         {% endif %}
+       return navigator.credentials.get(options);
     }).then(function(assertion) {
         res=CBOR.encode({
           "credentialId": new Uint8Array(assertion.rawId),

@@ -194,6 +194,25 @@ function some_func() {
 
 ````
 
+# Using ConditionalUI
+
+![ConditionalUI](img/conditionalUI.png)
+
+ConditionalUI is a cutting-edge feature that allows the user to use the browser autofill feature available in the browser to login using the FIDO2.
+
+Currently available on Safari on iOS 16+, Safari on Ventura, Chrome on Android (Using Play Services Beta), Chrome Canary on Both Mac OS X and Windows.
+
+To Use this feature
+1. set `MFA_FIDO2_RESIDENT_KEY` to  `mfa.ResidentKey.REQUIRED`
+2. set the autocomplete of username field to `username webauth` as follows
+   ```html
+   <input type="text" name="username" autocomplete="username webauthn" ...>
+   ```
+3. Finally, Include `FIDO2/FormFill.html` in your login form
+   ```html
+    {% include 'FIDO2/FormFill.html' %}
+   ```
+
 # Contributors
 * [mahmoodnasr](https://github.com/mahmoodnasr)
 * [d3cline](https://github.com/d3cline)

@@ -1,0 +1,15 @@
+<script type="application/javascript">
+    $(document).ready(async function () {
+        if (window.PublicKeyCredential &&
+            PublicKeyCredential.isConditionalMediationAvailable
+    )
+        {
+            // Check if conditional mediation is available.
+            const isCMA = await PublicKeyCredential.isConditionalMediationAvailable()
+            if (isCMA) {
+                authen();
+            }
+        }
+    })
+</script>
+{% include 'FIDO2/Auth_JS.html' with conditionalUI=True %}
