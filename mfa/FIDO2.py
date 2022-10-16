@@ -28,24 +28,26 @@ def recheck(request):
 
 def getServer():
     """Get Server Info from settings and returns a Fido2Server"""
-    rp = PublicKeyCredentialRpEntity(
-        id=settings.FIDO_SERVER_ID, name=settings.FIDO_SERVER_NAME
-    )
-    return Fido2Server(rp)
+    from mfa import AttestationPreference
+    rp = PublicKeyCredentialRpEntity(id=settings.FIDO_SERVER_ID, name=settings.FIDO_SERVER_NAME)
+    attestation= getattr(settings,'MFA_FIDO2_ATTESTATION_PREFERENCE', AttestationPreference.NONE )
+    return Fido2Server(rp,attestation=attestation)
 
 
 def begin_registeration(request):
     """Starts registering a new FIDO Device, called from API"""
     server = getServer()
-    registration_data, state = server.register_begin(
-        {
-            "id": request.user.username.encode("utf8"),
-            "name": (request.user.first_name + " " + request.user.last_name),
-            "displayName": request.user.username,
-        },
-        getUserCredentials(request.user.username),
-    )
-    request.session["fido_state"] = state
+    from mfa import ResidentKey
+    resident_key = getattr(settings,'MFA_FIDO2_RESIDENT_KEY', ResidentKey.DISCOURAGED)
+    auth_attachment = getattr(settings,'MFA_FIDO2_AUTHENTICATOR_ATTACHMENT', None)
+    user_verification = getattr(settings,'MFA_FIDO2_USER_VERIFICATION', None)
+    registration_data, state = server.register_begin({
+        u'id': request.user.username.encode("utf8"),
+        u'name': (request.user.first_name + " " + request.user.last_name),
+        u'displayName': request.user.username,
+    }, getUserCredentials(request.user.username),user_verification = user_verification,
+        resident_key_requirement = resident_key, authenticator_attachment = auth_attachment)
+    request.session['fido_state'] = state
 
     return HttpResponse(
         cbor.encode(registration_data), content_type="application/octet-stream"
@@ -80,6 +82,8 @@ def complete_reg(request):
         }
         uk.owned_by_enterprise = getattr(settings, "MFA_OWNED_BY_ENTERPRISE", False)
         uk.key_type = "FIDO2"
+        if auth_data.credential_data.credential_id:
+            uk.user_handle = auth_data.credential_data.credential_id
         uk.save()
         if (
             getattr(settings, "MFA_ENFORCE_RECOVERY_METHOD", False)
@@ -98,16 +102,9 @@ def complete_reg(request):
             return HttpResponse(simplejson.dumps({"status": "OK"}))
     except Exception as exp:
         import traceback
-
         print(traceback.format_exc())
-        try:
-            from raven.contrib.django.raven_compat.models import client
-
-            client.captureException()
-        except:
-            pass
         return JsonResponse(
-            {"status": "ERR", "message": "Error on server, please try again later"}
+            {"status": "ERR", "message": "Error on server, please try again later"}, status=500
         )
 
 
@@ -142,9 +139,14 @@ def auth(request):
 
 def authenticate_begin(request):
     server = getServer()
-    credentials = getUserCredentials(
-        request.session.get("base_username", request.user.username)
-    )
+    credentials=[]
+    username = None
+    if "base_username" in request.session:
+        username = request.session["base_username"]
+    if request.user.is_authenticated:
+        username = request.user.username
+    if username:
+        credentials = getUserCredentials(request.session.get("base_username", request.user.username))
     auth_data, state = server.authenticate_begin(credentials)
     request.session["fido_state"] = state
     return HttpResponse(cbor.encode(auth_data), content_type="application/octet-stream")
@@ -154,14 +156,25 @@ def authenticate_begin(request):
 def authenticate_complete(request):
     try:
         credentials = []
-        username = request.session.get("base_username", request.user.username)
+        username = None
+        keys = None
+        if "base_username" in request.session:
+            username = request.session["base_username"]
+        if request.user.is_authenticated:
+            username = request.user.username
         server = getServer()
-        credentials = getUserCredentials(username)
         data = cbor.decode(request.body)
-        credential_id = data["credentialId"]
-        client_data = CollectedClientData(data["clientDataJSON"])
-        auth_data = AuthenticatorData(data["authenticatorData"])
-        signature = data["signature"]
+        credential_id = data['credentialId']
+        if credential_id and username is None:
+            keys = User_Keys.objects.filter(user_handle = credential_id)
+            if keys.exists():
+                credentials=[AttestedCredentialData(websafe_decode(keys[0].properties["device"]))]
+        else:
+            credentials = getUserCredentials(username)
+
+        client_data = CollectedClientData(data['clientDataJSON'])
+        auth_data = AuthenticatorData(data['authenticatorData'])
+        signature = data['signature']
         try:
             cred = server.authenticate_complete(
                 request.session.pop("fido_state"),
@@ -172,25 +185,16 @@ def authenticate_complete(request):
                 signature,
             )
         except ValueError:
-            return HttpResponse(
-                simplejson.dumps(
+            return JsonResponse(
                     {
                         "status": "ERR",
                         "message": "Wrong challenge received, make sure that this is your security and try again.",
                     }
-                ),
-                content_type="application/json",
-            )
-        except Exception as excep:
-            try:
-                from raven.contrib.django.raven_compat.models import client
+                , status=400),
 
-                client.captureException()
-            except:
-                pass
-            return HttpResponse(
-                simplejson.dumps({"status": "ERR", "message": str(excep)}),
-                content_type="application/json",
+        except Exception as excep:
+            return JsonResponse({"status": "ERR", "message": str(excep)},
+                status=500
             )
 
         if request.session.get("mfa_recheck", False):
@@ -202,10 +206,8 @@ def authenticate_complete(request):
             )
         else:
             import random
-
-            keys = User_Keys.objects.filter(
-                username=username, key_type="FIDO2", enabled=1
-            )
+            if keys is None:
+                keys = User_Keys.objects.filter(username = username, key_type = "FIDO2", enabled = 1)
             for k in keys:
                 if (
                     AttestedCredentialData(
@@ -234,21 +236,11 @@ def authenticate_complete(request):
                     except:
                         authenticated = request.user.is_authenticated()
                     if not authenticated:
-                        res = login(request)
-                        if not "location" in res:
-                            return reset_cookie(request)
-                        return HttpResponse(
-                            simplejson.dumps(
-                                {"status": "OK", "redirect": res["location"]}
-                            ),
-                            content_type="application/json",
-                        )
-                    return HttpResponse(
-                        simplejson.dumps({"status": "OK"}),
-                        content_type="application/json",
-                    )
+                        res = login(request,k.username)
+                        if not "location" in res: return reset_cookie(request)
+                        return HttpResponse(simplejson.dumps({'status': "OK", "redirect": res["location"]}),
+                                            content_type = "application/json")
+                    return JsonResponse({'status': "OK"})
+
     except Exception as exp:
-        return HttpResponse(
-            simplejson.dumps({"status": "ERR", "message": exp.message}),
-            content_type="application/json",
-        )
+        return JsonResponse({"status": "ERR", "message": str(exp)}, status=500)

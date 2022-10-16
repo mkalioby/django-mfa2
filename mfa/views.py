@@ -74,10 +74,12 @@ def reset_cookie(request):
     response.delete_cookie("base_username")
     return response
 
-
-def login(request):
+def login(request,username = None):
+    from django.conf import settings
     callable_func = __get_callable_function__(settings.MFA_LOGIN_CALLBACK)
-    return callable_func(request, username=request.session["base_username"])
+    if not username:
+        username = request.session["base_username"]
+    return callable_func(request,username=username)
 
 
 @login_required

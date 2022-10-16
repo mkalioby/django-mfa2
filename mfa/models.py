@@ -14,14 +14,15 @@ except ModuleNotFoundError:
 
 
 class User_Keys(models.Model):
-    username = models.CharField(max_length=50)
-    properties = JSONField(null=True)
-    added_on = models.DateTimeField(auto_now_add=True)
-    key_type = models.CharField(max_length=25, default="TOTP")
-    enabled = models.BooleanField(default=True)
-    expires = models.DateTimeField(null=True, default=None, blank=True)
-    last_used = models.DateTimeField(null=True, default=None, blank=True)
-    owned_by_enterprise = models.BooleanField(default=None, null=True, blank=True)
+    username=models.CharField(max_length = 50)
+    properties=JSONField(null = True)
+    added_on=models.DateTimeField(auto_now_add = True)
+    key_type=models.CharField(max_length = 25,default = "TOTP")
+    enabled=models.BooleanField(default=True)
+    expires=models.DateTimeField(null=True,default=None,blank=True)
+    last_used=models.DateTimeField(null=True,default=None,blank=True)
+    owned_by_enterprise=models.BooleanField(default=None,null=True,blank=True)
+    user_handle = models.CharField(default = None, null = True, blank = True, max_length = 255)
 
     def save(
         self, force_insert=False, force_update=False, using=None, update_fields=None
