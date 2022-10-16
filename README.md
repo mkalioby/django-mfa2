@@ -90,6 +90,10 @@ Depends on
    U2F_APPID="https://localhost"    #URL For U2F
    FIDO_SERVER_ID=u"localehost"      # Server rp id for FIDO2, it is the full domain of your project
    FIDO_SERVER_NAME=u"PROJECT_NAME"
+   MFA_FIDO2_RESIDENT_KEY = mfa.ResidentKey.DISCOURAGED  # Resident Key allows a special User Handle
+   MFA_FIDO2_AUTHENTICATOR_ATTACHMENT = None  # Let the user choose
+   MFA_FIDO2_USER_VERIFICATION = None         # Verify User Presence
+   MFA_FIDO2_ATTESTATION_PREFERENCE = mfa.AttestationPreference.NONE
    ```
    **Method Names**
    * U2F
@@ -104,8 +108,10 @@ Depends on
     * Starting version 1.7.0, Key owners can be specified.
     * Starting version 2.2.0
         * Added: `MFA_SUCCESS_REGISTRATION_MSG` & `MFA_REDIRECT_AFTER_REGISTRATION`
-    Start version 2.6.0
+    * Starting version 2.6.0
         * Added: `MFA_ALWAYS_GO_TO_LAST_METHOD`, `MFA_RENAME_METHODS`, `MFA_ENFORCE_RECOVERY_METHOD` & `RECOVERY_ITERATION`
+    * Starting version 2.7.0
+        * Added: `MFA_FIDO2_RESIDENT_KEY`, `MFA_FIDO2_AUTHENTICATOR_ATTACHMENT`, `MFA_FIDO2_USER_VERIFICATION`, `MFA_FIDO2_ATTESTATION_PREFERENCE`
 4. Break your login function
 
    Usually your login function will check for username and password, log the user in if the username and password are correct and create the user session, to support mfa, this has to change

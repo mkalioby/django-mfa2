@@ -28,18 +28,25 @@ def recheck(request):
 
 def getServer():
     """Get Server Info from settings and returns a Fido2Server"""
+    from mfa import AttestationPreference
     rp = PublicKeyCredentialRpEntity(id=settings.FIDO_SERVER_ID, name=settings.FIDO_SERVER_NAME)
-    return Fido2Server(rp)
+    attestation= getattr(settings,'MFA_FIDO2_ATTESTATION_PREFERENCE', AttestationPreference.NONE )
+    return Fido2Server(rp,attestation=attestation)
 
 
 def begin_registeration(request):
     """Starts registering a new FIDO Device, called from API"""
     server = getServer()
+    from mfa import ResidentKey
+    resident_key = getattr(settings,'MFA_FIDO2_RESIDENT_KEY', ResidentKey.DISCOURAGED)
+    auth_attachment = getattr(settings,'MFA_FIDO2_AUTHENTICATOR_ATTACHMENT', None)
+    user_verification = getattr(settings,'MFA_FIDO2_USER_VERIFICATION', None)
     registration_data, state = server.register_begin({
         u'id': request.user.username.encode("utf8"),
         u'name': (request.user.first_name + " " + request.user.last_name),
         u'displayName': request.user.username,
-    }, getUserCredentials(request.user.username))
+    }, getUserCredentials(request.user.username),user_verification = user_verification,
+        resident_key_requirement = resident_key, authenticator_attachment = auth_attachment)
     request.session['fido_state'] = state
 
     return HttpResponse(cbor.encode(registration_data), content_type = 'application/octet-stream')
@@ -67,6 +74,8 @@ def complete_reg(request):
         uk.properties = {"device": encoded, "type": att_obj.fmt, }
         uk.owned_by_enterprise = getattr(settings, "MFA_OWNED_BY_ENTERPRISE", False)
         uk.key_type = "FIDO2"
+        if auth_data.credential_data.credential_id:
+            uk.user_handle = auth_data.credential_data.credential_id
         uk.save()
         if getattr(settings, 'MFA_ENFORCE_RECOVERY_METHOD', False) and not User_Keys.objects.filter(key_type = "RECOVERY", username=request.user.username).exists():
             request.session["mfa_reg"] = {"method":"FIDO2","name": getattr(settings, "MFA_RENAME_METHODS", {}).get("FIDO2", "FIDO2")}
@@ -107,7 +116,14 @@ def auth(request):
 
 def authenticate_begin(request):
     server = getServer()
-    credentials = getUserCredentials(request.session.get("base_username", request.user.username))
+    credentials=[]
+    username = None
+    if "base_username" in request.session:
+        username = request.session["base_username"]
+    if request.user.is_authenticated:
+        username = request.user.username
+    if username:
+        credentials = getUserCredentials(request.session.get("base_username", request.user.username))
     auth_data, state = server.authenticate_begin(credentials)
     request.session['fido_state'] = state
     return HttpResponse(cbor.encode(auth_data), content_type = "application/octet-stream")
@@ -117,11 +133,22 @@ def authenticate_begin(request):
 def authenticate_complete(request):
     try:
         credentials = []
-        username = request.session.get("base_username", request.user.username)
+        username = None
+        keys = None
+        if "base_username" in request.session:
+            username = request.session["base_username"]
+        if request.user.is_authenticated:
+            username = request.user.username
         server = getServer()
-        credentials = getUserCredentials(username)
         data = cbor.decode(request.body)
         credential_id = data['credentialId']
+        if credential_id and username is None:
+            keys = User_Keys.objects.filter(user_handle = credential_id)
+            if keys.exists():
+                credentials=[AttestedCredentialData(websafe_decode(keys[0].properties["device"]))]
+        else:
+            credentials = getUserCredentials(username)
+
         client_data = CollectedClientData(data['clientDataJSON'])
         auth_data = AuthenticatorData(data['authenticatorData'])
         signature = data['signature']
@@ -155,7 +182,8 @@ def authenticate_complete(request):
                                 content_type = "application/json")
         else:
             import random
-            keys = User_Keys.objects.filter(username = username, key_type = "FIDO2", enabled = 1)
+            if keys is None:
+                keys = User_Keys.objects.filter(username = username, key_type = "FIDO2", enabled = 1)
             for k in keys:
                 if AttestedCredentialData(websafe_decode(k.properties["device"])).credential_id == cred.credential_id:
                     k.last_used = timezone.now()
@@ -170,7 +198,7 @@ def authenticate_complete(request):
                     except:
                         authenticated = request.user.is_authenticated()
                     if not authenticated:
-                        res = login(request)
+                        res = login(request,k.username)
                         if not "location" in res: return reset_cookie(request)
                         return HttpResponse(simplejson.dumps({'status': "OK", "redirect": res["location"]}),
                                             content_type = "application/json")

@@ -44,7 +44,9 @@
             </div>
           </div>
 
-          <button class="btn btn-primary btn-block" type="submit">Login</button>
+          <button class="btn btn-primary btn-block" type="submit">Login</button><br/>
+
+            <button class="btn btn-primary btn-block" type="button" onclick="authen()">Login By Security Key</button>
         </form>
       </div>
     </div>
@@ -56,7 +58,7 @@
 
   <!-- Core plugin JavaScript-->
   <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js'%}"></script>
-
+    {% include 'FIDO2/Auth_JS.html'%}
 </body>
 
 </html>
