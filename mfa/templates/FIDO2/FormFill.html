@@ -7,9 +7,9 @@
             // Check if conditional mediation is available.
             const isCMA = await PublicKeyCredential.isConditionalMediationAvailable()
             if (isCMA) {
-                authen();
+               authen(true);
             }
         }
     })
 </script>
-{% include 'FIDO2/Auth_JS.html' with conditionalUI=True %}
+{% include 'FIDO2/Auth_JS.html' %}

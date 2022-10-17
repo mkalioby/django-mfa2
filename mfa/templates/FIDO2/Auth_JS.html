@@ -12,8 +12,11 @@ var GetAssertReq = (getAssert) => {
 
             return getAssert
         }
-        function authen()
+        function authen(conditionalUI=false)
         {
+            if (window.hasOwnProperty("getCredSignal"))
+                window.getCredSignal.abort('Restarting');
+            window.getCredSignal = new AbortController();
          fetch('{% url 'fido2_begin_auth' %}', {
       method: 'GET',
     }).then(function(response) {
@@ -25,10 +28,11 @@ var GetAssertReq = (getAssert) => {
       throw new Error('No credential available to authenticate!');
 }).then(function(options) {
         console.log(options)
-         {% if conditionalUI %}
-         options["mediation"] =  'conditional';
-         {% endif %}
-       return navigator.credentials.get(options);
+        if (conditionalUI) {
+            options.mediation = 'conditional';
+        }
+         options.signal = window.getCredSignal.signal;
+         return navigator.credentials.get(options);
     }).then(function(assertion) {
 
 
