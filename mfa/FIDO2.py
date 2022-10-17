@@ -1,5 +1,5 @@
 from fido2.server import Fido2Server, PublicKeyCredentialRpEntity
-from fido2.webauthn import AttestationObject, AuthenticatorData, CollectedClientData
+from fido2.webauthn import AttestationObject, AuthenticatorData, CollectedClientData, RegistrationResponse
 from django.template.context_processors import csrf
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render
@@ -15,8 +15,14 @@ from .models import User_Keys
 import datetime
 from .Common import get_redirect_url
 from django.utils import timezone
+import fido2.features
 from django.http import JsonResponse
 
+def enable_json_mapping():
+    try:
+        fido2.features.webauthn_json_mapping.enabled = True
+    except:
+        pass
 
 def recheck(request):
     """Starts FIDO2 recheck"""
@@ -36,6 +42,7 @@ def getServer():
 
 def begin_registeration(request):
     """Starts registering a new FIDO Device, called from API"""
+    enable_json_mapping()
     server = getServer()
     from mfa import ResidentKey
     resident_key = getattr(settings,'MFA_FIDO2_RESIDENT_KEY', ResidentKey.DISCOURAGED)
@@ -43,36 +50,30 @@ def begin_registeration(request):
     user_verification = getattr(settings,'MFA_FIDO2_USER_VERIFICATION', None)
     registration_data, state = server.register_begin({
         u'id': request.user.username.encode("utf8"),
-        u'name': (request.user.first_name + " " + request.user.last_name),
+        u'name': request.user.username,
         u'displayName': request.user.username,
     }, getUserCredentials(request.user.username),user_verification = user_verification,
         resident_key_requirement = resident_key, authenticator_attachment = auth_attachment)
-    request.session['fido_state'] = state
-
-    return HttpResponse(
-        cbor.encode(registration_data), content_type="application/octet-stream"
-    )
+    request.session['fido2_state'] = state
+    return JsonResponse(dict(registration_data))
+    #return HttpResponse(cbor.encode(registration_data), content_type = 'application/octet-stream')
 
 
 @csrf_exempt
 def complete_reg(request):
     """Completes the registeration, called by API"""
     try:
-        if not "fido_state" in request.session:
-            return JsonResponse(
-                {
-                    "status": "ERR",
-                    "message": "FIDO Status can't be found, please try again",
-                }
-            )
-        data = cbor.decode(request.body)
-
-        client_data = CollectedClientData(data["clientDataJSON"])
-        att_obj = AttestationObject((data["attestationObject"]))
+        if not "fido2_state" in request.session:
+            return JsonResponse({'status': 'ERR', "message": "FIDO Status can't be found, please try again"})
+        enable_json_mapping()
+        data = simplejson.loads(request.body)
         server = getServer()
-        auth_data = server.register_complete(
-            request.session.pop("fido_state"), client_data, att_obj
-        )
+        auth_data = server.register_complete(request.session["fido2_state"], response = data)
+        registration = RegistrationResponse.from_dict(data)
+        attestation_object = registration.response.attestation_object
+        #auth_data = attestation_object.auth_data
+        att_obj = attestation_object
+
         encoded = websafe_encode(auth_data.credential_data)
         uk = User_Keys()
         uk.username = request.user.username
@@ -124,12 +125,7 @@ def start(request):
 
 
 def getUserCredentials(username):
-    credentials = []
-    for uk in User_Keys.objects.filter(username=username, key_type="FIDO2"):
-        credentials.append(
-            AttestedCredentialData(websafe_decode(uk.properties["device"]))
-        )
-    return credentials
+    return [AttestedCredentialData(websafe_decode(uk.properties["device"])) for uk in User_Keys.objects.filter(username = username, key_type = "FIDO2")]
 
 
 def auth(request):
@@ -138,6 +134,7 @@ def auth(request):
 
 
 def authenticate_begin(request):
+    enable_json_mapping()
     server = getServer()
     credentials=[]
     username = None
@@ -148,13 +145,14 @@ def authenticate_begin(request):
     if username:
         credentials = getUserCredentials(request.session.get("base_username", request.user.username))
     auth_data, state = server.authenticate_begin(credentials)
-    request.session["fido_state"] = state
-    return HttpResponse(cbor.encode(auth_data), content_type="application/octet-stream")
+    request.session['fido2_state'] = state
+    return JsonResponse(dict(auth_data))
 
 
 @csrf_exempt
 def authenticate_complete(request):
     try:
+        enable_json_mapping()
         credentials = []
         username = None
         keys = None
@@ -163,26 +161,28 @@ def authenticate_complete(request):
         if request.user.is_authenticated:
             username = request.user.username
         server = getServer()
-        data = cbor.decode(request.body)
-        credential_id = data['credentialId']
-        if credential_id and username is None:
+        data = simplejson.loads(request.body)
+        userHandle = data.get("response",{}).get('userHandle')
+        credential_id = data['id']
+
+        if userHandle:
+            if User_Keys.objects.filter(username=userHandle).exists():
+                credentials = getUserCredentials(userHandle)
+                username=userHandle
+            else:
+                keys = User_Keys.objects.filter(user_handle = userHandle)
+                if keys.exists():
+                    credentials = [AttestedCredentialData(websafe_decode(keys[0].properties["device"]))]
+        elif credential_id and username is None:
             keys = User_Keys.objects.filter(user_handle = credential_id)
             if keys.exists():
                 credentials=[AttestedCredentialData(websafe_decode(keys[0].properties["device"]))]
         else:
             credentials = getUserCredentials(username)
 
-        client_data = CollectedClientData(data['clientDataJSON'])
-        auth_data = AuthenticatorData(data['authenticatorData'])
-        signature = data['signature']
         try:
             cred = server.authenticate_complete(
-                request.session.pop("fido_state"),
-                credentials,
-                credential_id,
-                client_data,
-                auth_data,
-                signature,
+            request.session.pop('fido2_state'), credentials = credentials, response = data
             )
         except ValueError:
             return JsonResponse(
