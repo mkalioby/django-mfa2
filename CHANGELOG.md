@@ -1,4 +1,14 @@
 # Change Log
+## 3.0 (Unreleased)
+* Updated to fido2==1.1.0
+* Removed: CBOR and exchange is done in JSON now
+* Added: the following settings 
+  * `MFA_FIDO2_RESIDENT_KEY`: Defaults to `Discouraged` which was the old behaviour
+  * `MFA_FIDO2_AUTHENTICATOR_ATTACHMENT`: If you like to have a PLATFORM Authenticator, Defaults to NONE
+  * `MFA_FIDO2_USER_VERIFICATION`:  If you need User Verification 
+  * `MFA_FIDO2_ATTESTATION_PREFERENCE`: If you like to have an Attention
+* Added: ConditionalUI support (check example)
+
 ## 2.6.1
 * Fix: CVE-2022-42731: related to the possibility of registration replay attack.
   Thanks to 'SSE (Secure Systems Engineering)'
