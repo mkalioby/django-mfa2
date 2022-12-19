@@ -34,6 +34,8 @@ Trusted device is a mode for the user to add a device that doesn't support secur
 
 Package tested with Django 1.8, Django 2.2 on Python 2.7 and Python 3.5+ but it was not checked with any version in between but open for issues.
 
+If you just need WebAuthn and Passkeys, you can use **[django-passkeys](https://github.com/mkalioby/django-passkeys)**, which is a slim-down of this app and much easier to integrate.
+
 Depends on
 
 * pyotp
