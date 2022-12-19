@@ -22,7 +22,9 @@ For FIDO2, the following are supported
  * **android-safetynet** (Chrome 70+, Firefox 68+)
  * **NFC devices using PCSC** (Not Tested, but as supported in fido2)
  * **Soft Tokens** 
-    * [krypt.co](https://krypt.co/): Login by a notification on your phone.
+    * ~~[krypt.co](https://krypt.co/): Login by a notification on your phone.~~
+
+**Update**: Dec 2022, krypt.co has been killed by Google for Passkeys.
 
 In English :), It allows you to verify the user by security keys on PC, Laptops or Mobiles, Windows Hello (Fingerprint, PIN) on Windows 10 Build 1903+ (May 2019 Update) Touch/Face ID on Macbooks (Chrome, Safari), Touch/Face ID on iPhone and iPad and Fingerprint/Face/Iris/PIN on Android Phones.
 
@@ -43,8 +45,12 @@ Depends on
 
 # Installation
 1. using pip 
-
-    `pip install django-mfa2`
+    * For Django >= 4.0
+       
+        `pip install django-mfa2`
+    * For Django < 4.0
+           
+      `pip install django-mfa2 jsonfield`
 2. Using Conda forge 
    
    `conda config --add channels conda-forge`

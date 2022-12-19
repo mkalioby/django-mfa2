@@ -2,7 +2,14 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
-import jsonfield.fields
+try:
+    from django.db.models import JSONField
+except ImportError:
+    try:
+        from jsonfield.fields import JSONField
+    except ImportError:
+        raise ImportError("Can't find a JSONField implementation, please install jsonfield if django < 4.0")
+
 
 
 def modify_json(apps, schema_editor):
@@ -24,7 +31,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='user_keys',
             name='properties',
-            field=jsonfield.fields.JSONField(null=True),
+            field=JSONField(null=True),
         ),
         migrations.RunPython(modify_json)
     ]

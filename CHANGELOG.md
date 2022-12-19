@@ -1,5 +1,9 @@
 # Change Log
-## 2.7.0 (Dev)
+## 2.8.0
+* Support For Django 4.0+ JSONField
+* Removed jsonfield package from requirements
+
+## 2.7.0 
 * Fixed #70
 * Add QR Code for trusted device link
 * Better formatting for trusted device start page.
