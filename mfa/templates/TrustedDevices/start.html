@@ -1,5 +1,7 @@
 {% extends "base.html" %}
+{% load static %}
 {% block head %}
+    <script src="{% static 'mfa/js/qrious.min.js' %}" type="text/javascript"></script>
     <style>
     #two-factor-steps {
 	border: 1px solid #ccc;
@@ -12,6 +14,12 @@
     </style>
 
     <script type="text/javascript">
+    $(document).ready(function (){
+        var qr = new QRious({
+          element: document.getElementById('qr'),
+          value: "{{ url }}?u={{ request.user.username }}&k={{ key }}"
+        });
+    })
     function sendEmail() {
         $("#modal-title").html("Send Link")
         $("#modal-body").html("Sending Email, Please wait....");
@@ -82,21 +90,52 @@
         {%  if not_allowed %}
             <div class="alert alert-danger">You can't add any more devices, you need to remove previously trusted devices first.</div>
         {% else %}
-    <p style="color: green">Allow access from mobile phone and tables.</p>
-    <h5>Steps:</h5>
-        <ol>
+    <p style="color: green">Allow access from mobile phone and tables.</p><br/>
+            <br/>
+            </div>
+            <div class="row">
+                <h5>Steps:</h5>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Using Camera</h5>
+                    <ol>
             <li>Using your mobile/table, open Chrome/Firefox.</li>
-            <li>Go to <b>{{ HOST }}{{ BASE_URL }}devices/add</b>&nbsp;&nbsp;<a href="javascript:void(0)" onclick="sendEmail()" title="Send to my email"><i class="fas fa-paper-plane"></i></a></li>
+            <li>Scan the following barcode <br/>
+                <img id="qr"/> <br/>
+            </li>
+            <li>Confirm the consent and submit form.</li>
+        </ol>
+                </div>
+
+
+            <div class="col-md-6">
+            <h5>Manual</h5>
+            <ol>
+            <li>Using your mobile/table, open Chrome/Firefox.</li>
+                <li>Go to <b>{{ url }}</b>&nbsp;&nbsp;</li>
             <li>Enter your username & following 6 digits<br/>
                 <span style="font-size: 16px;font-weight: bold; margin-left: 50px">{{ key|slice:":3" }} - {{ key|slice:"3:" }}</span>
             </li>
-            <li>This window will ask to confirm the device.</li>
+                <li>Confirm the consent and submit form.</li>
+                </div>
+            </div>
+            <div class="row">
+            <div class="col-md-8 offset-2">
+           This window will ask to confirm the device.
+            </div>
+            </div>
 
-        </ol>
+
     {% endif %}
     </div>
         </div>
-    </div>
+
+    <br/>
+        <br/>
+        <br/>
+        <br/>
     {% include "modal.html" %}
     {% include 'mfa_check.html' %}
 {% endblock %}

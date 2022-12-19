@@ -7,10 +7,11 @@ from django.template.context_processors import csrf
 from .models import *
 import user_agents
 from django.utils import timezone
+from django.urls import reverse
 
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
     x=''.join(random.choice(chars) for _ in range(size))
-    if not User_Keys.objects.filter(properties__shas="$.key="+x).exists(): return x
+    if not User_Keys.objects.filter(properties__icontains='"key": "%s"'%x).exists(): return x
     else: return id_generator(size,chars)
 
 def getUserAgent(request):
@@ -57,12 +58,13 @@ def getCookie(request):
 def add(request):
     context=csrf(request)
     if request.method=="GET":
+        context.update({"username":request.GET.get('u',''),"key":request.GET.get('k','')})
         return render(request,"TrustedDevices/Add.html",context)
     else:
         key=request.POST["key"].replace("-","").replace(" ","").upper()
         context["username"] = request.POST["username"]
         context["key"] = request.POST["key"]
-        trusted_keys=User_Keys.objects.filter(username=request.POST["username"],properties__has="$.key="+key)
+        trusted_keys=User_Keys.objects.filter(username=request.POST["username"],properties__icontains='"key": "%s"'%key)
         cookie=False
         if trusted_keys.exists():
             tk=trusted_keys[0]
@@ -97,7 +99,7 @@ def start(request):
         request.session["td_id"]=td.id
     try:
         if td==None: td=User_Keys.objects.get(id=request.session["td_id"])
-        context={"key":td.properties["key"]}
+        context={"key":td.properties["key"],"url":request.scheme+"://"+request.get_host() + reverse('add_trusted_device')}
     except:
         del request.session["td_id"]
         return start(request)
@@ -124,12 +126,14 @@ def verify(request):
         json= jwt.decode(request.COOKIES.get('deviceid'),settings.SECRET_KEY)
         if json["username"].lower()== request.session['base_username'].lower():
             try:
-                uk = User_Keys.objects.get(username=request.POST["username"].lower(), properties__has="$.key=" + json["key"])
+                uk = User_Keys.objects.get(username=request.POST["username"].lower(), properties__icontains='"key": "%s"'%json["key"])
                 if uk.enabled and uk.properties["status"] == "trusted":
                     uk.last_used=timezone.now()
                     uk.save()
                     request.session["mfa"] = {"verified": True, "method": "Trusted Device","id":uk.id}
                     return True
             except:
+                import traceback
+                print(traceback.format_exc())
                 return False
     return False
