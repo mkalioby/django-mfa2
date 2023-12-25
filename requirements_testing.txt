@@ -1,0 +1,10 @@
+tox
+pytest>=7.0.0
+pytest-xdist
+pytest-cov          # Test coverage
+pytest-dotenv       # plugin to load environment from .env file
+pytest-env          # plugin to allow passing environment variable to pytest environmentt
+pytest-mock         # plugin that provides a mocker fixture which is a thin-wrapper around the patching API provided by the mock package
+hypothesis          # plugin that helps in automatize generating random values instead of static values in pyttests
+pytest-django       # pytest support for Django
+validators          # a package containing several validator functions
