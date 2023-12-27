@@ -11,6 +11,7 @@ A Django app that handles MFA, it supports TOTP, U2F, FIDO2 U2F (Web Authn), Ema
 [![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/django-mfa2.svg)](https://anaconda.org/conda-forge/django-mfa2) 
 [![Conda Version](https://img.shields.io/conda/vn/conda-forge/django-mfa2.svg)](https://anaconda.org/conda-forge/django-mfa2) 
 
+
 Web Authencation API (WebAuthn) is state-of-the art techology that is expected to replace passwords.
 
 ![Andriod Fingerprint](https://cdn-images-1.medium.com/max/800/1*1FWkRE8D7NTA2Kn1DrPjPA.png)
@@ -205,8 +206,7 @@ In the root folder, `pytest.ini` contains configurations for running the tests, 
 To run the tests, install the packages in requirements and requirements_testing.txt:
 
 ```bash
-pip install -r requirements.txt
-pip install -r requirements_testing.txt
+pip install -r requirements.txt -r requirements_testing.txt
 ```
 
 then simply run pytest
