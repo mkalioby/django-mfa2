@@ -1,6 +1,9 @@
 import pytest
 from django.urls import reverse
 
+@pytest.mark.VIEWS
+@pytest.mark.DJANGO
+@pytest.mark.ANNONYMOUS_USER
 @pytest.mark.django_db
 def test_index_unauthenticated(client):
     url = reverse("mfa_home")
@@ -9,7 +12,8 @@ def test_index_unauthenticated(client):
     assert response.status_code == 302
     assert response.url=="/accounts/login/?next=/"
 
-
+@pytest.mark.VIEWS
+@pytest.mark.AUTHENTICATED_USER
 @pytest.mark.django_db
 def test_index_authenticated(client, authenticated_user):
     url = reverse("mfa_home")

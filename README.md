@@ -196,6 +196,44 @@ function some_func() {
 
 ````
 
+# Testing
+
+We use `pytest` and several pytest plugins, especially the `pytest-django` and `pytest-cov` plugins that provide Django fixtures, and test coverage analysis.
+
+In the root folder, `pytest.ini` contains configurations for running the tests, `requirements_testing.txt` contains the python packages required for running tests, and the folder `tests` contains the actual test files.
+
+To run the tests, install the packages in requirements and requirements_testing.txt:
+
+```bash
+pip install -r requirements.txt
+pip install -r requirements_testing.txt
+```
+
+then simply run pytest
+```
+pytest
+```
+
+to generate the coverage html pages:
+
+```
+pytest --cov=. --cov-report html -v
+```
+
+the coverage html files will be generated in the `htmlcov` folder
+
+We use `tox` to test the package against different isolated environments. `tox.ini` contains the configurations for tox. To run the tests in the environments defined in the `tox.ini` file, make sure the python package tox is installed:
+
+```
+pip install tox
+```
+
+then run tox in the project root:
+
+```
+tox
+```
+
 # Contributors
 * [mahmoodnasr](https://github.com/mahmoodnasr)
 * [d3cline](https://github.com/d3cline)
@@ -207,6 +245,7 @@ function some_func() {
 * [ezrajrice](https://github.com/ezrajrice)
 * [Spitfireap](https://github.com/Spitfireap)
 * [peterthomassen](https://github.com/peterthomassen)
+* [oussjarrousse](https://github.com/oussjarrousse)
 
 
  # Security contact information
