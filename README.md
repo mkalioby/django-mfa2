@@ -207,6 +207,7 @@ function some_func() {
 * [ezrajrice](https://github.com/ezrajrice)
 * [Spitfireap](https://github.com/Spitfireap)
 * [peterthomassen](https://github.com/peterthomassen)
+* [jkirkcaldy](https://github.com/jkirkcaldy)
 
 
  # Security contact information
