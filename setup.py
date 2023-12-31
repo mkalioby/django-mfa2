@@ -23,7 +23,7 @@ setup(
         'ua-parser',
         'user-agents',
         'python-jose',
-        'fido2 == 1.0.0',
+        'fido2 == 1.1.2',
       ],
     python_requires=">=3.5",
     include_package_data=True,
