@@ -14,7 +14,7 @@ setup(
     url = 'https://github.com/mkalioby/django-mfa2/',
     download_url='https://github.com/mkalioby/django-mfa2/',
     license='MIT',
-    packages=find_packages(),
+    packages=find_packages(exclude=("tests",)),
     install_requires=[
         'django >= 2.0',
         'simplejson',

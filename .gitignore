@@ -1,5 +1,9 @@
-.idea
 example/venv
+
+# IDE
+.idea
+.vscode
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -105,3 +109,6 @@ venv.bak/
 # mypy
 .mypy_cache/
 example/test_db
+
+# OS related
+.DS_Store
