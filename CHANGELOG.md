@@ -1,4 +1,9 @@
 # Change Log
+## 2.9.0
+* Fix a typo,
+  
+    Thanks to @jkirkcaldy
+
 ## 2.8.0
 * Support For Django 4.0+ JSONField
 * Removed jsonfield package from requirements
