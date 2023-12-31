@@ -246,6 +246,7 @@ tox
 * [Spitfireap](https://github.com/Spitfireap)
 * [peterthomassen](https://github.com/peterthomassen)
 * [oussjarrousse](https://github.com/oussjarrousse)
+* [jkirkcaldy](https://github.com/jkirkcaldy)
 
 
  # Security contact information
