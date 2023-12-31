@@ -1,5 +1,12 @@
 from django.db import models
-from jsonfield import JSONField
+try:
+    from django.db.models import JSONField
+except ModuleNotFoundError:
+    try:
+        from jsonfield import JSONField
+    except ModuleNotFoundError:
+        raise ModuleNotFoundError("Can't find a JSONField implementation, please install jsonfield if django < 4.0")
+
 from jose import jwt
 from django.conf import settings
 #from jsonLookup import shasLookup, hasLookup
