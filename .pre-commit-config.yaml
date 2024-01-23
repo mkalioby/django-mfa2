@@ -9,3 +9,8 @@ repos:
         # pre-commit's default_language_version, see
         # https://pre-commit.com/#top_level-default_language_version
         language_version: python3.11
+
+  - repo: https://github.com/fsouza/pre-commit-pyre-check
+    rev: '199dc59'  # Use the sha / tag you want to point at
+    hooks:
+    -   id: pyre-check

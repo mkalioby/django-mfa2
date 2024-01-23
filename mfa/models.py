@@ -4,7 +4,7 @@ try:
     from django.db.models import JSONField
 except ModuleNotFoundError:
     try:
-        from jsonfield import JSONField
+        from jsonfield import JSONField  # pyre-ignore[21]
     except ModuleNotFoundError:
         raise ModuleNotFoundError(
             "Can't find a JSONField implementation, please install jsonfield if django < 4.0"

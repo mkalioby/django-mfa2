@@ -4,7 +4,7 @@ from django.core.mail import EmailMessage
 try:
     from django.urls import reverse
 except:
-    from django.core.urlresolver import reverse
+    from django.core.urlresolver import reverse  # pyre-ignore[21]
 
 
 def send(to, subject, body):

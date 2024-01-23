@@ -5,7 +5,7 @@ from . import views, totp, U2F, TrustedDevice, helpers, FIDO2, Email, recovery
 try:
     from django.urls import re_path as url
 except:
-    from django.conf.urls import url
+    from django.conf.urls import url  # pyre-ignore[21]
 urlpatterns = [
     url(r"totp/start/", totp.start, name="start_new_otop"),
     url(r"totp/getToken", totp.getToken, name="get_new_otop"),

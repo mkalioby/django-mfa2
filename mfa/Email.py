@@ -40,7 +40,7 @@ def start(request):
             from django.http import HttpResponseRedirect
 
             try:
-                from django.core.urlresolvers import reverse
+                from django.core.urlresolvers import reverse  # pyre-ignore[21]
             except:
                 from django.urls import reverse
             if (

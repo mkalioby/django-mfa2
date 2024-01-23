@@ -7,7 +7,7 @@ try:
     from django.db.models import JSONField
 except ImportError:
     try:
-        from jsonfield.fields import JSONField
+        from jsonfield.fields import JSONField  # pyre-ignore[21]
     except ImportError:
         raise ImportError(
             "Can't find a JSONField implementation, please install jsonfield if django < 4.0"

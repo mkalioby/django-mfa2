@@ -7,7 +7,7 @@ from .models import *
 try:
     from django.urls import reverse
 except:
-    from django.core.urlresolvers import reverse
+    from django.core.urlresolvers import reverse  # pyre-ignore[21]
 from django.template.context_processors import csrf
 from django.template.context import RequestContext
 from django.conf import settings
