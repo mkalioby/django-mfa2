@@ -4,6 +4,7 @@ from fido2.webauthn import AttestationObject, AuthenticatorData, CollectedClient
 from django.template.context_processors import csrf
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render
+
 # from django.template.context import RequestContext
 import simplejson
 from fido2 import cbor
@@ -18,6 +19,7 @@ from .Common import get_redirect_url
 from django.utils import timezone
 from django.http import JsonResponse
 
+
 def recheck(request):
     """Starts FIDO2 recheck"""
     context = csrf(request)
@@ -28,21 +30,28 @@ def recheck(request):
 
 def getServer():
     """Get Server Info from settings and returns a Fido2Server"""
-    rp = PublicKeyCredentialRpEntity(id=settings.FIDO_SERVER_ID, name=settings.FIDO_SERVER_NAME)
+    rp = PublicKeyCredentialRpEntity(
+        id=settings.FIDO_SERVER_ID, name=settings.FIDO_SERVER_NAME
+    )
     return Fido2Server(rp)
 
 
 def begin_registeration(request):
     """Starts registering a new FIDO Device, called from API"""
     server = getServer()
-    registration_data, state = server.register_begin({
-        u'id': request.user.username.encode("utf8"),
-        u'name': (request.user.first_name + " " + request.user.last_name),
-        u'displayName': request.user.username,
-    }, getUserCredentials(request.user.username))
-    request.session['fido_state'] = state
+    registration_data, state = server.register_begin(
+        {
+            "id": request.user.username.encode("utf8"),
+            "name": (request.user.first_name + " " + request.user.last_name),
+            "displayName": request.user.username,
+        },
+        getUserCredentials(request.user.username),
+    )
+    request.session["fido_state"] = state
 
-    return HttpResponse(cbor.encode(registration_data), content_type = 'application/octet-stream')
+    return HttpResponse(
+        cbor.encode(registration_data), content_type="application/octet-stream"
+    )
 
 
 @csrf_exempt
@@ -50,53 +59,81 @@ def complete_reg(request):
     """Completes the registeration, called by API"""
     try:
         if not "fido_state" in request.session:
-            return JsonResponse({'status': 'ERR', "message": "FIDO Status can't be found, please try again"})
+            return JsonResponse(
+                {
+                    "status": "ERR",
+                    "message": "FIDO Status can't be found, please try again",
+                }
+            )
         data = cbor.decode(request.body)
 
-        client_data = CollectedClientData(data['clientDataJSON'])
-        att_obj = AttestationObject((data['attestationObject']))
+        client_data = CollectedClientData(data["clientDataJSON"])
+        att_obj = AttestationObject((data["attestationObject"]))
         server = getServer()
         auth_data = server.register_complete(
-            request.session.pop('fido_state'),
-            client_data,
-            att_obj
+            request.session.pop("fido_state"), client_data, att_obj
         )
         encoded = websafe_encode(auth_data.credential_data)
         uk = User_Keys()
         uk.username = request.user.username
-        uk.properties = {"device": encoded, "type": att_obj.fmt, }
+        uk.properties = {
+            "device": encoded,
+            "type": att_obj.fmt,
+        }
         uk.owned_by_enterprise = getattr(settings, "MFA_OWNED_BY_ENTERPRISE", False)
         uk.key_type = "FIDO2"
         uk.save()
-        if getattr(settings, 'MFA_ENFORCE_RECOVERY_METHOD', False) and not User_Keys.objects.filter(key_type = "RECOVERY", username=request.user.username).exists():
-            request.session["mfa_reg"] = {"method":"FIDO2","name": getattr(settings, "MFA_RENAME_METHODS", {}).get("FIDO2", "FIDO2")}
-            return HttpResponse(simplejson.dumps({'status': 'RECOVERY'}))
+        if (
+            getattr(settings, "MFA_ENFORCE_RECOVERY_METHOD", False)
+            and not User_Keys.objects.filter(
+                key_type="RECOVERY", username=request.user.username
+            ).exists()
+        ):
+            request.session["mfa_reg"] = {
+                "method": "FIDO2",
+                "name": getattr(settings, "MFA_RENAME_METHODS", {}).get(
+                    "FIDO2", "FIDO2"
+                ),
+            }
+            return HttpResponse(simplejson.dumps({"status": "RECOVERY"}))
         else:
-            return HttpResponse(simplejson.dumps({'status': 'OK'}))
+            return HttpResponse(simplejson.dumps({"status": "OK"}))
     except Exception as exp:
         import traceback
+
         print(traceback.format_exc())
         try:
             from raven.contrib.django.raven_compat.models import client
+
             client.captureException()
         except:
             pass
-        return JsonResponse({'status': 'ERR', "message": "Error on server, please try again later"})
+        return JsonResponse(
+            {"status": "ERR", "message": "Error on server, please try again later"}
+        )
 
 
 def start(request):
     """Start Registration a new FIDO Token"""
     context = csrf(request)
     context.update(get_redirect_url())
-    context["method"] = {"name":getattr(settings,"MFA_RENAME_METHODS",{}).get("FIDO2","FIDO2 Security Key")}
-    context["RECOVERY_METHOD"]=getattr(settings,"MFA_RENAME_METHODS",{}).get("RECOVERY","Recovery codes")
+    context["method"] = {
+        "name": getattr(settings, "MFA_RENAME_METHODS", {}).get(
+            "FIDO2", "FIDO2 Security Key"
+        )
+    }
+    context["RECOVERY_METHOD"] = getattr(settings, "MFA_RENAME_METHODS", {}).get(
+        "RECOVERY", "Recovery codes"
+    )
     return render(request, "FIDO2/Add.html", context)
 
 
 def getUserCredentials(username):
     credentials = []
-    for uk in User_Keys.objects.filter(username = username, key_type = "FIDO2"):
-        credentials.append(AttestedCredentialData(websafe_decode(uk.properties["device"])))
+    for uk in User_Keys.objects.filter(username=username, key_type="FIDO2"):
+        credentials.append(
+            AttestedCredentialData(websafe_decode(uk.properties["device"]))
+        )
     return credentials
 
 
@@ -107,10 +144,12 @@ def auth(request):
 
 def authenticate_begin(request):
     server = getServer()
-    credentials = getUserCredentials(request.session.get("base_username", request.user.username))
+    credentials = getUserCredentials(
+        request.session.get("base_username", request.user.username)
+    )
     auth_data, state = server.authenticate_begin(credentials)
-    request.session['fido_state'] = state
-    return HttpResponse(cbor.encode(auth_data), content_type = "application/octet-stream")
+    request.session["fido_state"] = state
+    return HttpResponse(cbor.encode(auth_data), content_type="application/octet-stream")
 
 
 @csrf_exempt
@@ -121,49 +160,76 @@ def authenticate_complete(request):
         server = getServer()
         credentials = getUserCredentials(username)
         data = cbor.decode(request.body)
-        credential_id = data['credentialId']
-        client_data = CollectedClientData(data['clientDataJSON'])
-        auth_data = AuthenticatorData(data['authenticatorData'])
-        signature = data['signature']
+        credential_id = data["credentialId"]
+        client_data = CollectedClientData(data["clientDataJSON"])
+        auth_data = AuthenticatorData(data["authenticatorData"])
+        signature = data["signature"]
         try:
             cred = server.authenticate_complete(
-                request.session.pop('fido_state'),
+                request.session.pop("fido_state"),
                 credentials,
                 credential_id,
                 client_data,
                 auth_data,
-                signature
+                signature,
             )
         except ValueError:
-            return HttpResponse(simplejson.dumps({'status': "ERR",
-                                                  "message": "Wrong challenge received, make sure that this is your security and try again."}),
-                                content_type = "application/json")
+            return HttpResponse(
+                simplejson.dumps(
+                    {
+                        "status": "ERR",
+                        "message": "Wrong challenge received, make sure that this is your security and try again.",
+                    }
+                ),
+                content_type="application/json",
+            )
         except Exception as excep:
             try:
                 from raven.contrib.django.raven_compat.models import client
+
                 client.captureException()
             except:
                 pass
-            return HttpResponse(simplejson.dumps({'status': "ERR",
-                                                  "message": str(excep)}),
-                                content_type = "application/json")
+            return HttpResponse(
+                simplejson.dumps({"status": "ERR", "message": str(excep)}),
+                content_type="application/json",
+            )
 
         if request.session.get("mfa_recheck", False):
             import time
+
             request.session["mfa"]["rechecked_at"] = time.time()
-            return HttpResponse(simplejson.dumps({'status': "OK"}),
-                                content_type = "application/json")
+            return HttpResponse(
+                simplejson.dumps({"status": "OK"}), content_type="application/json"
+            )
         else:
             import random
-            keys = User_Keys.objects.filter(username = username, key_type = "FIDO2", enabled = 1)
+
+            keys = User_Keys.objects.filter(
+                username=username, key_type="FIDO2", enabled=1
+            )
             for k in keys:
-                if AttestedCredentialData(websafe_decode(k.properties["device"])).credential_id == cred.credential_id:
+                if (
+                    AttestedCredentialData(
+                        websafe_decode(k.properties["device"])
+                    ).credential_id
+                    == cred.credential_id
+                ):
                     k.last_used = timezone.now()
                     k.save()
-                    mfa = {"verified": True, "method": "FIDO2", 'id': k.id}
+                    mfa = {"verified": True, "method": "FIDO2", "id": k.id}
                     if getattr(settings, "MFA_RECHECK", False):
-                        mfa["next_check"] = datetime.datetime.timestamp((datetime.datetime.now() + datetime.timedelta(
-                            seconds = random.randint(settings.MFA_RECHECK_MIN, settings.MFA_RECHECK_MAX))))
+                        mfa["next_check"] = datetime.datetime.timestamp(
+                            (
+                                datetime.datetime.now()
+                                + datetime.timedelta(
+                                    seconds=random.randint(
+                                        settings.MFA_RECHECK_MIN,
+                                        settings.MFA_RECHECK_MAX,
+                                    )
+                                )
+                            )
+                        )
                     request.session["mfa"] = mfa
                     try:
                         authenticated = request.user.is_authenticated
@@ -171,11 +237,20 @@ def authenticate_complete(request):
                         authenticated = request.user.is_authenticated()
                     if not authenticated:
                         res = login(request)
-                        if not "location" in res: return reset_cookie(request)
-                        return HttpResponse(simplejson.dumps({'status': "OK", "redirect": res["location"]}),
-                                            content_type = "application/json")
-                    return HttpResponse(simplejson.dumps({'status': "OK"}),
-                                        content_type = "application/json")
+                        if not "location" in res:
+                            return reset_cookie(request)
+                        return HttpResponse(
+                            simplejson.dumps(
+                                {"status": "OK", "redirect": res["location"]}
+                            ),
+                            content_type="application/json",
+                        )
+                    return HttpResponse(
+                        simplejson.dumps({"status": "OK"}),
+                        content_type="application/json",
+                    )
     except Exception as exp:
-        return HttpResponse(simplejson.dumps({'status': "ERR", "message": exp.message}),
-                            content_type = "application/json")
+        return HttpResponse(
+            simplejson.dumps({"status": "ERR", "message": exp.message}),
+            content_type="application/json",
+        )

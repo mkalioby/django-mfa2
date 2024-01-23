@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('mfa', '0010_auto_20201110_0557'),
+        ("mfa", "0010_auto_20201110_0557"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='user_keys',
-            name='owned_by_enterprise',
+            model_name="user_keys",
+            name="owned_by_enterprise",
             field=models.BooleanField(blank=True, default=None, null=True),
         ),
     ]

@@ -13,78 +13,115 @@ from django.utils import timezone
 import random
 
 
-def verify_login(request,username,token):
-    for key in User_Keys.objects.filter(username=username,key_type = "TOTP"):
+def verify_login(request, username, token):
+    for key in User_Keys.objects.filter(username=username, key_type="TOTP"):
         totp = pyotp.TOTP(key.properties["secret_key"])
-        if  totp.verify(token,valid_window = 30):
-            key.last_used=timezone.now()
+        if totp.verify(token, valid_window=30):
+            key.last_used = timezone.now()
             key.save()
-            return [True,key.id]
+            return [True, key.id]
     return [False]
+
 
 def recheck(request):
     context = csrf(request)
-    context["mode"]="recheck"
+    context["mode"] = "recheck"
     if request.method == "POST":
-        if verify_login(request,request.user.username, token=request.POST["otp"])[0]:
+        if verify_login(request, request.user.username, token=request.POST["otp"])[0]:
             import time
+
             request.session["mfa"]["rechecked_at"] = time.time()
-            return HttpResponse(simplejson.dumps({"recheck": True}), content_type="application/json")
+            return HttpResponse(
+                simplejson.dumps({"recheck": True}), content_type="application/json"
+            )
         else:
-            return HttpResponse(simplejson.dumps({"recheck": False}), content_type="application/json")
-    return render(request,"TOTP/recheck.html", context)
+            return HttpResponse(
+                simplejson.dumps({"recheck": False}), content_type="application/json"
+            )
+    return render(request, "TOTP/recheck.html", context)
+
 
 @never_cache
 def auth(request):
-    context=csrf(request)
-    if request.method=="POST":
+    context = csrf(request)
+    if request.method == "POST":
         tokenLength = len(request.POST["otp"])
         if tokenLength == 6:
-            #TOTO code check
-            res=verify_login(request,request.session["base_username"],token = request.POST["otp"])
+            # TOTO code check
+            res = verify_login(
+                request, request.session["base_username"], token=request.POST["otp"]
+            )
             if res[0]:
-                mfa = {"verified": True, "method": "TOTP","id":res[1]}
+                mfa = {"verified": True, "method": "TOTP", "id": res[1]}
                 if getattr(settings, "MFA_RECHECK", False):
-                    mfa["next_check"] = datetime.datetime.timestamp((datetime.datetime.now()
-                                            + datetime.timedelta(
-                                seconds=random.randint(settings.MFA_RECHECK_MIN, settings.MFA_RECHECK_MAX))))
+                    mfa["next_check"] = datetime.datetime.timestamp(
+                        (
+                            datetime.datetime.now()
+                            + datetime.timedelta(
+                                seconds=random.randint(
+                                    settings.MFA_RECHECK_MIN, settings.MFA_RECHECK_MAX
+                                )
+                            )
+                        )
+                    )
                 request.session["mfa"] = mfa
                 return login(request)
-        context["invalid"]=True
-    return render(request,"TOTP/Auth.html", context)
-
+        context["invalid"] = True
+    return render(request, "TOTP/Auth.html", context)
 
 
 def getToken(request):
-    secret_key=pyotp.random_base32()
+    secret_key = pyotp.random_base32()
     totp = pyotp.TOTP(secret_key)
-    request.session["new_mfa_answer"]=totp.now()
-    return HttpResponse(simplejson.dumps({"qr":pyotp.totp.TOTP(secret_key).provisioning_uri(str(request.user.username), issuer_name = settings.TOKEN_ISSUER_NAME),
-                         "secret_key": secret_key}))
+    request.session["new_mfa_answer"] = totp.now()
+    return HttpResponse(
+        simplejson.dumps(
+            {
+                "qr": pyotp.totp.TOTP(secret_key).provisioning_uri(
+                    str(request.user.username), issuer_name=settings.TOKEN_ISSUER_NAME
+                ),
+                "secret_key": secret_key,
+            }
+        )
+    )
+
+
 def verify(request):
-    answer=request.GET["answer"]
-    secret_key=request.GET["key"]
+    answer = request.GET["answer"]
+    secret_key = request.GET["key"]
     totp = pyotp.TOTP(secret_key)
-    if totp.verify(answer,valid_window = 60):
-        uk=User_Keys()
-        uk.username=request.user.username
-        uk.properties={"secret_key":secret_key}
-        #uk.name="Authenticatior #%s"%User_Keys.objects.filter(username=user.username,type="TOTP")
-        uk.key_type="TOTP"
+    if totp.verify(answer, valid_window=60):
+        uk = User_Keys()
+        uk.username = request.user.username
+        uk.properties = {"secret_key": secret_key}
+        # uk.name="Authenticatior #%s"%User_Keys.objects.filter(username=user.username,type="TOTP")
+        uk.key_type = "TOTP"
         uk.save()
-        if getattr(settings, 'MFA_ENFORCE_RECOVERY_METHOD', False) and not User_Keys.objects.filter(key_type="RECOVERY",
-                                                                                                    username=request.user.username).exists():
-            request.session["mfa_reg"] = {"method": "TOTP",
-                                          "name": getattr(settings, "MFA_RENAME_METHODS", {}).get("TOTP", "TOTP")}
+        if (
+            getattr(settings, "MFA_ENFORCE_RECOVERY_METHOD", False)
+            and not User_Keys.objects.filter(
+                key_type="RECOVERY", username=request.user.username
+            ).exists()
+        ):
+            request.session["mfa_reg"] = {
+                "method": "TOTP",
+                "name": getattr(settings, "MFA_RENAME_METHODS", {}).get("TOTP", "TOTP"),
+            }
             return HttpResponse("RECOVERY")
         else:
             return HttpResponse("Success")
-    else: return HttpResponse("Error")
+    else:
+        return HttpResponse("Error")
+
 
 @never_cache
 def start(request):
     """Start Adding Time One Time Password (TOTP)"""
     context = get_redirect_url()
-    context["RECOVERY_METHOD"] = getattr(settings, "MFA_RENAME_METHODS", {}).get("RECOVERY", "Recovery codes")
-    context["method"] = {"name":getattr(settings,"MFA_RENAME_METHODS",{}).get("TOTP","Authenticator")}
-    return render(request,"TOTP/Add.html",context)
+    context["RECOVERY_METHOD"] = getattr(settings, "MFA_RENAME_METHODS", {}).get(
+        "RECOVERY", "Recovery codes"
+    )
+    context["method"] = {
+        "name": getattr(settings, "MFA_RENAME_METHODS", {}).get("TOTP", "Authenticator")
+    }
+    return render(request, "TOTP/Add.html", context)
