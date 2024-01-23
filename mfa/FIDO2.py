@@ -47,10 +47,13 @@ def begin_registeration(request):
 
 @csrf_exempt
 def complete_reg(request):
-    """Completes the registeration, called by API"""
+    """Completes the registration, called by API"""
     try:
         if not "fido_state" in request.session:
-            return JsonResponse({'status': 'ERR', "message": "FIDO Status can't be found, please try again"})
+            return JsonResponse(
+                {'status': 'ERR', "message": "FIDO Status can't be found, please try again"},
+                status=400
+            )
         data = cbor.decode(request.body)
 
         client_data = CollectedClientData(data['clientDataJSON'])
@@ -81,7 +84,7 @@ def complete_reg(request):
             client.captureException()
         except:
             pass
-        return JsonResponse({'status': 'ERR', "message": "Error on server, please try again later"})
+        return JsonResponse({'status': 'ERR', "message": "Error on server, please try again later"}, status=400)
 
 
 def start(request):
