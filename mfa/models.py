@@ -5,17 +5,13 @@ try:
 except ModuleNotFoundError:
     try:
         from jsonfield import JSONField  # pyre-ignore[21]
-    except ModuleNotFoundError:
+    except ModuleNotFoundError as exc:
         raise ModuleNotFoundError(
             "Can't find a JSONField implementation, please install jsonfield if django < 4.0"
         )
 
 from jose import jwt
 from django.conf import settings
-
-# from jsonLookup import shasLookup, hasLookup
-# JSONField.register_lookup(shasLookup)
-# JSONField.register_lookup(hasLookup)
 
 
 class User_Keys(models.Model):

@@ -5,7 +5,6 @@ import datetime, random
 from random import randint
 from .models import *
 
-# from django.template.context import RequestContext
 from .views import login
 from .Common import send
 

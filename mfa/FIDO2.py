@@ -1,16 +1,14 @@
-from fido2.client import Fido2Client
 from fido2.server import Fido2Server, PublicKeyCredentialRpEntity
 from fido2.webauthn import AttestationObject, AuthenticatorData, CollectedClientData
 from django.template.context_processors import csrf
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render
 
-# from django.template.context import RequestContext
 import simplejson
 from fido2 import cbor
 from django.http import HttpResponse
 from django.conf import settings
-from .models import *
+from .models import User_Keys
 from fido2.utils import websafe_decode, websafe_encode
 from fido2.webauthn import AttestedCredentialData
 from .views import login, reset_cookie

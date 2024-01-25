@@ -3,7 +3,7 @@ from django.core.mail import EmailMessage
 
 try:
     from django.urls import reverse
-except:
+except ImportError:
     from django.core.urlresolver import reverse  # pyre-ignore[21]
 
 

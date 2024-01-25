@@ -2,31 +2,30 @@ import string
 import random
 from django.shortcuts import render
 from django.http import HttpResponse
-from django.template.context import RequestContext
 from django.template.context_processors import csrf
-from .models import *
 import user_agents
 from django.utils import timezone
 from django.urls import reverse
+
+from .models import User_Keys
 
 
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
     x = "".join(random.choice(chars) for _ in range(size))
     if not User_Keys.objects.filter(properties__icontains='"key": "%s"' % x).exists():
         return x
-    else:
-        return id_generator(size, chars)
+    return id_generator(size, chars)
 
 
 def getUserAgent(request):
-    id = id = request.session.get("td_id", None)
-    if id:
-        tk = User_Keys.objects.get(id=id)
+    device_id = request.session.get("td_id", None)
+    if device_id:
+        tk = User_Keys.objects.get(id=device_id)
         if tk.properties.get("user_agent", "") != "":
             ua = user_agents.parse(tk.properties["user_agent"])
             res = render(None, "TrustedDevices/user-agent.html", context={"ua": ua})
             return HttpResponse(res)
-    return HttpResponse("")
+    return HttpResponse("No Device provide", status=401)
 
 
 def trust_device(request):

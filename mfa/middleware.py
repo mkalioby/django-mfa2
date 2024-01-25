@@ -2,9 +2,11 @@ import time
 from django.http import HttpResponseRedirect
 
 try:
-    from django.core.urlresolvers import reverse  # pyre-ignore[21]
-except:
     from django.urls import reverse
+except ImportError:
+    from django.core.urlresolvers import reverse  # pyre-ignore[21]
+
+
 from django.conf import settings
 
 
