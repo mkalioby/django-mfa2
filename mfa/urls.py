@@ -5,7 +5,7 @@ from . import views, totp, U2F, TrustedDevice, helpers, FIDO2, Email, recovery
 try:
     from django.urls import re_path as url
 except ImportError:
-    from django.conf.urls import url  # pyre-ignore[21]
+    from django.conf.urls import url
 
 
 urlpatterns = [

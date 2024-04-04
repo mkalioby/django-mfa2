@@ -1,9 +1,13 @@
+import datetime
+from random import randint
 from django.shortcuts import render
 from django.views.decorators.cache import never_cache
 from django.template.context_processors import csrf
-import datetime, random
-from random import randint
-from .models import *
+from django.contrib.auth import get_user_model
+from django.http import HttpResponseRedirect
+from django.conf import settings
+
+from .models import User_Keys
 
 from .views import login
 from .Common import send
@@ -11,7 +15,6 @@ from .Common import send
 
 def sendEmail(request, username, secret):
     """Send Email to the user after rendering `mfa_email_token_template`"""
-    from django.contrib.auth import get_user_model
 
     User = get_user_model()
     key = getattr(User, "USERNAME_FIELD", "username")
@@ -36,7 +39,6 @@ def start(request):
             uk.key_type = "Email"
             uk.enabled = 1
             uk.save()
-            from django.http import HttpResponseRedirect
 
             try:
                 from django.core.urlresolvers import reverse  # pyre-ignore[21]

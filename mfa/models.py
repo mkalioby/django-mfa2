@@ -1,4 +1,6 @@
 from django.db import models
+from jose import jwt
+from django.conf import settings
 
 try:
     from django.db.models import JSONField
@@ -10,8 +12,6 @@ except ModuleNotFoundError:
             "Can't find a JSONField implementation, please install jsonfield if django < 4.0"
         )
 
-from jose import jwt
-from django.conf import settings
 
 
 class User_Keys(models.Model):

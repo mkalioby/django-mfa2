@@ -1,8 +1,8 @@
-from .models import User_Keys
-from . import TrustedDevice, U2F, FIDO2, totp
 import simplejson
 from django.shortcuts import HttpResponse
 from mfa.views import verify
+from . import TrustedDevice, U2F, FIDO2, totp
+from .models import User_Keys
 
 
 def has_mfa(request, username):

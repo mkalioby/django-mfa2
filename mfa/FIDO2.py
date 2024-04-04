@@ -8,10 +8,10 @@ import simplejson
 from fido2 import cbor
 from django.http import HttpResponse
 from django.conf import settings
-from .models import User_Keys
 from fido2.utils import websafe_decode, websafe_encode
 from fido2.webauthn import AttestedCredentialData
 from .views import login, reset_cookie
+from .models import User_Keys
 import datetime
 from .Common import get_redirect_url
 from django.utils import timezone

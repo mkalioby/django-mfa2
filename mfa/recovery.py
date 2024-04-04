@@ -1,15 +1,17 @@
+import time
+import random
+import string
+import simplejson
+
 from django.shortcuts import render
 from django.views.decorators.cache import never_cache
 from django.template.context_processors import csrf
+from django.utils import timezone
 from django.contrib.auth.hashers import make_password, PBKDF2PasswordHasher
 from django.http import HttpResponse
 from django.conf import settings
 from .Common import get_redirect_url
 from .models import User_Keys
-import simplejson
-import random
-import string
-from django.utils import timezone
 
 USER_FRIENDLY_NAME = "Recovery Codes"
 
@@ -89,7 +91,6 @@ def recheck(request):
         if verify_login(request, request.user.username, token=request.POST["recovery"])[
             0
         ]:
-            import time
 
             request.session["mfa"]["rechecked_at"] = time.time()
             return HttpResponse(

@@ -5,7 +5,7 @@ python-u2flib-server
 ua-parser
 user-agents
 python-jose
-fido2 == 1.1.0
+fido2 > 1.1.0
 jsonLookup
 raven
 pyre-check

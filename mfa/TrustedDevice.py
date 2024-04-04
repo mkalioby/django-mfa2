@@ -1,5 +1,6 @@
 import string
 import random
+from datetime import datetime, timedelta
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.template.context_processors import csrf
@@ -8,7 +9,6 @@ from django.utils import timezone
 from django.urls import reverse
 
 from .models import User_Keys
-
 
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
     x = "".join(random.choice(chars) for _ in range(size))
@@ -55,7 +55,6 @@ def getCookie(request):
     if tk.properties["status"] == "trusted":
         context = {"added": True}
         response = render(request, "TrustedDevices/Done.html", context)
-        from datetime import datetime, timedelta
 
         expires = datetime.now() + timedelta(days=180)
         tk.expires = expires

@@ -1,16 +1,16 @@
+import random
+import datetime
+import simplejson
+import pyotp
 from django.shortcuts import render
 from django.views.decorators.cache import never_cache
 from django.http import HttpResponse
-from .Common import get_redirect_url
-from .models import *
 from django.template.context_processors import csrf
-import simplejson
 from django.conf import settings
-import pyotp
-from .views import login
-import datetime
 from django.utils import timezone
-import random
+from .views import login
+from .Common import get_redirect_url
+from .models import User_Keys
 
 
 def verify_login(request, username, token):
@@ -28,8 +28,6 @@ def recheck(request):
     context["mode"] = "recheck"
     if request.method == "POST":
         if verify_login(request, request.user.username, token=request.POST["otp"])[0]:
-            import time
-
             request.session["mfa"]["rechecked_at"] = time.time()
             return HttpResponse(
                 simplejson.dumps({"recheck": True}), content_type="application/json"

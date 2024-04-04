@@ -9,8 +9,8 @@ try:
 except:
     from django.core.urlresolvers import reverse  # pyre-ignore[21]
 from django.contrib.auth.decorators import login_required
-from user_agents import parse
 from django.conf import settings
+from user_agents import parse
 from . import TrustedDevice
 from .models import User_Keys
 
@@ -76,9 +76,6 @@ def reset_cookie(request):
 
 
 def login(request):
-    from django.contrib import auth
-    from django.conf import settings
-
     callable_func = __get_callable_function__(settings.MFA_LOGIN_CALLBACK)
     return callable_func(request, username=request.session["base_username"])
 
@@ -94,7 +91,6 @@ def delKey(request):
 
 
 def __get_callable_function__(func_path):
-    import importlib
 
     if not "." in func_path:
         raise Exception("class Name should include modulename.classname")
