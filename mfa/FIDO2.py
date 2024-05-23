@@ -16,7 +16,7 @@ from .views import login, reset_cookie
 import datetime
 from .Common import get_redirect_url
 from django.utils import timezone
-
+from django.http import JsonResponse
 
 def recheck(request):
     """Starts FIDO2 recheck"""
@@ -49,13 +49,15 @@ def begin_registeration(request):
 def complete_reg(request):
     """Completes the registeration, called by API"""
     try:
+        if not "fido_state" in request.session:
+            return JsonResponse({'status': 'ERR', "message": "FIDO Status can't be found, please try again"})
         data = cbor.decode(request.body)
 
         client_data = CollectedClientData(data['clientDataJSON'])
         att_obj = AttestationObject((data['attestationObject']))
         server = getServer()
         auth_data = server.register_complete(
-            request.session['fido_state'],
+            request.session.pop['fido_state'],
             client_data,
             att_obj
         )
@@ -75,7 +77,7 @@ def complete_reg(request):
             client.captureException()
         except:
             pass
-        return HttpResponse(simplejson.dumps({'status': 'ERR', "message": "Error on server, please try again later"}))
+        return JsonResponse({'status': 'ERR', "message": "Error on server, please try again later"})
 
 
 def start(request):
