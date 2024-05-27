@@ -4,8 +4,9 @@ from django.contrib.auth.decorators import login_required
 
 @login_required()
 def home(request):
-    return render(request,"home.html",{})
+    return render(request, "home.html", {})
+
 
 @login_required()
 def registered(request):
-    return render(request,"home.html",{"registered":True})
+    return render(request, "home.html", {"registered": True})

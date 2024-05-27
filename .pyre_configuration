@@ -1,0 +1,15 @@
+{
+  "source_directories": [
+    "."
+  ],
+  "search_path": [
+    "env/lib/python3.11/site-packages/"
+  ],
+  "ignore_all_errors":[
+    "*env*/*",
+    "example/venv/*",
+"build/*",
+"example/*"
+
+  ]
+}

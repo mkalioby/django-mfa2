@@ -1,4 +1,11 @@
 # Change Log
+
+## 2.9.0
+* Add: Set black as code formatter
+* Add: Add Pyre as a type checker
+* Add: Add pre-commit hooks
+* Upgrade: fido to be 1.1.0 as minimum
+
 ## 2.8.0
 * Support For Django 4.0+ JSONField
 * Removed jsonfield package from requirements
