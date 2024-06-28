@@ -22,7 +22,6 @@
 * Fixed #70
 * Add QR Code for trusted device link
 * Better formatting for trusted device start page.
-* Added: ConditionalUI support (check example)
 
 ## 2.6.1
 * Fix: CVE-2022-42731: related to the possibility of registration replay attack.

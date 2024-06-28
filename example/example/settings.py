@@ -151,11 +151,15 @@ PASSWORD_HASHERS = DEFAULT_PASSWORD_HASHERS  # Comment if PASSWORD_HASHER alread
 PASSWORD_HASHERS += ["mfa.recovery.Hash"]
 RECOVERY_ITERATION = 1  # Number of iteration for recovery code, higher is more secure, but uses more resources for generation and check...
 TOKEN_ISSUER_NAME = "PROJECT_NAME"  # TOTP Issuer name
-
 MFA_FIDO2_RESIDENT_KEY = mfa.ResidentKey.REQUIRED  # Resident Key allows a special User Handle
 MFA_FIDO2_AUTHENTICATOR_ATTACHMENT = None  # Let the user choose
 MFA_FIDO2_USER_VERIFICATION = None         # Verify User Presence
 MFA_FIDO2_ATTESTATION_PREFERENCE = mfa.AttestationPreference.NONE
+MFA_RENAME_METHODS = {"RECOVERY":"Backup Codes","FIDO2":"Biometric Authentication"}
+PASSWORD_HASHERS = DEFAULT_PASSWORD_HASHERS #Comment if PASSWORD_HASHER already set
+PASSWORD_HASHERS += ['mfa.recovery.Hash']
+RECOVERY_ITERATION = 1 #Number of iteration for recovery code, higher is more secure, but uses more resources for generation and check...
+TOKEN_ISSUER_NAME="PROJECT_NAME"      #TOTP Issuer name
 
 U2F_APPID = "https://localhost:9000"  # URL For U2F
 FIDO_SERVER_ID = (

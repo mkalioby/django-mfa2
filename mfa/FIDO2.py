@@ -23,7 +23,6 @@ def enable_json_mapping():
         fido2.features.webauthn_json_mapping.enabled = True
     except:
         pass
-
 def recheck(request):
     """Starts FIDO2 recheck"""
     context = csrf(request)
@@ -182,7 +181,7 @@ def authenticate_complete(request):
 
         try:
             cred = server.authenticate_complete(
-            request.session.pop('fido2_state'), credentials = credentials, response = data
+                    request.session.pop('fido2_state'), credentials = credentials, response = data
             )
         except ValueError:
             return JsonResponse(
