@@ -3,6 +3,7 @@
 ## 3.0 (Beta)
 * Updated to fido2==1.1.3
 * Removed: CBOR and exchange is done in JSON now
+* Allows using WebAuthn (passkeys) as a single factor for login
 * Added: the following settings
   * `MFA_FIDO2_RESIDENT_KEY`: Defaults to `Discouraged` which was the old behaviour
   * `MFA_FIDO2_AUTHENTICATOR_ATTACHMENT`: If you like to have a PLATFORM Authenticator, Defaults to NONE
