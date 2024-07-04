@@ -1,15 +1,15 @@
 {%  load static %}
 <div class="row">
 
-<div class="col-sm-10 col-sm-offset-1 col-xs-12 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2 offset-2 col-8">
-<div class="panel panel-default card">
+
+<div class="panel panel-default card mx-auto mt-5 auth-card">
       <div class="panel-heading card-header">
-	      <strong> Security Key</strong>
+	      <strong> PassKey</strong>
       </div>
       <div class="panel-body card-body">
 
               <div class="row">
-            <div style="padding-left: 15px" class="col-md-10 col-md-offset-1" id="main_paragraph" align="center">
+            <div style="padding-left: 15px" class="col-md-10 col-md-offset-1 offset-md-1" id="main_paragraph" align="center">
                 {% if mode == "auth" %}
                    Welcome back {% comment %}<img src="{% url 'getUserImage' request.session.base_username  %}" title="{{ request.session.base_username }}" style="padding: 3px;height: 50px" class="img-circle"/>{% endcomment %} {{ request.session.base_username }}<br/>
                     <a href="{% url 'mfa_reset_cookie' %}">Not me</a>
@@ -21,9 +21,9 @@
                 </div>
                 <div id="msgdiv"></div>
                 {% if mode == "auth" %}
-                    <form id="u2f_login" action="{% url 'fido2_complete_auth' %}" method="post" enctype="multipart/form-data">
+                    <form id="fido2_login" action="{% url 'fido2_complete_auth' %}" method="post" enctype="multipart/form-data">
                 {% elif mode == "recheck" %}
-                    <form id="u2f_login" action="{% url 'fido2_recheck' %}" method="post" enctype="multipart/form-data">
+                    <form id="fido2_login" action="{% url 'fido2_recheck' %}" method="post" enctype="multipart/form-data">
                 {% endif %}
               {% csrf_token %}
               <input type="hidden" name="response" id="response" value=""/>

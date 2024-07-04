@@ -1,12 +1,17 @@
-import simplejson
-from django.shortcuts import HttpResponse
+from django.http import JsonResponse
+from django.conf import settings
+
 from mfa.views import verify
 from . import TrustedDevice, U2F, FIDO2, totp
 from .models import User_Keys
 
 
 def has_mfa(request, username):
-    if User_Keys.objects.filter(username=username, enabled=1).count() > 0:
+    FORCE_EMAIL = getattr(settings, "MFA_ENFORCE_EMAIL_TOKEN", False)
+    if (
+        User_Keys.objects.filter(username=username, enabled=1).count() > 0
+        or FORCE_EMAIL
+    ):
         return verify(request, username)
     return False
 
@@ -21,26 +26,15 @@ def is_mfa(request, ignore_methods=[]):
 def recheck(request):
     method = request.session.get("mfa", {}).get("method", None)
     if not method:
-        return HttpResponse(
-            simplejson.dumps({"res": False}), content_type="application/json"
-        )
+        return JsonResponse({"res": False})
     if method == "Trusted Device":
-        return HttpResponse(
-            simplejson.dumps({"res": TrustedDevice.verify(request)}),
-            content_type="application/json",
-        )
+        return JsonResponse({"res": TrustedDevice.verify(request)})
+
     elif method == "U2F":
-        return HttpResponse(
-            simplejson.dumps({"html": U2F.recheck(request).content}),
-            content_type="application/json",
-        )
+        return JsonResponse({"html": U2F.recheck(request).content})
+
     elif method == "FIDO2":
-        return HttpResponse(
-            simplejson.dumps({"html": FIDO2.recheck(request).content}),
-            content_type="application/json",
-        )
+        return JsonResponse({"html": FIDO2.recheck(request).content})
+
     elif method == "TOTP":
-        return HttpResponse(
-            simplejson.dumps({"html": totp.recheck(request).content}),
-            content_type="application/json",
-        )
+        return JsonResponse({"html": totp.recheck(request).content})

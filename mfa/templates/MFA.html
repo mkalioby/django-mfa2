@@ -103,7 +103,7 @@
                         {% endif %}
             </tr>
             {% endfor %}
-            {% if "RECOVERY" not in UNALLOWED_AUTHEN_METHODS %}
+            {% if "RECOVERY" not in UNALLOWED_AUTHEN_METHODS and recovery %}
             <tr>
 
                 <td>{{ recovery.name }}</td>

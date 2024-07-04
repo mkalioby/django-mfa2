@@ -1,3 +1,5 @@
+import json
+
 from u2flib_server.u2f import (
     begin_registration,
     begin_authentication,
@@ -8,10 +10,10 @@ from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.serialization import Encoding
 from django.shortcuts import render
-import simplejson
+
 
 from django.template.context_processors import csrf
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.conf import settings
 from .models import User_Keys
 from .views import login
@@ -31,13 +33,11 @@ def recheck(request):
 
 def process_recheck(request):
     x = validate(request, request.user.username)
-    if x == True:
+    if x is True:
         import time
 
         request.session["mfa"]["rechecked_at"] = time.time()
-        return HttpResponse(
-            simplejson.dumps({"recheck": True}), content_type="application/json"
-        )
+        return JsonResponse({"recheck": True})
     return x
 
 
@@ -55,7 +55,7 @@ def check_errors(request, data):
 def validate(request, username):
     import datetime, random
 
-    data = simplejson.loads(request.POST["response"])
+    data = json.loads(request.POST["response"])
 
     res = check_errors(request, data)
     if res != True:
@@ -105,7 +105,7 @@ def start(request):
     enroll = begin_registration(settings.U2F_APPID, [])
     request.session["_u2f_enroll_"] = enroll.json
     context = csrf(request)
-    context["token"] = simplejson.dumps(enroll.data_for_client)
+    context["token"] = json.dumps(enroll.data_for_client)
     context.update(get_redirect_url())
     context["method"] = {
         "name": getattr(settings, "MFA_RENAME_METHODS", {}).get(
@@ -122,7 +122,7 @@ def bind(request):
     import hashlib
 
     enroll = request.session["_u2f_enroll_"]
-    data = simplejson.loads(request.POST["response"])
+    data = json.loads(request.POST["response"])
     device, cert = complete_registration(enroll, data, [settings.U2F_APPID])
     cert = x509.load_der_x509_certificate(cert, default_backend())
     cert_hash = hashlib.md5(cert.public_bytes(Encoding.PEM)).hexdigest()
@@ -135,7 +135,7 @@ def bind(request):
     uk = User_Keys()
     uk.username = request.user.username
     uk.owned_by_enterprise = getattr(settings, "MFA_OWNED_BY_ENTERPRISE", False)
-    uk.properties = {"device": simplejson.loads(device.json), "cert": cert_hash}
+    uk.properties = {"device": json.loads(device.json), "cert": cert_hash}
     uk.key_type = "U2F"
     uk.save()
     if (
@@ -160,7 +160,7 @@ def sign(username):
         for d in User_Keys.objects.filter(username=username, key_type="U2F")
     ]
     challenge = begin_authentication(settings.U2F_APPID, u2f_devices)
-    return [challenge.json, simplejson.dumps(challenge.data_for_client)]
+    return [challenge.json, json.dumps(challenge.data_for_client)]
 
 
 def verify(request):
