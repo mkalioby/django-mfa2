@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 import os
 from django.conf.global_settings import PASSWORD_HASHERS as DEFAULT_PASSWORD_HASHERS
 
+import mfa
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -144,6 +146,17 @@ MFA_REDIRECT_AFTER_REGISTRATION = "registered"
 MFA_SUCCESS_REGISTRATION_MSG = "Go to Home"
 MFA_ALWAYS_GO_TO_LAST_METHOD = True
 MFA_ENFORCE_RECOVERY_METHOD = True
+MFA_RENAME_METHODS = {"RECOVERY": "Backup Codes", "FIDO2": "Biometric Authentication"}
+PASSWORD_HASHERS = DEFAULT_PASSWORD_HASHERS  # Comment if PASSWORD_HASHER already set
+PASSWORD_HASHERS += ["mfa.recovery.Hash"]
+RECOVERY_ITERATION = 1  # Number of iteration for recovery code, higher is more secure, but uses more resources for generation and check...
+TOKEN_ISSUER_NAME = "PROJECT_NAME"  # TOTP Issuer name
+MFA_FIDO2_RESIDENT_KEY = (
+    mfa.ResidentKey.REQUIRED
+)  # Resident Key allows a special User Handle
+MFA_FIDO2_AUTHENTICATOR_ATTACHMENT = None  # Let the user choose
+MFA_FIDO2_USER_VERIFICATION = None  # Verify User Presence
+MFA_FIDO2_ATTESTATION_PREFERENCE = mfa.AttestationPreference.NONE
 MFA_RENAME_METHODS = {"RECOVERY": "Backup Codes", "FIDO2": "Biometric Authentication"}
 PASSWORD_HASHERS = DEFAULT_PASSWORD_HASHERS  # Comment if PASSWORD_HASHER already set
 PASSWORD_HASHERS += ["mfa.recovery.Hash"]

@@ -16,7 +16,7 @@
   <link href="{% static  'vendor/fontawesome-free/css/all.min.css'%}" rel="stylesheet" type="text/css">
 
   <!-- Custom styles for this template-->
-  <link href="{% static 'css/sb-admin.css'%}" rel="stylesheet">
+  <link href="{% static 'css/sb-admin.min.css'%}" rel="stylesheet">
 
 </head>
 
@@ -29,11 +29,11 @@
           {% if invalid %}
               <div class="alert alert-danger">Invalid Username or password</div>
           {% endif %}
-        <form action="{% url 'login' %}" method="post">
+        <form action="{% url 'login' %}" method="post" id="loginForm">
             {% csrf_token %}
           <div class="form-group">
-            <div class="form-label-group">
-              <input type="text" id="inputUsername" name="username" class="form-control" placeholder="username" required="required" autofocus="autofocus">
+           <div class="form-label-group">
+              <input type="text" id="inputUsername" name="username" class="form-control" placeholder="username" autocomplete="username webauthn"  autofocus="autofocus">
               <label for="inputUsername">Username</label>
             </div>
           </div>
@@ -44,7 +44,9 @@
             </div>
           </div>
 
-          <button class="btn btn-primary btn-block" type="submit">Login</button>
+          <button class="btn btn-primary btn-block" type="submit">Login</button><br/>
+
+            <button class="btn btn-primary btn-block" type="button" onclick="authen()">Login By Security Key</button>
         </form>
       </div>
     </div>
@@ -56,7 +58,10 @@
 
   <!-- Core plugin JavaScript-->
   <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js'%}"></script>
-
+    {% include 'FIDO2/Auth_JS.html'%}
+<script type="text/javascript">
+    window.onload = checkConditionalUI('loginForm')
+</script>
 </body>
 
 </html>

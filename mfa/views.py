@@ -24,8 +24,9 @@ def index(request):
         "HIDE_DISABLE": getattr(settings, "MFA_HIDE_DISABLE", []),
         "RENAME_METHODS": getattr(settings, "MFA_RENAME_METHODS", {}),
     }
+    name_map = getattr(settings, "MFA_RENAME_METHODS", {})
     for k in context["keys"]:
-        k.name = getattr(settings, "MFA_RENAME_METHODS", {}).get(k.key_type, k.key_type)
+        k.name = name_map.get(k.key_type, k.key_type)
         if k.key_type == "Trusted Device":
             setattr(k, "device", parse(k.properties.get("user_agent", "-----")))
         elif k.key_type == "FIDO2":
@@ -33,6 +34,11 @@ def index(request):
         elif k.key_type == "RECOVERY":
             context["recovery"] = k
             continue
+        elif k.key_type == "Email" and getattr(
+            settings, "MFA_ENFORCE_EMAIL_TOKEN", False
+        ):
+            continue
+
         keys.append(k)
     context["keys"] = keys
     return render(request, "MFA.html", context)
@@ -51,11 +57,12 @@ def verify(request, username):
             return login(request)
         methods.remove("Trusted Device")
     request.session["mfa_methods"] = methods
-
+    if len(methods) == 0 and getattr(settings, "MFA_ENFORCE_EMAIL_TOKEN", False):
+        methods = ["email"]
     if len(methods) == 1:
         return HttpResponseRedirect(reverse(methods[0].lower() + "_auth"))
     if getattr(settings, "MFA_ALWAYS_GO_TO_LAST_METHOD", False):
-        keys = keys.exclude(last_used__isnull=True).order_by("last_used")
+        keys = keys.exclude(last_used__isnull=True).order_by("-last_used")
         if keys.count() > 0:
             return HttpResponseRedirect(reverse(keys[0].key_type.lower() + "_auth"))
     return show_methods(request)
@@ -75,9 +82,13 @@ def reset_cookie(request):
     return response
 
 
-def login(request):
+def login(request, username=None):
+    from django.conf import settings
+
     callable_func = __get_callable_function__(settings.MFA_LOGIN_CALLBACK)
-    return callable_func(request, username=request.session["base_username"])
+    if not username:
+        username = request.session["base_username"]
+    return callable_func(request, username=username)
 
 
 @login_required

@@ -1,29 +1,39 @@
 {% extends "base.html" %}
 {% load static %}
 {% block head %}
-    <script type="application/javascript" src="{% static 'mfa/js/cbor.js'%}"></script>
     <script type="application/javascript" src="{% static 'mfa/js/ua-parser.min.js'%}"></script>
+    <script type="application/javascript" src="{% static 'mfa/js/base64url.js'%}"></script>
+    <script type="application/javascript" src="{% static 'mfa/js/helpers.js'%}"></script>
     <script type="application/javascript">
+    var MakeCredReq = (makeCredReq) => {
+            makeCredReq.publicKey.challenge = base64url.decode(makeCredReq.publicKey.challenge);
+            makeCredReq.publicKey.user.id   = base64url.decode(makeCredReq.publicKey.user.id);
+
+            for(let excludeCred of makeCredReq.publicKey.excludeCredentials) {
+                excludeCred.id = base64url.decode(excludeCred.id);
+            }
+
+            return makeCredReq
+        }
     function begin_reg(){
     fetch('{% url 'fido2_begin_reg' %}',{}).then(function(response) {
       if(response.ok)
       {
-          return response.arrayBuffer();
+          return response.json().then(function (req){
+              return MakeCredReq(req)
+          });
       }
       throw new Error('Error getting registration data!');
-    }).then(CBOR.decode).then(function(options) {
-        options.publicKey.attestation="direct"
+    }).then(function(options) {
+
+        //options.publicKey.attestation="direct"
         console.log(options)
 
       return navigator.credentials.create(options);
     }).then(function(attestation) {
       return fetch('{% url 'fido2_complete_reg' %}', {
         method: 'POST',
-        headers: {'Content-Type': 'application/cbor'},
-        body: CBOR.encode({
-          "attestationObject": new Uint8Array(attestation.response.attestationObject),
-          "clientDataJSON": new Uint8Array(attestation.response.clientDataJSON),
-        })
+        body: JSON.stringify(publicKeyCredentialToJSON(attestation))
       });
     }).then(function(response) {
 

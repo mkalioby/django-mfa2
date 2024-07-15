@@ -1,5 +1,23 @@
 # Change Log
 
+## 3.0
+
+This is a major cleanup and CSS adjustments so please test before deployment.
+
+* Updated to fido2==1.1.3
+* Removed: CBOR and exchange is done in JSON now.
+* Removed: `simplejson` package from dependencies.
+* Email OTP is always 6 numbers.
+* Better support for bootstrap 4 and 5.
+* Added: the following settings
+  * `MFA_FIDO2_RESIDENT_KEY`: Defaults to `Discouraged` which was the old behaviour
+  * `MFA_FIDO2_AUTHENTICATOR_ATTACHMENT`: If you like to have a PLATFORM Authenticator, Defaults to NONE
+  * `MFA_FIDO2_USER_VERIFICATION`:  If you need User Verification
+  * `MFA_FIDO2_ATTESTATION_PREFERENCE`: If you like to have an Attention
+  * `MFA_ENFORCE_EMAIL_TOKEN`: if you want the user to receive OTP by email without enrolling, if this the case, the system admins shall make sure that emails are valid.
+  * `MFA_SHOW_OTP_IN_EMAIL_SUBJECT`: If you like to show the OTP in the email subject
+  * `MFA_OTP_EMAIL_SUBJECT`: The subject of the email after the token allows placeholder '%s' for otp
+
 ## 2.9.0
 * Add: Set black as code formatter
 * Add: Add Pyre as a type checker
@@ -14,6 +32,7 @@
 * Fixed #70
 * Add QR Code for trusted device link
 * Better formatting for trusted device start page.
+
 ## 2.6.1
 * Fix: CVE-2022-42731: related to the possibility of registration replay attack.
   Thanks to 'SSE (Secure Systems Engineering)'

@@ -22,6 +22,7 @@ class User_Keys(models.Model):
     expires = models.DateTimeField(null=True, default=None, blank=True)
     last_used = models.DateTimeField(null=True, default=None, blank=True)
     owned_by_enterprise = models.BooleanField(default=None, null=True, blank=True)
+    user_handle = models.CharField(default=None, null=True, blank=True, max_length=255)
 
     def save(
         self, force_insert=False, force_update=False, using=None, update_fields=None

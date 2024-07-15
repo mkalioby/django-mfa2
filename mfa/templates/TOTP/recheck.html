@@ -12,17 +12,17 @@
         })
     }
 </script>
-<div class='container'>
-<div class="row">
 
-<div class="col-sm-10 col-sm-offset-1 col-xs-12 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
-<div class="panel panel-default card">
+
+
+
+<div class="card panel panel-default mx-auto mt-5 auth-card">
       <div class="panel-heading card-header">
 	      <strong> One Time Password</strong>
       </div>
       <div class="panel-body card-body">
 
-      <FORM METHOD="POST" ACTION="{% url 'totp_auth' %}" Id="formLogin" onSubmit="" name="FrontPage_Form1">
+      <FORM METHOD="POST" ACTION="{% url 'totp_auth' %}">
 
 
       {% csrf_token %}
@@ -31,33 +31,41 @@
               Sorry, The provided token is not valid.
           </div>
           {% endif %}
-      {% if quota %}
-          <div class="alert alert-warning">
-              {{ quota }}
-          </div>
-      {% endif %}
       <fieldset>
+      {% if mode == "auth" %}
       <div class="row">
-      <div class="col-sm-12 col-md-12">
+      <div class="offset-md-1 col-offset-md-1 col-md-10" align="center" >
+               Welcome back  {{ request.session.base_username }}<br/>
+                <a href="{% url 'mfa_reset_cookie' %}">Not me</a>
+                <br/>
+      </div>
+      </div>
+      {% endif %}
+      <div class="row">
+      <div class="col-sm-12 col-md-10 offset-md-1 col-offset-md-1">
         <p>Enter the 6-digits on your authenticator</p>
       </div>
       </div>
 
       <div class="row">
-	  <div class="col-sm-12 col-md-12">
+	  <div class="col-sm-12 col-md-10 offset-md-1 col-offset-md-1">
 	    <div class="form-group">
 	      <div class="input-group mb-3">
 		<span class="input-group-addon input-group-text">
-		<i class="glyphicon glyphicon-lock bi bi-lock"></i>
+		<i class="glyphicon glyphicon-lock fa fa-lock"></i>
 		</span>
-		<input class="form-control" size="6" MaxLength="6" value="" placeholder="e.g 55552" name="otp" type="text" id="otp" autofocus>
+		<input class="form-control" size="6" MaxLength="6"  autocomplete="one-time-code"  placeholder="e.g 55552"
+               name="otp" inputmode="numeric" pattern="\d{6}" type="text" id="otp" autofocus>
 
 	      </div>
 	    </div>
 
           <div class="form-group d-grid gap-2">
 
-            <input type="{% if mode == "auth" %}submit{% elif mode == 'recheck'  %}button{% endif %}" {% if mode == "recheck" %}onclick="send_totp()" {% endif %} class="btn btn-lg btn-success btn-block" value="Sign in">	      </div>
+            <button type="{% if mode == "auth" %}submit{% elif mode == 'recheck'  %}button{% endif %}" {% if mode == "recheck" %}onclick="send_totp()" {% endif %} class="btn btn-lg btn-success btn-block" >
+            Verify
+            </button>
+          </div>
       </div>
       </fieldset>
       </FORM>
@@ -70,8 +78,5 @@
         </div>
         </div>
 	      </div>
-              </div>
-	      </div>
-	      </div>
-</div>
+
 {% include "modal.html" %}

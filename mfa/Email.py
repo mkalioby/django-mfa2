@@ -10,22 +10,26 @@ from django.conf import settings
 from .models import User_Keys
 
 from .views import login
-from .Common import send
+from .Common import send, get_username_field, set_next_recheck
 
 
 def sendEmail(request, username, secret):
     """Send Email to the user after rendering `mfa_email_token_template`"""
-
-    User = get_user_model()
-    key = getattr(User, "USERNAME_FIELD", "username")
-    kwargs = {key: username}
+    User, UsernameField = get_username_field()
+    kwargs = {UsernameField: username}
     user = User.objects.get(**kwargs)
     res = render(
         request,
         "mfa_email_token_template.html",
         {"request": request, "user": user, "otp": secret},
     )
-    return send([user.email], "OTP", res.content.decode())
+    subject = getattr(settings, "MFA_OTP_EMAIL_SUBJECT", "OTP")
+    if getattr(settings, "MFA_SHOW_OTP_IN_EMAIL_SUBJECT", False):
+        if "%s" in subject:
+            subject = subject % secret
+        else:
+            subject = secret + " " + subject
+    return send([user.email], subject, res.content.decode())
 
 
 @never_cache
@@ -35,7 +39,8 @@ def start(request):
     if request.method == "POST":
         if request.session["email_secret"] == request.POST["otp"]:  # if successful
             uk = User_Keys()
-            uk.username = request.user.username
+            User, USERNAME_FIELD = get_username_field()
+            uk.username = USERNAME_FIELD
             uk.key_type = "Email"
             uk.enabled = 1
             uk.save()
@@ -64,8 +69,8 @@ def start(request):
                 )
         context["invalid"] = True
     else:
-        request.session["email_secret"] = str(
-            randint(0, 100000)
+        request.session["email_secret"] = str(randint(0, 1000000)).zfill(
+            6
         )  # generate a random integer
 
         if sendEmail(request, request.user.username, request.session["email_secret"]):
@@ -78,20 +83,23 @@ def auth(request):
     """Authenticating the user by email."""
     context = csrf(request)
     if request.method == "POST":
+        username = request.session["base_username"]
+
         if request.session["email_secret"] == request.POST["otp"].strip():
-            uk = User_Keys.objects.get(
-                username=request.session["base_username"], key_type="Email"
-            )
+            email_keys = User_Keys.objects.filter(username=username, key_type="Email")
+            if email_keys.exists():
+                uk = email_keys.first()
+            elif getattr(settings, "MFA_ENFORCE_EMAIL_TOKEN", False):
+                uk = User_Keys()
+                uk.username = username
+                uk.key_type = "Email"
+                uk.enabled = 1
+                uk.save()
+            else:
+                raise Exception("Email is not a valid method for this user")
+
             mfa = {"verified": True, "method": "Email", "id": uk.id}
-            if getattr(settings, "MFA_RECHECK", False):
-                mfa["next_check"] = datetime.datetime.timestamp(
-                    datetime.datetime.now()
-                    + datetime.timedelta(
-                        seconds=random.randint(
-                            settings.MFA_RECHECK_MIN, settings.MFA_RECHECK_MAX
-                        )
-                    )
-                )
+            mfa.update(set_next_recheck())
             request.session["mfa"] = mfa
 
             from django.utils import timezone
@@ -101,7 +109,7 @@ def auth(request):
             return login(request)
         context["invalid"] = True
     else:
-        request.session["email_secret"] = str(randint(0, 100000))
+        request.session["email_secret"] = str(randint(0, 1000000)).zfill(6)
         if sendEmail(
             request, request.session["base_username"], request.session["email_secret"]
         ):

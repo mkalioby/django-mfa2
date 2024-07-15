@@ -1,14 +1,14 @@
 import time
 import random
 import string
-import simplejson
+
 
 from django.shortcuts import render
 from django.views.decorators.cache import never_cache
 from django.template.context_processors import csrf
 from django.utils import timezone
 from django.contrib.auth.hashers import make_password, PBKDF2PasswordHasher
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.conf import settings
 from .Common import get_redirect_url
 from .models import User_Keys
@@ -58,7 +58,7 @@ def genTokens(request):
     uk.key_type = "RECOVERY"
     uk.enabled = True
     uk.save()
-    return HttpResponse(simplejson.dumps({"keys": clearKeys}))
+    return JsonResponse({"keys": clearKeys})
 
 
 def verify_login(request, username, token):
@@ -81,7 +81,7 @@ def getTokenLeft(request):
     keyLeft = 0
     for key in uk:
         keyLeft += len(key.properties["secret_keys"])
-    return HttpResponse(simplejson.dumps({"left": keyLeft}))
+    return JsonResponse({"left": keyLeft})
 
 
 def recheck(request):
@@ -92,13 +92,11 @@ def recheck(request):
             0
         ]:
             request.session["mfa"]["rechecked_at"] = time.time()
-            return HttpResponse(
-                simplejson.dumps({"recheck": True}), content_type="application/json"
-            )
+            return JsonResponse({"recheck": True})
+
         else:
-            return HttpResponse(
-                simplejson.dumps({"recheck": False}), content_type="application/json"
-            )
+            return JsonResponse({"recheck": False})
+
     return render(request, "RECOVERY/recheck.html", context)
 
 
@@ -123,10 +121,6 @@ def auth(request):
                     "id": resBackup[1],
                     "lastBackup": resBackup[2],
                 }
-                # if getattr(settings, "MFA_RECHECK", False):
-                #     mfa["next_check"] = datetime.datetime.timestamp((datetime.datetime.now()
-                #                             + datetime.timedelta(
-                #                 seconds=random.randint(settings.MFA_RECHECK_MIN, settings.MFA_RECHECK_MAX))))
                 request.session["mfa"] = mfa
                 if resBackup[2]:
                     # If the last bakup code has just been used, we return a response insead of redirecting to login

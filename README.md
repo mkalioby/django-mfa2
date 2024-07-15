@@ -80,6 +80,7 @@ Depends on
 
    ```python
    from django.conf.global_settings import PASSWORD_HASHERS as DEFAULT_PASSWORD_HASHERS #Preferably at the same place where you import your other modules
+   
    MFA_UNALLOWED_METHODS=()   # Methods that shouldn't be allowed for the user e.g ('TOTP','U2F',)
    MFA_LOGIN_CALLBACK=""      # A function that should be called by username to login the user in session
    MFA_RECHECK=True           # Allow random rechecking of the user
@@ -91,7 +92,7 @@ Depends on
    MFA_ALWAYS_GO_TO_LAST_METHOD = False # Always redirect the user to the last method used to save a click (Added in 2.6.0).
    MFA_RENAME_METHODS={} #Rename the methods in a more user-friendly way e.g {"RECOVERY":"Backup Codes"} (Added in 2.6.0)
    MFA_HIDE_DISABLE=('FIDO2',)     # Can the user disable his key (Added in 1.2.0).
-   MFA_OWNED_BY_ENTERPRISE = FALSE  # Who owns security keys   
+   MFA_OWNED_BY_ENTERPRISE = False   # Who owns security keys   
    PASSWORD_HASHERS = DEFAULT_PASSWORD_HASHERS # Comment if PASSWORD_HASHER already set in your settings.py
    PASSWORD_HASHERS += ['mfa.recovery.Hash'] 
    RECOVERY_ITERATION = 350000 #Number of iteration for recovery code, higher is more secure, but uses more resources for generation and check...
@@ -101,6 +102,16 @@ Depends on
    U2F_APPID="https://localhost"    #URL For U2F
    FIDO_SERVER_ID=u"localehost"      # Server rp id for FIDO2, it is the full domain of your project
    FIDO_SERVER_NAME=u"PROJECT_NAME"
+
+   import mfa
+   MFA_FIDO2_RESIDENT_KEY = mfa.ResidentKey.DISCOURAGED  # Resident Key allows a special User Handle
+   MFA_FIDO2_AUTHENTICATOR_ATTACHMENT = None  # Let the user choose
+   MFA_FIDO2_USER_VERIFICATION = None         # Verify User Presence
+   MFA_FIDO2_ATTESTATION_PREFERENCE = mfa.AttestationPreference.NONE
+   
+   MFA_ENFORCE_EMAIL_TOKEN = False          # If you want the user to receive OTP by email without enrolling, if this the case, the system admins shall make sure that emails are valid.
+   MFA_SHOW_OTP_IN_EMAIL_SUBJECT = False    #If you like to show the OTP in the email subject
+   MFA_OTP_EMAIL_SUBJECT= "OTP"       # The subject of the email after the token
    ```
    **Method Names**
    * U2F
@@ -115,8 +126,11 @@ Depends on
     * Starting version 1.7.0, Key owners can be specified.
     * Starting version 2.2.0
         * Added: `MFA_SUCCESS_REGISTRATION_MSG` & `MFA_REDIRECT_AFTER_REGISTRATION`
-    Start version 2.6.0
+    * Starting version 2.6.0
         * Added: `MFA_ALWAYS_GO_TO_LAST_METHOD`, `MFA_RENAME_METHODS`, `MFA_ENFORCE_RECOVERY_METHOD` & `RECOVERY_ITERATION`
+    * Starting version 3.0
+        * Added: `MFA_FIDO2_RESIDENT_KEY`, `MFA_FIDO2_AUTHENTICATOR_ATTACHMENT`, `MFA_FIDO2_USER_VERIFICATION`, `MFA_FIDO2_ATTESTATION_PREFERENCE`
+        * Added: `MFA_ENFORCE_EMAIL_TOKEN`, `MFA_SHOW_OTP_IN_EMAIL_SUBJECT`, `MFA_OTP_EMAIL_SUBJECT`
 4. Break your login function
 
    Usually your login function will check for username and password, log the user in if the username and password are correct and create the user session, to support mfa, this has to change

@@ -1,15 +1,16 @@
 import random
 import datetime
-import simplejson
+import time
+
 import pyotp
 from django.shortcuts import render
 from django.views.decorators.cache import never_cache
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.template.context_processors import csrf
 from django.conf import settings
 from django.utils import timezone
 from .views import login
-from .Common import get_redirect_url
+from .Common import get_redirect_url, set_next_recheck
 from .models import User_Keys
 
 
@@ -28,14 +29,12 @@ def recheck(request):
     context["mode"] = "recheck"
     if request.method == "POST":
         if verify_login(request, request.user.username, token=request.POST["otp"])[0]:
-            request.session["mfa"]["rechecked_at"] = time.time()
-            return HttpResponse(
-                simplejson.dumps({"recheck": True}), content_type="application/json"
-            )
+            mfa = request.session["mfa"]
+            mfa["rechecked_at"] = time.time()
+            mfa.update(set_next_recheck())
+            return JsonResponse({"recheck": True})
         else:
-            return HttpResponse(
-                simplejson.dumps({"recheck": False}), content_type="application/json"
-            )
+            return JsonResponse({"recheck": False})
     return render(request, "TOTP/recheck.html", context)
 
 
@@ -51,17 +50,7 @@ def auth(request):
             )
             if res[0]:
                 mfa = {"verified": True, "method": "TOTP", "id": res[1]}
-                if getattr(settings, "MFA_RECHECK", False):
-                    mfa["next_check"] = datetime.datetime.timestamp(
-                        (
-                            datetime.datetime.now()
-                            + datetime.timedelta(
-                                seconds=random.randint(
-                                    settings.MFA_RECHECK_MIN, settings.MFA_RECHECK_MAX
-                                )
-                            )
-                        )
-                    )
+                mfa.update(set_next_recheck())
                 request.session["mfa"] = mfa
                 return login(request)
         context["invalid"] = True
@@ -72,15 +61,14 @@ def getToken(request):
     secret_key = pyotp.random_base32()
     totp = pyotp.TOTP(secret_key)
     request.session["new_mfa_answer"] = totp.now()
-    return HttpResponse(
-        simplejson.dumps(
-            {
-                "qr": pyotp.totp.TOTP(secret_key).provisioning_uri(
-                    str(request.user.username), issuer_name=settings.TOKEN_ISSUER_NAME
-                ),
-                "secret_key": secret_key,
-            }
-        )
+    qr = pyotp.totp.TOTP(secret_key).provisioning_uri(
+        str(request.user.username), issuer_name=settings.TOKEN_ISSUER_NAME
+    )
+    return JsonResponse(
+        {
+            "qr": qr,
+            "secret_key": secret_key,
+        }
     )
 
 
