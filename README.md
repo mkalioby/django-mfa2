@@ -100,7 +100,7 @@ Depends on
    TOKEN_ISSUER_NAME="PROJECT_NAME"      #TOTP Issuer name
 
    U2F_APPID="https://localhost"    #URL For U2F
-   FIDO_SERVER_ID=u"localehost"      # Server rp id for FIDO2, it is the full domain of your project
+   FIDO_SERVER_ID=u"localhost"      # Server rp id for FIDO2, it is the full domain of your project
    FIDO_SERVER_NAME=u"PROJECT_NAME"
 
    import mfa
