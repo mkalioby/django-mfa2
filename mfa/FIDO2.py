@@ -1,4 +1,5 @@
 import json
+from base64 import urlsafe_b64encode
 
 from fido2.server import Fido2Server, PublicKeyCredentialRpEntity
 from fido2.webauthn import RegistrationResponse
@@ -58,7 +59,7 @@ def begin_registeration(request):
     user_verification = getattr(settings, "MFA_FIDO2_USER_VERIFICATION", None)
     registration_data, state = server.register_begin(
         {
-            "id": request.user.username.encode("utf8"),
+            "id":urlsafe_b64encode(request.user.username.encode("utf8")),
             "name": request.user.username,
             "displayName": request.user.username,
         },
