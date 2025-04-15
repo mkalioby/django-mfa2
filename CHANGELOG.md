@@ -1,5 +1,9 @@
 # Change Log
 
+## 3.0.1
+
+* Fix: Issue with some usernames that crashes FIDO2 registration.
+
 ## 3.0
 
 This is a major cleanup and CSS adjustments so please test before deployment.
