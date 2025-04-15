@@ -104,8 +104,9 @@ def complete_reg(request):
         }
         uk.owned_by_enterprise = getattr(settings, "MFA_OWNED_BY_ENTERPRISE", False)
         uk.key_type = "FIDO2"
-        if auth_data.credential_data.credential_id:
-            uk.user_handle = auth_data.credential_data.credential_id
+        if data.get("id"):
+            uk.user_handle = data.get('id')
+
         uk.save()
         if (
             getattr(settings, "MFA_ENFORCE_RECOVERY_METHOD", False)
@@ -190,7 +191,7 @@ def authenticate_complete(request):
             username = request.user.username
         server = getServer()
         data = json.loads(request.body)
-        userHandle = data.get("response", {}).get("userHandle")
+        userHandle = data['id']
         credential_id = data["id"]
 
         if userHandle:
@@ -205,12 +206,16 @@ def authenticate_complete(request):
                             websafe_decode(keys[0].properties["device"])
                         )
                     ]
+                else:
+                    credentials = getUserCredentials(username)
         elif credential_id and username is None:
             keys = User_Keys.objects.filter(user_handle=credential_id)
             if keys.exists():
                 credentials = [
                     AttestedCredentialData(websafe_decode(keys[0].properties["device"]))
                 ]
+            else:
+                credentials = getUserCredentials(username)
         else:
             credentials = getUserCredentials(username)
 
@@ -221,16 +226,13 @@ def authenticate_complete(request):
                 response=data,
             )
         except ValueError:
-            return (
-                JsonResponse(
+            return JsonResponse(
                     {
                         "status": "ERR",
                         "message": "Wrong challenge received, make sure that this is your security and try again.",
                     },
                     status=400,
                 ),
-            )
-
         except Exception as excep:
             return JsonResponse({"status": "ERR", "message": str(excep)}, status=500)
 
@@ -240,7 +242,7 @@ def authenticate_complete(request):
             return JsonResponse({"status": "OK"})
 
         else:
-            if keys is None:
+            if keys is None or len(keys)==0:
                 keys = User_Keys.objects.filter(
                     username=username, key_type="FIDO2", enabled=1
                 )

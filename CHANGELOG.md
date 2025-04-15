@@ -1,5 +1,10 @@
 # Change Log
 
+## 3.1
+
+* Upgraded to fido==1.2.0
+* Fix: issue when finding the user based on credential id
+
 ## 3.0.1
 
 * Fix: Issue with some usernames that crashes FIDO2 registration.
