@@ -6,7 +6,8 @@
     function confirmDel(id) {
         $.ajax({
             url:"{% url 'mfa_delKey' %}",
-            data:{"id":id},
+            method: "POST",
+            data:{"id":id,"csrfmiddlewaretoken":"{{ csrf_token }}"},
             success:function (data) {
                 alert(data)
                 window.location.reload();

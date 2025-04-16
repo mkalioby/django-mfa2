@@ -3,7 +3,8 @@
 ## 3.1
 
 * Upgraded to fido==1.2.0
-* Fix: issue when finding the user based on credential id
+* Fix: issue when finding the user based on credential id.
+* Fix: Move key delete to be POST call. Thanks to @AndreasDickow
 
 ## 3.0.1
 
