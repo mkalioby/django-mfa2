@@ -1,141 +1,130 @@
 {% extends "base.html" %}
 {% load static %}
 {% block head %}
+    <link href="{% static 'mfa/css/mfa.css' %}" rel="stylesheet">
     <script src="{% static 'mfa/js/qrious.min.js' %}" type="text/javascript"></script>
-    <style>
-    #two-factor-steps {
-	border: 1px solid #ccc;
-	border-radius: 3px;
-	padding: 15px;
-}
-    .row{
-        margin: 0px;
-    }
-    </style>
-
     <script type="text/javascript">
-    $(document).ready(function (){
-        var qr = new QRious({
-          element: document.getElementById('qr'),
-          value: "{{ url }}?u={{ request.user.username }}&k={{ key }}"
-        });
-    })
-    function sendEmail() {
-        $("#modal-title").html("Send Link")
-        $("#modal-body").html("Sending Email, Please wait....");
-        $("#popUpModal").modal('show');
-        $.ajax({
-            "url":"{% url 'td_sendemail' %}",
-            success:function (data) {
-                alert(data);
-                $("#popUpModal").modal('toggle')
-
-            }
+        $(document).ready(function () {
+            var qr = new QRious({
+                element: document.getElementById('qr'),
+                value: "{{ url }}?u={{ request.user.username }}&k={{ key }}"
+            });
         })
-    }
-    function failedMFA() {
-        $("#modal-body").html("<div class='alert alert-danger'>Failed to validate you, please <a href='javascript:void(0)' onclick='getUserAgent()'>try again</a></div>")
-    }
-    function checkMFA() {
-        recheck_mfa(trustDevice,failedMFA,true)
-    }
-    function trustDevice() {
 
-        $.ajax(
-            {
-
-                "url":"{% url 'td_trust_device' %}",
+        function sendEmail() {
+            $("#modal-title").html("Send Link")
+            $("#modal-body").html("Sending Email, Please wait....");
+            $("#popUpModal").modal('show');
+            $.ajax({
+                "url": "{% url 'td_sendemail' %}",
                 success: function (data) {
-                    if (data == "OK")
-                    {
-                        alert("Your are done, your device should show final confirmation")
-                        window.location.href="{% url 'mfa_home' %}"
+                    alert(data);
+                    $("#popUpModal").modal('toggle')
 
+                }
+            })
+        }
+
+        function failedMFA() {
+            $("#modal-body").html("<div class='alert alert-danger'>Failed to validate you, please <a href='javascript:void(0)' onclick='getUserAgent()'>try again</a></div>")
+        }
+
+        function checkMFA() {
+            recheck_mfa(trustDevice, failedMFA, true)
+        }
+
+        function trustDevice() {
+
+            $.ajax(
+                {
+
+                    "url": "{% url 'td_trust_device' %}",
+                    success: function (data) {
+                        if (data == "OK") {
+                            alert("Your are done, your device should show final confirmation")
+                            window.location.href = "{% url 'mfa_home' %}"
+
+                        }
                     }
                 }
-            }
-        )
-    }
-    function getUserAgent() {
-        $.ajax({
-            "url":"{% url 'td_get_useragent' %}",success: function(data)
-            {
-                if (data == "")
-                    setTimeout('getUserAgent()',5000)
-                else
-                {
-                    $("#modal-title").html("Confirm Trusted Device")
-                    $("#actionBtn").remove();
-                    $("#modal-footer").prepend("<button id='actionBtn' class='btn btn-success' onclick='checkMFA()'>Trust Device</button>")
-                    $("#modal-body").html(data)
-                    $("#popUpModal").modal('show');
-                }
-            }
-        })
+            )
+        }
 
-    }
-    $(document).ready(getUserAgent())
+        function getUserAgent() {
+            $.ajax({
+                "url": "{% url 'td_get_useragent' %}", success: function (data) {
+                    if (data == "")
+                        setTimeout('getUserAgent()', 5000)
+                    else {
+                        $("#modal-title").html("Confirm Trusted Device")
+                        $("#actionBtn").remove();
+                        $("#modal-footer").prepend("<button id='actionBtn' class='btn btn-success' onclick='checkMFA()'>Trust Device</button>")
+                        $("#modal-body").html(data)
+                        $("#popUpModal").modal('show');
+                    }
+                }
+            })
+
+        }
+
+        $(document).ready(getUserAgent())
     </script>
 {% endblock %}
 {% block content %}
-      <br/>
+    <br/>
     <br/>
     <div class="container">
         <div class="col-md-6 col-md-offset-3" id="two-factor-steps">
-            <div class="row" align="center">
+            <div class="row text-center">
                 <h4>Add Trusted Device</h4>
             </div>
-
-    <div class="row" >
-        {%  if not_allowed %}
-            <div class="alert alert-danger">You can't add any more devices, you need to remove previously trusted devices first.</div>
-        {% else %}
-    <p style="color: green">Allow access from mobile phone and tables.</p><br/>
-            <br/>
-            </div>
             <div class="row">
-                <h5>Steps:</h5>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6">
-                    <h5>Using Camera</h5>
-                    <ol>
-            <li>Using your mobile/table, open Chrome/Firefox.</li>
-            <li>Scan the following barcode <br/>
-                <img id="qr"/> <br/>
-            </li>
-            <li>Confirm the consent and submit form.</li>
-        </ol>
-                </div>
-
-
-            <div class="col-md-6">
-            <h5>Manual</h5>
-            <ol>
-            <li>Using your mobile/table, open Chrome/Firefox.</li>
-                <li>Go to <b>{{ url }}</b>&nbsp;&nbsp;</li>
-            <li>Enter your username & following 6 digits<br/>
-                <span style="font-size: 16px;font-weight: bold; margin-left: 50px">{{ key|slice:":3" }} - {{ key|slice:"3:" }}</span>
-            </li>
-                <li>Confirm the consent and submit form.</li>
-                </div>
-            </div>
-            <div class="row">
-            <div class="col-md-8 offset-2">
-           This window will ask to confirm the device.
-            </div>
-            </div>
-
-
-    {% endif %}
-    </div>
+                {% if not_allowed %}
+                    <div class="alert alert-danger">You can't add any more devices, you need to remove previously
+                        trusted devices first.
+                    </div>
+                {% else %}
+                    <p class="success-message">Allow access from mobile phone and tables.</p><br/>
+                    <br/>
+                    </div>
+                    <div class="row">
+                        <h5>Steps:</h5>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Using Camera</h5>
+                            <ol>
+                                <li>Using your mobile/table, open Chrome/Firefox.</li>
+                                <li>Scan the following barcode <br/>
+                                    <img id="qr"/> <br/>
+                                </li>
+                                <li>Confirm the consent and submit form.</li>
+                            </ol>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Manual</h5>
+                            <ol>
+                                <li>Using your mobile/table, open Chrome/Firefox.</li>
+                                <li>Go to <b>{{ url }}</b>&nbsp;&nbsp;</li>
+                                <li>Enter your username & following 6 digits<br/>
+                                    <span class="td-digits">{{ key|slice:":3" }} - {{ key|slice:"3:" }}</span>
+                                </li>
+                                <li>Confirm the consent and submit form.</li>
+                            </ol>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-8 offset-2">
+                            This window will ask to confirm the device.
+                        </div>
+                    </div>
+                {% endif %}
         </div>
-
+    </div>
     <br/>
-        <br/>
-        <br/>
-        <br/>
+    <br/>
+    <br/>
+    <br/>
     {% include "modal.html" %}
     {% include 'mfa_check.html' %}
 {% endblock %}

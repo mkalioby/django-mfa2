@@ -1,133 +1,108 @@
-
 {% extends "base.html" %}
 {% load static %}
 {% block head %}
-<style>
-    #two-factor-steps {
-	border: 1px solid #ccc;
-	border-radius: 3px;
-	padding: 15px;
-    }
-    .row{
-        margin: 0px;
-    }
-    .toolbtn {
-        border-radius: 7px;
-        cursor: pointer;
-    }
-    .toolbtn:hover {
-        background-color: gray;
-        transition: 0.2s;
-    }
-    .toolbtn:active {
-        background-color: green;
-        transition: 0.2s;
-    }
-    </style>
-<script src="{% static 'mfa/js/qrious.min.js' %}" type="text/javascript"></script>
-<script type="text/javascript">
-    var key="";
-    $(document).ready(function addToken() {
-        $.ajax({
-            "url":"{% url 'get_new_otop' %}",dataType:"JSON",
-            success:function (data) {
-                window.key=data.secret_key;
-                var qr = new QRious({
-          element: document.getElementById('qr'),
-          value: data.qr
+    <link href="{% static 'mfa/css/mfa.css' %}" rel="stylesheet">
+    <script src="{% static 'mfa/js/qrious.min.js' %}" type="text/javascript"></script>
+    <script type="text/javascript">
+        var key = "";
+        $(document).ready(function addToken() {
+            $.ajax({
+                "url": "{% url 'get_new_otop' %}", dataType: "JSON",
+                success: function (data) {
+                    window.key = data.secret_key;
+                    var qr = new QRious({
+                        element: document.getElementById('qr'),
+                        value: data.qr
+                    });
+                    $("#second_step").show()
+                }
+            })
         });
-                $("#second_step").show()
-            }
-        })
-    });
-    function showKey() {
-        const htmlkey = `
+
+        function showKey() {
+            const htmlkey = `
             <div class="row">
                 <div class="col-11">
-                    <pre id="totp_secret">`+window.key+`</pre>
+                    <pre id="totp_secret">` + window.key + `</pre>
                 </div>
                 <div class="col-1">
                     <span onclick=navigator.clipboard.writeText($("#totp_secret").text()) class="fa fa-clipboard toolbtn"></span>
                 </div>
             </div>`
-        $("#modal-title").html("Your Secret Key")
-        $("#modal-body").html(htmlkey)
-        $("#popUpModal").modal('show')
-    }
-    function verify() {
-        answer=$("#answer").val()
-        $.ajax({
-            "url":"{% url 'verify_otop' %}?key="+key+ "&answer="+answer,
-            success:function (data) {
-            if (data =='Success')
-                $("#res").html("<div class='alert alert-success'>Your authenticator is registered successfully, <a href='{{redirect_html}}'> {{reg_success_msg}}</a></div>")
-      else if (data == "RECOVERY")
-      {
-         setTimeout(function (){location.href="{% url 'manage_recovery_codes' %}"},2500)
-        $("#res").html("<div class='alert alert-success'>Your authenticator is registered successfully, but <a href='{% url 'manage_recovery_codes' %}'>redirecting to {{ RECOVERY_METHOD }} method</a></div>")
-      }
-      else
-        $("#res").html("<div class='alert alert-danger'>The code provided doesn't match the key, please try again or <a href='{% url 'mfa_home' %}'> Go to Security Home</a></div>")
+            $("#modal-title").html("Your Secret Key")
+            $("#modal-body").html(htmlkey)
+            $("#popUpModal").modal('show')
+        }
 
-            }
-        })
-    }
-    function showTOTP() {
-        $("#modal-title").html("One Time Password Apps")
-        html="<div class='row'><ul>"+
-            "<li>Android: <a href='https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2' target='_blank'>Google Authenticator</a> | <a href='https://play.google.com/store/apps/details?id=com.authy.authy' target='_blank'>Authy</a></li>"
-        html+="<li>iPhone/iPad: <a href='https://itunes.apple.com/us/app/authy/id494168017' target='_blank'>Authy</a></li> "
-        html+="<li>Chrome: <a href='https://chrome.google.com/webstore/detail/authenticator/bhghoamapcdpbohphigoooaddinpkbai?hl=en'>Google Authenticator</a> | <a href='https://chrome.google.com/webstore/detail/authy/gaedmjdfmmahhbjefcbgaolhhanlaolb?hl=en' target='_blank'>Authy</a></li>"
-        html+="</ul></div>"
-        $("#modal-body").html(html)
-        $('#popUpModal').modal('show')
-    }
+        function verify() {
+            answer = $("#answer").val()
+            $.ajax({
+                "url": "{% url 'verify_otop' %}?key=" + key + "&answer=" + answer,
+                success: function (data) {
+                    if (data == 'Success')
+                        $("#res").html("<div class='alert alert-success'>Your authenticator is registered successfully, <a href='{{redirect_html}}'> {{reg_success_msg}}</a></div>")
+                    else if (data == "RECOVERY") {
+                        setTimeout(function () {
+                            location.href = "{% url 'manage_recovery_codes' %}"
+                        }, 2500)
+                        $("#res").html("<div class='alert alert-success'>Your authenticator is registered successfully, but <a href='{% url 'manage_recovery_codes' %}'>redirecting to {{ RECOVERY_METHOD }} method</a></div>")
+                    } else
+                        $("#res").html("<div class='alert alert-danger'>The code provided doesn't match the key, please try again or <a href='{% url 'mfa_home' %}'> Go to Security Home</a></div>")
+
+                }
+            })
+        }
+
+        function showTOTP() {
+            $("#modal-title").html("One Time Password Apps")
+            html = "<div class='row'><ul>" +
+                "<li>Android: <a href='https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2' target='_blank'>Google Authenticator</a> | <a href='https://play.google.com/store/apps/details?id=com.authy.authy' target='_blank'>Authy</a></li>"
+            html += "<li>iPhone/iPad: <a href='https://itunes.apple.com/us/app/authy/id494168017' target='_blank'>Authy</a></li> "
+            html += "<li>Chrome: <a href='https://chrome.google.com/webstore/detail/authenticator/bhghoamapcdpbohphigoooaddinpkbai?hl=en'>Google Authenticator</a> | <a href='https://chrome.google.com/webstore/detail/authy/gaedmjdfmmahhbjefcbgaolhhanlaolb?hl=en' target='_blank'>Authy</a></li>"
+            html += "</ul></div>"
+            $("#modal-body").html(html)
+            $('#popUpModal').modal('show')
+        }
     </script>
 {% endblock %}
 {% block content %}
-<br/>
-<br/>
-<div class="container d-flex justify-content-center">
-    <div class="col-md-6 col-md-offset-3" id="two-factor-steps">
-        <div class="row" align="center">
-            <h4>Adding a new {{ method.name }}</h4>
-        </div>
-        <div class="row">
-
-            <p>Scan the image below with the two-factor authentication app on your <a href="javascript:void(0)" onclick="showTOTP()">phone/PC</a>. If you can’t use a barcode,
-                <a href="javascript:void(0)" onclick="showKey()">enter this text</a> instead. </p>
-        </div>
-        <div id="res">
-
-        </div>
-        <div class="row" style="text-align: center">
-
-            <div align="center" style="display: none;text-align: center;align-content: center" id="second_step">
-
-                <img id="qr"/>
-
-            </div>
-        </div>
+    <br/>
+    <br/>
+    <div class="container d-flex justify-content-center">
+        <div class="col-md-6 col-md-offset-3" id="two-factor-steps">
             <div class="row">
-
+                <h4>Adding a new {{ method.name }}</h4>
+            </div>
+            <div class="row">
+                <p>Scan the image below with the two-factor authentication app on your <a href="javascript:void(0)" onclick="showTOTP()">phone/PC</a>.
+                    If you can’t use a barcode,
+                    <a href="javascript:void(0)" onclick="showKey()">enter this text</a> instead.
+                </p>
+            </div>
+            <div id="res">
+            </div>
+            <div class="row text-center">
+                <div id="second_step">
+                    <img id="qr"/>
+                </div>
+            </div>
+            <div class="row">
                 <p><b>Enter the six-digit code from the application</b></p>
-                <p style="color: #333333;font-size: 10px">After scanning the barcode image, the app will display a six-digit code that you can enter below. </p>
-
+                <p class="font-10 color-gray">After scanning the barcode image, the app will display a
+                    six-digit code that you can enter below. </p>
             </div>
             <div class="row">
                 <div class="offset-md-4 col-md-4">
-                <input style="display: inline;width: 95%" maxlength="6" size="6" class="form-control" id="answer" placeholder="e.g 785481"/>
+                    <input maxlength="6" size="6" class="form-control" id="answer" placeholder="e.g 785481"/>
                 </div>
             </div>
-            <div class="row" style="padding-top: 10px;">
-                <div class="col-md-4 offset-md-4" style="padding-left: 0px">
+            <div class="row padding-top-10">
+                <div class="col-md-4 offset-md-4 padding-left-0">
                     <button class="btn btn-success" onclick="verify()">Enable</button>
                     <a href="{% url 'mfa_home' %}" class="btn btn-default btn-secondary" role="button">Cancel</a>
                 </div>
             </div>
         </div>
-
     </div>
-</div>
-{% include "modal.html" %}
+    {% include "modal.html" %}
 {% endblock %}

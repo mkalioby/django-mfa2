@@ -1,82 +1,80 @@
-<script type="application/javascript">
-    function send_totp() {
-        $.ajax({"url":"{% url 'totp_recheck' %}", method:"POST",dataType:"JSON",
-            data:{"csrfmiddlewaretoken":"{{ csrf_token }}","otp":$("#otp").val()},
-         success:function (data) {
-                            if (data["recheck"])
-                                mfa_success_function();
-                            else {
-                                mfa_failed_function();
-                            }
-                        }
-        })
-    }
-</script>
-
-
-
-
-<div class="card panel panel-default mx-auto mt-5 auth-card">
-      <div class="panel-heading card-header">
-	      <strong> One Time Password</strong>
-      </div>
-      <div class="panel-body card-body">
-
-      <FORM METHOD="POST" ACTION="{% url 'totp_auth' %}">
-
-
-      {% csrf_token %}
-          {%  if invalid %}
-          <div class="alert alert-danger">
-              Sorry, The provided token is not valid.
-          </div>
-          {% endif %}
-      <fieldset>
-      {% if mode == "auth" %}
-      <div class="row">
-      <div class="offset-md-1 col-offset-md-1 col-md-10" align="center" >
-               Welcome back  {{ request.session.base_username }}<br/>
-                <a href="{% url 'mfa_reset_cookie' %}">Not me</a>
-                <br/>
-      </div>
-      </div>
-      {% endif %}
-      <div class="row">
-      <div class="col-sm-12 col-md-10 offset-md-1 col-offset-md-1">
-        <p>Enter the 6-digits on your authenticator</p>
-      </div>
-      </div>
-
-      <div class="row">
-	  <div class="col-sm-12 col-md-10 offset-md-1 col-offset-md-1">
-	    <div class="form-group">
-	      <div class="input-group mb-3">
-		<span class="input-group-addon input-group-text">
-		<i class="glyphicon glyphicon-lock fa fa-lock"></i>
-		</span>
-		<input class="form-control" size="6" MaxLength="6"  autocomplete="one-time-code"  placeholder="e.g 55552"
-               name="otp" inputmode="numeric" pattern="\d{6}" type="text" id="otp" autofocus>
-
-	      </div>
-	    </div>
-
-          <div class="form-group d-grid gap-2">
-
-            <button type="{% if mode == "auth" %}submit{% elif mode == 'recheck'  %}button{% endif %}" {% if mode == "recheck" %}onclick="send_totp()" {% endif %} class="btn btn-lg btn-success btn-block" >
-            Verify
-            </button>
-          </div>
-      </div>
-      </fieldset>
-      </FORM>
-      </div>
+{% load static %}
+{% block head %}
+    <link href="{% static 'mfa/css/mfa.css' %}" rel="stylesheet">
+    <script type="application/javascript">
+        function send_totp() {
+            $.ajax({
+                "url": "{% url 'totp_recheck' %}", method: "POST", dataType: "JSON",
+                data: {"csrfmiddlewaretoken": "{{ csrf_token }}", "otp": $("#otp").val()},
+                success: function (data) {
+                    if (data["recheck"])
+                        mfa_success_function();
+                    else {
+                        mfa_failed_function();
+                    }
+                }
+            })
+        }
+    </script>
+{% endblock %}
+{% block content %}
+    <div class="card panel panel-default mx-auto mt-5 auth-card">
+        <div class="panel-heading card-header">
+            <strong> One Time Password</strong>
+        </div>
+        <div class="panel-body card-body">
+            <FORM METHOD="POST" ACTION="{% url 'totp_auth' %}">
+                {% csrf_token %}
+                {% if invalid %}
+                    <div class="alert alert-danger">
+                        Sorry, The provided token is not valid.
+                    </div>
+                {% endif %}
+                <fieldset>
+                    {% if mode == "auth" %}
+                        <div class="row">
+                            <div class="offset-md-1 col-offset-md-1 col-md-10 text-center">
+                                Welcome back {{ request.session.base_username }}<br/>
+                                <a href="{% url 'mfa_reset_cookie' %}">Not me</a>
+                                <br/>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <div class="row">
+                        <div class="col-sm-12 col-md-10 offset-md-1 col-offset-md-1">
+                            <p>Enter the 6-digits on your authenticator</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 col-md-10 offset-md-1 col-offset-md-1">
+                            <div class="form-group">
+                                <div class="input-group mb-3">
+                                    <span class="input-group-addon input-group-text">
+                                    <i class="glyphicon glyphicon-lock fa fa-lock"></i>
+                                    </span>
+                                    <input class="form-control" size="6" MaxLength="6" autocomplete="one-time-code"
+                                           placeholder="e.g 55552"
+                                           name="otp" inputmode="numeric" pattern="\d{6}" type="text" id="otp" autofocus>
+                                </div>
+                            </div>
+                            <div class="form-group d-grid gap-2">
+                                <button type="{% if mode == "auth" %}submit{% elif mode == 'recheck' %}button{% endif %}"
+                                        {% if mode == "recheck" %}onclick="send_totp()" {% endif %}
+                                        class="btn btn-lg btn-success btn-block">
+                                    Verify
+                                </button>
+                            </div>
+                        </div>
+                </fieldset>
+            </FORM>
+        </div>
         <div class="row">
-        <div class="col-md-12 mb-3" style="padding-left: 25px">
-            {% if request.session.mfa_methods|length > 1 %}
-                <a href="{%  url 'mfa_methods_list' %}">Select Another Method</a>
-            {% endif %}
+            <div class="col-md-12 mb-3 padding-left-25">
+                {% if request.session.mfa_methods|length > 1 %}
+                    <a href="{% url 'mfa_methods_list' %}">Select Another Method</a>
+                {% endif %}
+            </div>
         </div>
-        </div>
-	      </div>
-
-{% include "modal.html" %}
+    </div>
+    {% include "modal.html" %}
+{% endblock %}

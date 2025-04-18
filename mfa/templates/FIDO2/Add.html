@@ -1,90 +1,85 @@
 {% extends "base.html" %}
 {% load static %}
 {% block head %}
-    <script type="application/javascript" src="{% static 'mfa/js/ua-parser.min.js'%}"></script>
-    <script type="application/javascript" src="{% static 'mfa/js/base64url.js'%}"></script>
-    <script type="application/javascript" src="{% static 'mfa/js/helpers.js'%}"></script>
+    <link href="{% static 'mfa/css/mfa.css' %}" rel="stylesheet">
+    <script type="application/javascript" src="{% static 'mfa/js/ua-parser.min.js' %}"></script>
+    <script type="application/javascript" src="{% static 'mfa/js/base64url.js' %}"></script>
+    <script type="application/javascript" src="{% static 'mfa/js/helpers.js' %}"></script>
     <script type="application/javascript">
-    var MakeCredReq = (makeCredReq) => {
+        var MakeCredReq = (makeCredReq) => {
             makeCredReq.publicKey.challenge = base64url.decode(makeCredReq.publicKey.challenge);
-            makeCredReq.publicKey.user.id   = base64url.decode(makeCredReq.publicKey.user.id);
+            makeCredReq.publicKey.user.id = base64url.decode(makeCredReq.publicKey.user.id);
 
-            for(let excludeCred of makeCredReq.publicKey.excludeCredentials) {
+            for (let excludeCred of makeCredReq.publicKey.excludeCredentials) {
                 excludeCred.id = base64url.decode(excludeCred.id);
             }
 
             return makeCredReq
         }
-    function begin_reg(){
-    fetch('{% url 'fido2_begin_reg' %}',{}).then(function(response) {
-      if(response.ok)
-      {
-          return response.json().then(function (req){
-              return MakeCredReq(req)
-          });
-      }
-      throw new Error('Error getting registration data!');
-    }).then(function(options) {
 
-        //options.publicKey.attestation="direct"
-        console.log(options)
+        function begin_reg() {
+            fetch('{% url 'fido2_begin_reg' %}', {}).then(function (response) {
+                if (response.ok) {
+                    return response.json().then(function (req) {
+                        return MakeCredReq(req)
+                    });
+                }
+                throw new Error('Error getting registration data!');
+            }).then(function (options) {
 
-      return navigator.credentials.create(options);
-    }).then(function(attestation) {
-      return fetch('{% url 'fido2_complete_reg' %}', {
-        method: 'POST',
-        body: JSON.stringify(publicKeyCredentialToJSON(attestation))
-      });
-    }).then(function(response) {
+                //options.publicKey.attestation="direct"
+                console.log(options)
 
-        var stat = response.ok ? 'successful' : 'unsuccessful';
-        return response.json()
-    }).then(function (res)
-        {
-      if (res["status"] =='OK')
-        $("#res").html("<div class='alert alert-success'>Registered Successfully, <a href='{{redirect_html}}'> {{reg_success_msg}}</a></div>")
-      else if (res['status'] = "RECOVERY")
-      {
-          setTimeout(function (){location.href="{% url 'manage_recovery_codes' %}"},2500)
-        $("#res").html("<div class='alert alert-success'>Registered Successfully, but <a href='{% url 'manage_recovery_codes' %}'>redirecting to {{ RECOVERY_METHOD }} method</a></div>")
-      }
-      else
-        $("#res").html("<div class='alert alert-danger'>Registration Failed as " + res["message"] + ", <a href='javascript:void(0)' onclick='begin_reg()'> try again or <a href='{% url 'mfa_home' %}'> Go to Security Home</a></div>")
+                return navigator.credentials.create(options);
+            }).then(function (attestation) {
+                return fetch('{% url 'fido2_complete_reg' %}', {
+                    method: 'POST',
+                    body: JSON.stringify(publicKeyCredentialToJSON(attestation))
+                });
+            }).then(function (response) {
+
+                var stat = response.ok ? 'successful' : 'unsuccessful';
+                return response.json()
+            }).then(function (res) {
+                if (res["status"] == 'OK')
+                    $("#res").html("<div class='alert alert-success'>Registered Successfully, <a href='{{redirect_html}}'> {{reg_success_msg}}</a></div>")
+                else if (res['status'] = "RECOVERY") {
+                    setTimeout(function () {
+                        location.href = "{% url 'manage_recovery_codes' %}"
+                    }, 2500)
+                    $("#res").html("<div class='alert alert-success'>Registered Successfully, but <a href='{% url 'manage_recovery_codes' %}'>redirecting to {{ RECOVERY_METHOD }} method</a></div>")
+                } else
+                    $("#res").html("<div class='alert alert-danger'>Registration Failed as " + res["message"] + ", <a href='javascript:void(0)' onclick='begin_reg()'> try again or <a href='{% url 'mfa_home' %}'> Go to Security Home</a></div>")
 
 
-    }, function(reason) {
-       $("#res").html("<div class='alert alert-danger'>Registration Failed as " +reason +", <a href='javascript:void(0)' onclick='begin_reg()'> try again </a> or <a href='{% url 'mfa_home' %}'> Go to Security Home</a></div>")
-    })
-    }
-    $(document).ready(function (){
-        ua=new UAParser().getResult()
-        if (ua.browser.name == "Safari" || ua.browser.name == "Mobile Safari" )
-        {
+            }, function (reason) {
+                $("#res").html("<div class='alert alert-danger'>Registration Failed as " + reason + ", <a href='javascript:void(0)' onclick='begin_reg()'> try again </a> or <a href='{% url 'mfa_home' %}'> Go to Security Home</a></div>")
+            })
+        }
+
+        $(document).ready(function () {
+            ua = new UAParser().getResult()
+            if (ua.browser.name == "Safari" || ua.browser.name == "Mobile Safari") {
                 $("#res").html("<button class='btn btn-success' onclick='begin_reg()'>Start...</button>")
-        }
-        else
-        {
-            setTimeout(begin_reg, 500)
-        }
-    })
+            } else {
+                setTimeout(begin_reg, 500)
+            }
+        })
     </script>
-
 {% endblock %}
 {% block content %}
-      <br/>
     <br/>
-     <div class="container">
-     <div class="panel panel-default card">
-      <div class="panel-heading card-header">
-	      <strong> Adding a New {{ method.name }}</strong>
-      </div>
-      <div class="panel-body card-body">
-
-
-    <div class="row alert alert-pr" id="res" align="center">
-    <p style="color: green">Your browser should ask you to confirm you identity.</p>
-
-    </div>
+    <br/>
+    <div class="container">
+        <div class="panel panel-default card">
+            <div class="panel-heading card-header">
+                <strong> Adding a New {{ method.name }}</strong>
+            </div>
+            <div class="panel-body card-body">
+                <div class="row alert alert-pr.success-message " id="res">
+                    <p class="success-message">Your browser should ask you to confirm you identity.</p>
+                </div>
+            </div>
         </div>
     </div>
     {% include "modal.html" %}
