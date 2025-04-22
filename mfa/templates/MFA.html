@@ -3,41 +3,12 @@
 {% block head %}
     {{ block.super }}
     <link href="{% static 'mfa/css/mfa.css' %}" rel="stylesheet">
-    <script type="text/javascript">
-        function confirmDel(id) {
-            $.ajax({
-                url: "{% url 'mfa_delKey' %}",
-                method: "POST",
-                data: {"id": id, "csrfmiddlewaretoken": "{{ csrf_token }}"},
-                success: function (data) {
-                    alert(data)
-                    window.location.reload();
-                }
-            })
-        }
-
-        function deleteKey(id, name) {
-            $("#modal-title").html("Confirm Delete")
-            $("#modal-body").html("Are you sure you want to delete '" + name + "'? you may lose access to your system if this your only 2FA.");
-            $("#actionBtn").remove()
-            $("#modal-footer").prepend("<button id='actionBtn' class='btn btn-danger' onclick='confirmDel(" + id + ")'>Confirm Deletion</button>")
-            $("#popUpModal").modal('show')
-        }
-
-        function toggleKey(id) {
-            $.ajax({
-                url: "{% url 'toggle_key' %}?id=" + id,
-                success: function (data) {
-                    if (data == "Error")
-                        $("#toggle_" + id).toggle()
-
-                },
-                error: function (data) {
-                    $("#toggle_" + id).toggle()
-                }
-            })
-        }
-    </script>
+    {% url 'mfa_delKey' as mfa_delKey %}
+    {{ mfa_delKey|json_script:"mfa_delKey" }}
+    {{ csrf_token|stringformat:"s"|json_script:"csrf_token" }}
+    {% url 'toggle_key' as toggle_key %}
+    {{ toggle_key|json_script:"toggle_key" }}
+    <script type="application/javascript" src="{% static 'mfa/js/mfa.js' %}"></script>
     <link href="{% static  'mfa/css/bootstrap-toggle.min.css' %}" rel="stylesheet">
     <script src="{% static 'mfa/js/bootstrap-toggle.min.js' %}"></script>
 {% endblock %}

@@ -2,31 +2,11 @@
 {% load static %}
 {% block head %}
     <link href="{% static 'mfa/css/mfa.css' %}" rel="stylesheet">
-    <script type="application/javascript">
-        function checkFlag() {
-            if ($("#agree").is(":checked"))
-                return true;
-            else
-                alert("Please agree to the statement first");
-            return false;
-        }
-
-        function checkTrusted() {
-            $.ajax({
-                url: "{% url 'td_checkTrusted' %}",
-                success: function (data) {
-                    if (data == "OK")
-                        window.location.href = "{% url 'td_securedevice' %}";
-                    else
-                        setTimeout('checkTrusted()', 2000)
-                }
-
-            })
-
-        }
-
-        $(document).ready(checkTrusted())
-    </script>
+    {% url 'td_checkTrusted' as td_checkTrusted %}
+    {{ td_checkTrusted|json_script:"td_checkTrusted" }}
+    {% url 'td_securedevice' as td_securedevice %}
+    {{ td_securedevice|json_script:"td_securedevice" }}
+    <script type="application/javascript" src="{% static 'mfa/js/TrustedDevices/add.js' %}"></script>
 {% endblock %}
 {% block content %}
     <br/>

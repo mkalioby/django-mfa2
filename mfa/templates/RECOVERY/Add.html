@@ -3,78 +3,12 @@
 {% block head %}
     <link href="{% static 'mfa/css/mfa.css' %}" rel="stylesheet">
     <script src="{% static 'mfa/js/qrious.min.js' %}" type="text/javascript"></script>
-    <script type="text/javascript">
-        var clearCodes;
-        $(document).ready(function checkTokenLeft() {
-            $.ajax({
-                "url": "{% url 'get_recovery_token_left' %}", dataType: "JSON",
-                success: function (data) {
-                    tokenLeft = data.left
-                    html = ""
-                    {% if mfa_redirect %}
-                        html += "<div class='alert alert-success'>You have enrolled successfully in {{ mfa_redirect }} method, please generate recovery codes so that you can use in case you lost access to all your verification methods.</div>"
-                    {% endif %}
-                    if (tokenLeft == 0) {
-                        html += "<h6>You don't have any backup code linked to your account, please generate new ones !</h6>"
-
-                    } else {
-                        html += "<p>You still have " + tokenLeft + " backup code left."
-                    }
-                    document.getElementById('tokens').innerHTML = html
-                }
-            })
-        });
-
-        function confirmRegenerateTokens() {
-            htmlModal = "<h6>Caution! you can only view these token now, else you will need to generate new ones.</h6><div class='text-center'><button onclick='regenerateTokens()' class='btn btn-success'>Regenerate</button></div>"
-            $("#modal-title").html("Regenerate your recovery Codes?")
-            $("#modal-body").html(htmlModal)
-            $("#popUpModal").modal('show')
-        }
-
-        function copy() {
-            navigator.clipboard.writeText($("#recovery_codes").text());
-        }
-
-        function regenerateTokens() {
-            $.ajax({
-                "url": "{% url 'regen_recovery_tokens' %}", dataType: "JSON",
-                success: function (data) {
-                    let htmlkey = `<p>Here are the recovery codes, you have to save them now as you won't able to view them again.</p>
-                <div class='row'><div class='offset-4 col-md-4 bg-white padding-10'>
-                    <div class='row'>
-                    <div class="col-6 offset-6">
-                    <span onclick='download_recovery()' class='fa fa-download toolbtn' title="Download"></span>&nbsp;&nbsp;
-                    <span class='fa fa-clipboard toolbtn' title="Copy" onclick="copy()"></span>
-                    </div></div><div id='recovery_codes'><pre>`;
-                    for (let i = 0; i < data.keys.length; i++) {
-                        htmlkey += "- " + data.keys[i] + "\n"
-                    }
-                    document.getElementById('tokens').innerHTML = htmlkey + "</pre></div></div></div>"
-                    $("#popUpModal").modal('hide')
-                    clearCodes = data.keys
-                }
-            })
-        }
-
-        function download_recovery() {
-            var element = document.createElement('a');
-            var text = "";
-            for (let i = 0; i < clearCodes.length; i++) {
-                text = text + clearCodes[i]
-                if (i < clearCodes.length - 1) {
-                    text = text + "\n"
-                }
-            }
-            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-            element.setAttribute('download', 'Recovery Codes.txt');
-            element.hidden = true;
-            document.body.appendChild(element);
-            element.click();
-            console.log(element.innerHTML)
-            document.body.removeChild(element);
-        }
-    </script>
+    {% url 'get_recovery_token_left' as get_recovery_token_left %}
+    {{ get_recovery_token_left|json_script:"get_recovery_token_left" }}
+    {% url 'regen_recovery_tokens' as regen_recovery_tokens %}
+    {{ regen_recovery_tokens|json_script:"regen_recovery_tokens" }}
+    {{ mfa_redirect|json_script:"mfa_redirect" }}
+    <script type="application/javascript" src="{% static 'mfa/js/RECOVERY/add.js' %}"></script>
 {% endblock %}
 {% block content %}
     <br/>

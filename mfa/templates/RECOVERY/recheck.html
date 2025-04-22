@@ -1,32 +1,13 @@
 {% load static %}
 {% block head %}
     <link href="{% static 'mfa/css/mfa.css' %}" rel="stylesheet">
-    <script type="application/javascript">
-        $(document).ready(function showWarningLastBackup() {
-            {% if lastBackup %}
-                $("#modal-title").html("Last backup code used !")
-                $("#modal-body").html("Don't forget to regenerate new backup code after login !")
-                $('#modal-footer').html(`<FORM METHOD="GET" ACTION="{% url 'recovery_auth' %}" Id="confirmLogin" onSubmit="" name="recoveryLastBackupConfirm">
-            <input type='submit'class='btn btn-lg btn-success btn-block' value='Continue'>`)
-                $("#popUpModal").modal('show')
-            {% endif %}
-            return
-        });
-
-        function send_recovery() {
-            $.ajax({
-                "url": "{% url 'recovery_recheck' %}", method: "POST", dataType: "JSON",
-                data: {"csrfmiddlewaretoken": "{{ csrf_token }}", "recovery": $("#recovery").val()},
-                success: function (data) {
-                    if (data["recheck"])
-                        mfa_success_function();
-                    else {
-                        mfa_failed_function();
-                    }
-                }
-            })
-        }
-    </script>
+    {{ lastBackup|json_script:"lastBackup" }}
+    {{ csrf_token|stringformat:"s"|json_script:"csrf_token" }}
+    {% url 'recovery_recheck' as recovery_recheck %}
+    {{ recovery_recheck|json_script:"recovery_recheck" }}
+    {% url 'recovery_auth' as recovery_auth %}
+    {{ recovery_auth|json_script:"recovery_auth" }}
+    <script type="application/javascript" src="{% static 'mfa/js/RECOVERY/recheck.js' %}"></script>
 {% endblock %}
 {% block content %}
     <div class="row margin-left-15">

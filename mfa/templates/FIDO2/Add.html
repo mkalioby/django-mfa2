@@ -5,67 +5,18 @@
     <script type="application/javascript" src="{% static 'mfa/js/ua-parser.min.js' %}"></script>
     <script type="application/javascript" src="{% static 'mfa/js/base64url.js' %}"></script>
     <script type="application/javascript" src="{% static 'mfa/js/helpers.js' %}"></script>
-    <script type="application/javascript">
-        var MakeCredReq = (makeCredReq) => {
-            makeCredReq.publicKey.challenge = base64url.decode(makeCredReq.publicKey.challenge);
-            makeCredReq.publicKey.user.id = base64url.decode(makeCredReq.publicKey.user.id);
-
-            for (let excludeCred of makeCredReq.publicKey.excludeCredentials) {
-                excludeCred.id = base64url.decode(excludeCred.id);
-            }
-
-            return makeCredReq
-        }
-
-        function begin_reg() {
-            fetch('{% url 'fido2_begin_reg' %}', {}).then(function (response) {
-                if (response.ok) {
-                    return response.json().then(function (req) {
-                        return MakeCredReq(req)
-                    });
-                }
-                throw new Error('Error getting registration data!');
-            }).then(function (options) {
-
-                //options.publicKey.attestation="direct"
-                console.log(options)
-
-                return navigator.credentials.create(options);
-            }).then(function (attestation) {
-                return fetch('{% url 'fido2_complete_reg' %}', {
-                    method: 'POST',
-                    body: JSON.stringify(publicKeyCredentialToJSON(attestation))
-                });
-            }).then(function (response) {
-
-                var stat = response.ok ? 'successful' : 'unsuccessful';
-                return response.json()
-            }).then(function (res) {
-                if (res["status"] == 'OK')
-                    $("#res").html("<div class='alert alert-success'>Registered Successfully, <a href='{{redirect_html}}'> {{reg_success_msg}}</a></div>")
-                else if (res['status'] = "RECOVERY") {
-                    setTimeout(function () {
-                        location.href = "{% url 'manage_recovery_codes' %}"
-                    }, 2500)
-                    $("#res").html("<div class='alert alert-success'>Registered Successfully, but <a href='{% url 'manage_recovery_codes' %}'>redirecting to {{ RECOVERY_METHOD }} method</a></div>")
-                } else
-                    $("#res").html("<div class='alert alert-danger'>Registration Failed as " + res["message"] + ", <a href='javascript:void(0)' onclick='begin_reg()'> try again or <a href='{% url 'mfa_home' %}'> Go to Security Home</a></div>")
-
-
-            }, function (reason) {
-                $("#res").html("<div class='alert alert-danger'>Registration Failed as " + reason + ", <a href='javascript:void(0)' onclick='begin_reg()'> try again </a> or <a href='{% url 'mfa_home' %}'> Go to Security Home</a></div>")
-            })
-        }
-
-        $(document).ready(function () {
-            ua = new UAParser().getResult()
-            if (ua.browser.name == "Safari" || ua.browser.name == "Mobile Safari") {
-                $("#res").html("<button class='btn btn-success' onclick='begin_reg()'>Start...</button>")
-            } else {
-                setTimeout(begin_reg, 500)
-            }
-        })
-    </script>
+    {% url 'fido2_begin_reg' as fido2_begin_reg %}
+    {{ fido2_begin_reg|json_script:"fido2_begin_reg" }}
+    {% url 'fido2_complete_reg' as fido2_complete_reg %}
+    {{ fido2_complete_reg|json_script:"fido2_complete_reg" }}
+    {{ redirect_html|json_script:"redirect_html" }}
+    {{ reg_success_msg|json_script:"reg_success_msg" }}
+    {% url 'manage_recovery_codes' as manage_recovery_codes %}
+    {{ manage_recovery_codes|json_script:"manage_recovery_codes" }}
+    {{ RECOVERY_METHOD|json_script:"RECOVERY_METHOD" }}
+    {% url 'mfa_home' as mfa_home %}
+    {{ mfa_home|json_script:"mfa_home" }}
+    <script type="application/javascript" src="{% static 'mfa/js/FIDO2/add.js' %}"></script>
 {% endblock %}
 {% block content %}
     <br/>

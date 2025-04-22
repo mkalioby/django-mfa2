@@ -1,38 +1,12 @@
 {% load static %}
 {% block head %}
     <link href="{% static 'mfa/css/mfa.css' %}" rel="stylesheet">
-    <script type="application/javascript">
-        mfa_success_function = null;
-        mfa_failed_function = null;
-
-        function is_mfa() {
-            {% if request.session.mfa.verified  %}
-                return true;
-            {% else %}
-                return false;
-            {% endif %}
-        }
-
-        function recheck_mfa(success_func, fail_func, must_mfa) {
-            if (!must_mfa) success_func()
-            window.mfa_success_function = success_func;
-            window.mfa_failed_function = fail_func;
-            $.ajax({
-                "url": "{% url 'mfa_recheck' %}",
-                success: function (data) {
-                    if (data.hasOwnProperty("res")) {
-                        if (data["res"])
-                            success_func();
-                        else fail_func();
-                    } else {
-                        $("#modal-title").html("Recheck Indentity")
-                        $("#modal-body").html(data["html"])
-                        $("#popUpModal").modal('show')
-                    }
-                }
-            })
-        }
-    </script>
+    {{ request.session.mfa.verified|json_script:"request_session_mfa_verified" }}
+    {% url 'mfa_recheck' as mfa_recheck %}
+    {{ mfa_recheck|json_script:"mfa_recheck" }}
+    {% url 'toggle_key' as toggle_key %}
+    {{ toggle_key|json_script:"toggle_key" }}
+    <script type="application/javascript" src="{% static 'mfa/js/mfa_check.js' %}"></script>
 {% endblock %}
 {% block content %}
     {% include "modal.html" %}

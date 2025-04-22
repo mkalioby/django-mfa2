@@ -1,21 +1,10 @@
 {% load static %}
 {% block head %}
     <link href="{% static 'mfa/css/mfa.css' %}" rel="stylesheet">
-    <script type="application/javascript">
-        function send_totp() {
-            $.ajax({
-                "url": "{% url 'totp_recheck' %}", method: "POST", dataType: "JSON",
-                data: {"csrfmiddlewaretoken": "{{ csrf_token }}", "otp": $("#otp").val()},
-                success: function (data) {
-                    if (data["recheck"])
-                        mfa_success_function();
-                    else {
-                        mfa_failed_function();
-                    }
-                }
-            })
-        }
-    </script>
+    {% url 'totp_recheck' as totp_recheck %}
+    {{ totp_recheck|json_script:"totp_recheck" }}
+    {{ csrf_token|stringformat:"s"|json_script:"csrf_token" }}
+    <script type="application/javascript" src="{% static 'mfa/js/TOTP/recheck.js' %}"></script>
 {% endblock %}
 {% block content %}
     <div class="card panel panel-default mx-auto mt-5 auth-card">
