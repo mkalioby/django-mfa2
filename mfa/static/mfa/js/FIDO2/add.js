@@ -13,7 +13,7 @@ function begin_reg() {
     const fido2_begin_reg = JSON.parse(document.getElementById('fido2_begin_reg').textContent);
     const fido2_complete_reg = JSON.parse(document.getElementById('fido2_complete_reg').textContent);
     const redirect_html = JSON.parse(document.getElementById('redirect_html').textContent);
-    const reg_success_msg = JSON.parse(document.getElementById('fido2_complete_reg').textContent);
+    const reg_success_msg = JSON.parse(document.getElementById('reg_success_msg').textContent);
     const manage_recovery_codes = JSON.parse(document.getElementById('manage_recovery_codes').textContent);
     const RECOVERY_METHOD = JSON.parse(document.getElementById('RECOVERY_METHOD').textContent);
     const mfa_home = JSON.parse(document.getElementById('mfa_home').textContent);
