@@ -23,7 +23,8 @@ function sendEmail() {
 }
 
 function failedMFA() {
-    $("#modal-body").html("<div class='alert alert-danger'>Failed to validate you, please <a href='javascript:void(0)' onclick='getUserAgent()'>try again</a></div>")
+    $("#modal-body").html("<div class='alert alert-danger'>Failed to validate you, please <a href='#' id='getUserAgent'>try again</a></div>")
+    $("#getUserAgent").click(function () { getUserAgent() });
 }
 
 function checkMFA() {
@@ -54,7 +55,8 @@ function getUserAgent() {
             else {
                 $("#modal-title").html("Confirm Trusted Device")
                 $("#actionBtn").remove();
-                $("#modal-footer").prepend("<button id='actionBtn' class='btn btn-success' onclick='checkMFA()'>Trust Device</button>")
+                $("#modal-footer").prepend("<button id='actionBtn' class='btn btn-success'>Trust Device</button>")
+                $("#actionBtn").click(function () { checkMFA() })
                 $("#modal-body").html(data)
                 $("#popUpModal").modal('show');
             }

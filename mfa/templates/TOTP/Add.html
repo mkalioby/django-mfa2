@@ -12,7 +12,7 @@
     {{ RECOVERY_METHOD|json_script:"RECOVERY_METHOD" }}
     {% url 'manage_recovery_codes' as manage_recovery_codes %}
     {{ manage_recovery_codes|json_script:"manage_recovery_codes" }}
-    {% url 'verify_otop' as verify_otop %}
+    {% url 'mfa_home' as mfa_home %}
     {{ mfa_home|json_script:"mfa_home" }}
     <script type="application/javascript" src="{% static 'mfa/js/TOTP/add.js' %}"></script>
 {% endblock %}
@@ -25,9 +25,9 @@
                 <h4>Adding a new {{ method.name }}</h4>
             </div>
             <div class="row">
-                <p>Scan the image below with the two-factor authentication app on your <a href="javascript:void(0)" onclick="showTOTP()">phone/PC</a>.
+                <p>Scan the image below with the two-factor authentication app on your <a href="#" id="showTOTP">phone/PC</a>.
                     If you can’t use a barcode,
-                    <a href="javascript:void(0)" onclick="showKey()">enter this text</a> instead.
+                    <a href="#" id="showKey">enter this text</a> instead.
                 </p>
             </div>
             <div id="res">
@@ -49,7 +49,7 @@
             </div>
             <div class="row padding-top-10">
                 <div class="col-md-4 offset-md-4 padding-left-0">
-                    <button class="btn btn-success" onclick="verify()">Enable</button>
+                    <button class="btn btn-success" id="verify">Enable</button>
                     <a href="{% url 'mfa_home' %}" class="btn btn-default btn-secondary" role="button">Cancel</a>
                 </div>
             </div>

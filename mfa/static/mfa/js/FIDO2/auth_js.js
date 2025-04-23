@@ -64,7 +64,9 @@ function authen(conditionalUI = false) {
                 }
             } else {
                 $("#msgdiv").addClass("alert alert-danger").removeClass("alert-success")
-                $("#msgdiv").html("Verification Failed as " + res.message + ", <a href='javascript:void(0)' onclick='authen())'> try again</a> or <a href='javascript:void(0)' onclick='history.back()'> Go Back</a>")
+                $("#msgdiv").html("Verification Failed as " + res.message + ", <a href='#' id='failed_authen'> try again</a> or <a href='#' id='failed_history_back'> Go Back</a>")
+                $("#failed_history_back").click(function() { history.back() });
+                $("#failed_authen").click(function() { authen(); });
 
                 if (mode === "auth") {
                     // do nothing
@@ -83,9 +85,12 @@ $(document).ready(function () {
         $("#main_paragraph").html("FIDO2 must work under secure context")
     } else {
         ua = new UAParser().getResult()
-        if (ua.browser.name == "Safari" || ua.browser.name == "Mobile Safari" || ua.os.name == "iOS" || ua.os.name == "iPadOS")
-            $("#res").html("<button class='btn btn-success' onclick='authen()'>Authenticate...</button>")
-        else
+        if (ua.browser.name == "Safari" || ua.browser.name == "Mobile Safari" || ua.os.name == "iOS" || ua.os.name == "iPadOS") {
+            $("#res").html("<button class='btn btn-success' id='ua_authen'>Authenticate...</button>");
+            $("#ua_authen").click(function () { authen(); });
+        }
+        else {
             authen()
+        }
     }
 });

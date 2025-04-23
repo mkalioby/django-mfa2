@@ -1,5 +1,11 @@
 var clearCodes;
-$(document).ready(function checkTokenLeft() {
+$(document).ready(function() {
+    $("#confirmRegenerateTokens").click(function () { confirmRegenerateTokens() });
+
+    checkTokenLeft();
+});
+
+function checkTokenLeft() {
     const get_recovery_token_left = JSON.parse(document.getElementById('get_recovery_token_left').textContent);
     const mfa_redirect = JSON.parse(document.getElementById('mfa_redirect').textContent);
     $.ajax({
@@ -18,12 +24,13 @@ $(document).ready(function checkTokenLeft() {
             document.getElementById('tokens').innerHTML = html
         }
     })
-});
+}
 
 function confirmRegenerateTokens() {
-    htmlModal = "<h6>Caution! you can only view these token now, else you will need to generate new ones.</h6><div class='text-center'><button onclick='regenerateTokens()' class='btn btn-success'>Regenerate</button></div>"
+    htmlModal = "<h6>Caution! you can only view these token now, else you will need to generate new ones.</h6><div class='text-center'><button id='regenerateTokens' class='btn btn-success'>Regenerate</button></div>"
     $("#modal-title").html("Regenerate your recovery Codes?")
     $("#modal-body").html(htmlModal)
+    $("#regenerateTokens").click(function () { regenerateTokens(); })
     $("#popUpModal").modal('show')
 }
 
@@ -40,13 +47,19 @@ function regenerateTokens() {
         <div class='row'><div class='offset-4 col-md-4 bg-white padding-10'>
             <div class='row'>
             <div class="col-6 offset-6">
-            <span onclick='download_recovery()' class='fa fa-download toolbtn' title="Download"></span>&nbsp;&nbsp;
-            <span class='fa fa-clipboard toolbtn' title="Copy" onclick="copy()"></span>
+            <span id='download_recovery' class='fa fa-download toolbtn' title="Download"></span>&nbsp;&nbsp;
+            <span class='fa fa-clipboard toolbtn' id='copy_clipboard' title="Copy"></span>
             </div></div><div id='recovery_codes'><pre>`;
             for (let i = 0; i < data.keys.length; i++) {
                 htmlkey += "- " + data.keys[i] + "\n"
             }
             document.getElementById('tokens').innerHTML = htmlkey + "</pre></div></div></div>"
+            $("#download_recovery").click(function () {
+                download_recovery();
+            })
+            $("#copy_clipboard").click(function () {
+                copy();
+            })
             $("#popUpModal").modal('hide')
             clearCodes = data.keys
         }

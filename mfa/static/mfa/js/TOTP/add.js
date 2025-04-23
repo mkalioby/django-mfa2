@@ -1,5 +1,13 @@
+$(document).ready(function() {
+    $("#showKey").click(function () { showKey() });
+    $("#showTOTP").click(function () { showTOTP() });
+    $("#verify").click(function () { verify() });
+
+    addToken();
+});
+
 var key = "";
-$(document).ready(function addToken() {
+function addToken() {
     const get_new_otop = JSON.parse(document.getElementById('get_new_otop').textContent);
     $.ajax({
         "url": get_new_otop, dataType: "JSON",
@@ -12,7 +20,7 @@ $(document).ready(function addToken() {
             $("#second_step").show()
         }
     })
-});
+}
 
 function showKey() {
     const htmlkey = `
@@ -21,11 +29,12 @@ function showKey() {
             <pre id="totp_secret">` + window.key + `</pre>
         </div>
         <div class="col-1">
-            <span onclick=navigator.clipboard.writeText($("#totp_secret").text()) class="fa fa-clipboard toolbtn"></span>
+            <span id="copy_clipboard" class="fa fa-clipboard toolbtn"></span>
         </div>
     </div>`
     $("#modal-title").html("Your Secret Key")
     $("#modal-body").html(htmlkey)
+    $("#copy_clipboard").click(function () { navigator.clipboard.writeText($("#totp_secret").text()); })
     $("#popUpModal").modal('show')
 }
 

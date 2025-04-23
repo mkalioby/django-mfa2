@@ -1,6 +1,8 @@
 {% load static %}
 {% block head %}
     <link href="{% static 'mfa/css/mfa.css' %}" rel="stylesheet">
+    {{ mode|json_script:"mode" }}
+    <script type="application/javascript" src="{% static 'mfa/js/Email/recheck.js' %}"></script>
 {% endblock %}
 {% block content %}
     <div class="row">
@@ -51,7 +53,7 @@
                                 </div>
                                 <div class="form-group d-grid gap-2">
                                     <button type="{% if mode == "auth" %}submit{% elif mode == 'recheck' %}button{% endif %}"
-                                            {% if mode == "recheck" %}onclick="send_totp()" {% endif %}
+                                            {% if mode == "recheck" %}id="send_totp" {% endif %}
                                             class="btn btn-lg btn-success btn-block"> Verify
                                     </button>
                                 </div>

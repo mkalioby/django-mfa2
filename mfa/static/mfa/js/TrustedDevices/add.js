@@ -19,4 +19,8 @@ function checkTrusted() {
         }
     })
 }
-$(document).ready(checkTrusted())
+$(document).ready(function() {
+    $("#formLogin").submit(function () { return checkFlag(); });
+
+    checkTrusted()
+})

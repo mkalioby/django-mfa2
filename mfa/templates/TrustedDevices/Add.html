@@ -29,8 +29,7 @@
                     {% else %}
                         <div class="alert alert-warning">Please make sure you are not in private (incognito) mode <i
                                 class="fal fa-user-secret"></i></div>
-                        <FORM METHOD="POST" ACTION="{% url 'add_td' %}" Id="formLogin" onSubmit="return checkFlag()"
-                              name="FrontPage_Form1">
+                        <FORM METHOD="POST" ACTION="{% url 'add_td' %}" Id="formLogin" name="FrontPage_Form1">
                             {% csrf_token %}
                             {% if invalid %}
                                 <div class="alert alert-danger">

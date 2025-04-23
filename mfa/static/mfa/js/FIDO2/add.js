@@ -45,16 +45,19 @@ function begin_reg() {
             }, 2500)
             $("#res").html("<div class='alert alert-success'>Registered Successfully, but <a href='"+manage_recovery_codes+"'>redirecting to "+RECOVERY_METHOD+" method</a></div>")
         } else
-            $("#res").html("<div class='alert alert-danger'>Registration Failed as " + res["message"] + ", <a href='javascript:void(0)' onclick='begin_reg()'> try again or <a href='"+mfa_home+"'> Go to Security Home</a></div>")
+            $("#res").html("<div class='alert alert-danger'>Registration Failed as " + res["message"] + ", <a href='#' id='failed_begin_reg'> try again or <a href='"+mfa_home+"'> Go to Security Home</a></div>")
+            $("#failed_begin_reg").click(function() {begin_reg()});
     }, function (reason) {
-        $("#res").html("<div class='alert alert-danger'>Registration Failed as " + reason + ", <a href='javascript:void(0)' onclick='begin_reg()'> try again </a> or <a href='"+mfa_home+"'> Go to Security Home</a></div>")
+        $("#res").html("<div class='alert alert-danger'>Registration Failed as " + reason + ", <a href='#' id='failed_begin_reg'> try again </a> or <a href='"+mfa_home+"'> Go to Security Home</a></div>")
+        $("#failed_begin_reg").click(function() {begin_reg()});
     })
 }
 
 $(document).ready(function () {
     ua = new UAParser().getResult()
     if (ua.browser.name == "Safari" || ua.browser.name == "Mobile Safari") {
-        $("#res").html("<button class='btn btn-success' onclick='begin_reg()'>Start...</button>")
+        $("#res").html("<button class='btn btn-success' id='ua_begin_reg'>Start...</button>")
+        $("#ua_begin_reg").click(function() { begin_reg(); });
     } else {
         setTimeout(begin_reg, 500)
     }

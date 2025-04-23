@@ -7,6 +7,7 @@
     {{ recovery_recheck|json_script:"recovery_recheck" }}
     {% url 'recovery_auth' as recovery_auth %}
     {{ recovery_auth|json_script:"recovery_auth" }}
+    {{ mode|json_script:"mode" }}
     <script type="application/javascript" src="{% static 'mfa/js/RECOVERY/recheck.js' %}"></script>
 {% endblock %}
 {% block content %}
@@ -17,8 +18,7 @@
                     <strong> Recovery code</strong>
                 </div>
                 <div class="panel-body card-body">
-                    <FORM METHOD="POST" ACTION="{% url 'recovery_auth' %}" Id="formLogin" onSubmit=""
-                          name="FrontPage_Form1">
+                    <FORM METHOD="POST" ACTION="{% url 'recovery_auth' %}" Id="formLogin" name="FrontPage_Form1">
                         {% csrf_token %}
                         {% if invalid %}
                             <div class="alert alert-danger">
@@ -50,7 +50,7 @@
                                     </div>
                                     <div class="form-group d-grid gap-2">
                                         <input type="{% if mode == "auth" %}submit{% elif mode == 'recheck' %}button{% endif %}"
-                                               {% if mode == "recheck" %}onclick="send_recovery()" {% endif %}
+                                               {% if mode == "recheck" %}id="send_recovery" {% endif %}
                                                class="btn btn-lg btn-success btn-block" value="Sign in">
                                     </div>
                                 </div>

@@ -21,11 +21,14 @@ function addToken() {
                         location.href = manage_recovery_codes
                     }, 2500)
                     $("#res").html("<div class='alert alert-success'>Your device is registered successfully, but <a href='"+manage_recovery_codes+"'>redirecting to "+RECOVERY_METHOD+" method</a></div>")
-                } else
-                    $("#res").html("<div class='alert alert-danger'>Registration failed, please <a href='javascript:void(0)' onclick='addToken()'>try again</a> or <a href='"+mfa_home+"'> Go to Security Home</a></div>")
+                } else {
+                    $("#res").html("<div class='alert alert-danger'>Registration failed, please <a href='#' id='addToken'>try again</a> or <a href='" + mfa_home + "'> Go to Security Home</a></div>")
+                    $("#addToken").click(function () { addToken() });
+                }
             },
             error: function (data) {
-                $("#res").html("<div class='alert alert-danger'>Registration failed, please <a href='javascript:void(0)' onclick='addToken()'>try again</a> or <a href='"+mfa_home+"'> Go to Security Home</a></div>")
+                $("#res").html("<div class='alert alert-danger'>Registration failed, please <a href='#' id='addToken'>try again</a> or <a href='"+mfa_home+"'> Go to Security Home</a></div>")
+                $("#addToken").click(function () { addToken() });
             }
         })
     }, 5000)
