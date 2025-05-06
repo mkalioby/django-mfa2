@@ -156,19 +156,20 @@ When implementing a feature:
 4. Remove the skip decorator
 5. Run the test to verify implementation
 
-Example:
-```python
-# Before
-@unittest.skip("[SECURITY GAP] CSRF protection not implemented: Missing CSRF validation")
-def test_csrf_protection(self):
-    """Test CSRF protection."""
-    self.skip_if_security_gap("CSRF protection not implemented")
+Example usage of skip decorators:
 
-# After
+```python
+from .utils import (
+    skip_if_middleware_disabled,
+    skip_if_security_gap,
+    skip_if_logging_gap
+)
+
+@unittest.skip("[SECURITY GAP] CSRF protection not implemented")
+@skip_if_security_gap("CSRF protection not implemented")
 def test_csrf_protection(self):
-    """Test CSRF protection."""
-    # Implementation here
-    self.assertTrue(self.has_csrf_protection())
+    """Test CSRF protection in MFA views."""
+    pass
 ```
 
 ## Best Practices

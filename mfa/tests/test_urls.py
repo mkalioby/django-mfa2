@@ -6,6 +6,7 @@ from django.urls import re_path as url
 from mfa import views
 import sys
 import unittest
+from django.conf import settings
 
 # Detect missing views
 view_names_and_paths = [
@@ -266,10 +267,22 @@ for view_name, pattern in view_names_and_paths:
     else:
         print(f"[SKIP URL] mfa.views.{view_name} is missing", file=sys.stderr)
 
+# Add verify URL pattern
+test_specific_patterns.append(
+    path('verify/<str:username>/', views.verify, name='verify')
+)
+
 # Combine patterns
 test_urlpatterns.extend(test_specific_patterns)
 
 # Root URL configuration for tests
 urlpatterns = [
-    path('mfa/', (test_urlpatterns, 'mfa', 'mfa')),
-] 
+    path('mfa/', (test_urlpatterns, 'mfa', 'mfa')),  # Include MFA URLs with both app_name and namespace
+    path('', include('example.urls')),  # Include example app URLs
+]
+
+# Add any test-specific URL patterns here
+if settings.DEBUG:
+    urlpatterns += [
+        # Add any debug-specific URLs here
+    ] 

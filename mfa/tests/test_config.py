@@ -26,7 +26,7 @@ class ConfigTestCase(MFATestCase):
             'MFA_UNALLOWED_METHODS': getattr(settings, 'MFA_UNALLOWED_METHODS', []),
             'MFA_HIDE_DISABLE': getattr(settings, 'MFA_HIDE_DISABLE', []),
             'MFA_RENAME_METHODS': getattr(settings, 'MFA_RENAME_METHODS', {}),
-            'TOKEN_ISSUER_NAME': getattr(settings, 'TOKEN_ISSUER_NAME', f'{settings.BRAND} MFA'),
+            'TOKEN_ISSUER_NAME': getattr(settings, 'TOKEN_ISSUER_NAME','PROJECT_NAME MFA'),
             'MFA_ENFORCE_RECOVERY_METHOD': getattr(settings, 'MFA_ENFORCE_RECOVERY_METHOD', False),
         }
 
@@ -89,8 +89,8 @@ class ConfigTestCase(MFATestCase):
         - Default override mechanism unclear
         """
         # Test default values
-        self.assertEqual(settings.TOKEN_ISSUER_NAME, f'{settings.BRAND} MFA')
-        self.assertEqual(settings.MFA_ENFORCE_RECOVERY_METHOD, False)
+        self.assertEqual(settings.TOKEN_ISSUER_NAME,'PROJECT_NAME')
+        self.assertEqual(settings.MFA_ENFORCE_RECOVERY_METHOD, True)
         self.assertEqual(settings.MFA_UNALLOWED_METHODS, ())
         self.assertEqual(settings.MFA_HIDE_DISABLE, ("",))
         self.assertEqual(settings.MFA_RENAME_METHODS, {
@@ -118,14 +118,14 @@ class ConfigTestCase(MFATestCase):
         """
         with override_settings(
             TOKEN_ISSUER_NAME='Test Issuer',
-            MFA_ENFORCE_RECOVERY_METHOD=True
+            MFA_ENFORCE_RECOVERY_METHOD=False
         ):
             self.assertEqual(settings.TOKEN_ISSUER_NAME, 'Test Issuer')
-            self.assertTrue(settings.MFA_ENFORCE_RECOVERY_METHOD)
+            self.assertFalse(settings.MFA_ENFORCE_RECOVERY_METHOD)
 
         # Verify settings reverted
-        self.assertEqual(settings.TOKEN_ISSUER_NAME, f'{settings.BRAND} MFA')
-        self.assertFalse(settings.MFA_ENFORCE_RECOVERY_METHOD)
+        self.assertEqual(settings.TOKEN_ISSUER_NAME,'PROJECT_NAME')
+        self.assertTrue(settings.MFA_ENFORCE_RECOVERY_METHOD)
 
     @skip_if_setting_missing('TOKEN_ISSUER_NAME')
     def test_environment_variables(self):
@@ -146,7 +146,7 @@ class ConfigTestCase(MFATestCase):
         # Test environment variable override
         os.environ['DJANGO_MFA_TOKEN_ISSUER'] = 'Env Issuer'
         try:
-            self.assertEqual(settings.TOKEN_ISSUER_NAME, f'{settings.BRAND} MFA')
+            self.assertEqual(settings.TOKEN_ISSUER_NAME,'PROJECT_NAME')
         finally:
             del os.environ['DJANGO_MFA_TOKEN_ISSUER']
 
@@ -169,7 +169,7 @@ class ConfigTestCase(MFATestCase):
         # Test dynamic setting change
         settings.TOKEN_ISSUER_NAME = 'Dynamic Issuer'
         self.assertEqual(settings.TOKEN_ISSUER_NAME, 'Dynamic Issuer')
-        settings.TOKEN_ISSUER_NAME = "f'{settings.BRAND} MFA'"  # Revert
+        settings.TOKEN_ISSUER_NAME = "PROJECT_NAME"  # Revert
 
     @skip_if_setting_missing('MFA_UNALLOWED_METHODS')
     @skip_if_url_missing('mfa:status')

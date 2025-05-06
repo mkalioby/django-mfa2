@@ -10,8 +10,17 @@ from functools import wraps
 from unittest import SkipTest
 from .utils.skip_reasons import SkipReason
 from .utils.skip_registry import SkipRegistry
+from django.core.cache import cache
 
 from mfa.models import User_Keys
+from mfa.Common import set_next_recheck
+from .utils import (
+    skip_if_url_missing,
+    skip_if_setting_missing,
+    skip_if_middleware_disabled,
+    skip_if_security_gap,
+    skip_if_logging_gap
+)
 
 
 User = get_user_model()
@@ -72,13 +81,15 @@ class MFATestCase(TestCase):
 
     def setUp(self):
         """Set up test environment for MFA tests."""
-        # Create test user
+        super().setUp()
         self.username = 'testuser'
-        self.password = 'password123'
-        self.user = User.objects.create_user(username=self.username, password=self.password)
-
-        # Set up client
-        self.client = Client()
+        self.password = 'testpass123'
+        self.user = User.objects.create_user(
+            username=self.username,
+            password=self.password
+        )
+        self.client.login(username=self.username, password=self.password)
+        cache.clear()
 
         # TOTP setup
         self.totp_secret = pyotp.random_base32()
@@ -146,10 +157,11 @@ class MFATestCase(TestCase):
 
     def create_totp_key(self, enabled=True):
         """Create a TOTP key for the test user."""
+        secret = pyotp.random_base32()
         key = User_Keys.objects.create(
             username=self.username,
             key_type='TOTP',
-            properties={'secret_key': self.totp_secret},
+            properties={'secret_key': secret},
             enabled=enabled
         )
         return key
@@ -167,36 +179,35 @@ class MFATestCase(TestCase):
 
     def login_user(self):
         """Log in the test user."""
-        return self.client.login(username=self.username, password=self.password)
+        self.client.login(username=self.username, password=self.password)
 
-    def setup_mfa_session(self, method='TOTP', verified=True, id=None):
-        """Set up an MFA session."""
+    def setup_mfa_session(self, method='TOTP', verified=True, id=1):
+        """Set up MFA session state for testing."""
         session = self.client.session
-        session['base_username'] = self.username
-        session['mfa'] = {
-            'verified': verified,
+        mfa = {
             'method': method,
-            'id': id or 1,
-            'next_check': time.time() + 300,  # 5 minutes from now
+            'verified': verified,
+            'id': id
         }
+        mfa.update(set_next_recheck())
+        session['mfa'] = mfa
         session.save()
 
     def get_valid_totp_token(self):
-        """Get a valid TOTP token."""
-        return self.totp.now()
+        """Get a valid TOTP token for testing."""
+        key = User_Keys.objects.get(username=self.username, key_type='TOTP')
+        totp = pyotp.TOTP(key.properties['secret_key'])
+        return totp.now()
 
     def get_invalid_totp_token(self):
-        """Get an invalid TOTP token."""
-        # Simple approach to get an invalid token - add 1 to a valid token
-        valid = self.totp.now()
-        last_digit = int(valid[-1])
-        invalid_last_digit = (last_digit + 1) % 10
-        return valid[:-1] + str(invalid_last_digit)
+        """Get an invalid TOTP token for testing."""
+        return '000000'
 
     def tearDown(self):
         """Clean up after tests."""
-        # Clean up if we modified any settings
-        pass
+        super().tearDown()
+        cache.clear()
+        User_Keys.objects.all().delete()
 
     def verify_mfa_session_state(self, expected_verified=True, expected_method=None, expected_id=None):
         """Verify the MFA session state.
@@ -268,24 +279,3 @@ class MFATestCase(TestCase):
                 SkipReason.MISSING_SETTING,
                 f"Setting '{setting_name}' not configured"
             )
-
-    def skip_if_middleware_disabled(self, details: str = None) -> None:
-        """Skip test if MFA middleware is disabled"""
-        self.skip_test(
-            SkipReason.MIDDLEWARE_DISABLED,
-            details or "MFA Middleware is disabled in tests"
-        )
-
-    def skip_if_security_gap(self, details: str) -> None:
-        """Skip test due to security feature not implemented"""
-        self.skip_test(
-            SkipReason.SECURITY_GAP,
-            details
-        )
-
-    def skip_if_logging_gap(self, details: str) -> None:
-        """Skip test due to logging feature not implemented"""
-        self.skip_test(
-            SkipReason.LOGGING_GAP,
-            details
-        )

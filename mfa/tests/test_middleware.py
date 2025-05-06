@@ -1,13 +1,15 @@
+import unittest
 from django.test import override_settings
 from django.urls import reverse
 from django.http import HttpResponse
-from .base import MFATestCase, skip_if_url_missing, skip_if_setting_missing
 from django.core.cache import cache
 from django.conf import settings
 import time
 from django.urls import NoReverseMatch
-import unittest
-
+from .base import MFATestCase
+from .utils import (
+    skip_if_logging_gap, skip_if_url_missing, skip_if_setting_missing,
+)
 
 class MiddlewareTestCase(MFATestCase):
     """Test suite for MFA middleware functionality.
@@ -289,12 +291,26 @@ class MiddlewareTestCase(MFATestCase):
         self.assertIn('mfa.middleware.MFAMiddleware', middleware)
         self.assertIn('mfa.middleware.MFASessionMiddleware', middleware)
         self.assertIn('mfa.middleware.MFASecurityMiddleware', middleware)
-        
+
         # Verify correct ordering
         mfa_index = middleware.index('mfa.middleware.MFAMiddleware')
         session_index = middleware.index('django.contrib.sessions.middleware.SessionMiddleware')
         auth_index = middleware.index('django.contrib.auth.middleware.AuthenticationMiddleware')
-        
+
         # MFA middleware should come after session and auth middleware
         self.assertGreater(mfa_index, session_index)
         self.assertGreater(mfa_index, auth_index)
+
+    @skip_if_logging_gap("Logging middleware not implemented")
+    def test_logging_middleware(self):
+        """Test MFA logging middleware.
+
+        Verifies:
+        1. Logging is properly configured
+        2. Log levels are respected
+        3. Log messages are formatted
+        4. Log rotation works
+        5. Log cleanup works
+        """
+        # Test log level
+        self.assertEqual(settings.MFA_LOG_LEVEL, 'INFO')

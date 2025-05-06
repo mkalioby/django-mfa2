@@ -5,6 +5,11 @@ import unittest
 
 from mfa.models import User_Keys
 from .base import MFATestCase, skip_if_setting_missing
+from .utils import (
+    skip_if_middleware_disabled,
+    skip_if_security_gap,
+    skip_if_logging_gap
+)
 
 
 class UserKeysModelTestCase(MFATestCase):
@@ -82,17 +87,20 @@ class UserKeysModelTestCase(MFATestCase):
         self.assertEqual(key.properties['secret_key'], 'new_secret')
         self.assertFalse(key.enabled)
 
-    @unittest.skip("[SECURITY GAP] Key validation not implemented: Missing key validation checks")
+    @unittest.skip("[SECURITY GAP] Key validation not implemented: Missing validation checks")
+    @skip_if_security_gap("Key validation not implemented")
     def test_key_validation(self):
-        """Test key validation."""
-        self.skip_if_security_gap("Key validation not implemented")
+        """Test key validation security."""
+        pass
 
-    @unittest.skip("[SKIP LOGGING] Model logging not implemented: Missing model change logging")
+    @unittest.skip("[SKIP LOGGING] Model logging not implemented: Missing audit trail")
+    @skip_if_logging_gap("Model logging not implemented")
     def test_model_logging(self):
-        """Test model change logging."""
-        self.skip_if_logging_gap("Model logging not implemented")
+        """Test model audit logging."""
+        pass
 
-    @unittest.skip("[SECURITY GAP] Key rotation not implemented: Missing key rotation mechanism")
+    @unittest.skip("[SECURITY GAP] Key rotation not implemented: Missing rotation mechanism")
+    @skip_if_security_gap("Key rotation not implemented")
     def test_key_rotation(self):
-        """Test key rotation."""
-        self.skip_if_security_gap("Key rotation not implemented") 
+        """Test key rotation security."""
+        pass 

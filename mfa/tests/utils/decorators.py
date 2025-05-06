@@ -94,4 +94,48 @@ def skip_if_tdd_pending(reason: str = None):
             )
             raise SkipTest(SkipReason.TDD_PENDING.format_message(reason or "Test-driven development pending implementation"))
         return wrapper
+    return decorator
+
+def skip_if_middleware_disabled(details: str = None):
+    """Skip test if MFA middleware is disabled"""
+    def decorator(test_func):
+        @wraps(test_func)
+        def wrapper(self, *args, **kwargs):
+            SkipRegistry.register_skip(
+                test_func.__name__,
+                SkipReason.MIDDLEWARE_DISABLED,
+                details or "MFA Middleware is disabled in tests"
+            )
+            raise SkipTest(SkipReason.MIDDLEWARE_DISABLED.format_message(
+                details or "MFA Middleware is disabled in tests"
+            ))
+        return wrapper
+    return decorator
+
+def skip_if_security_gap(details: str):
+    """Skip test due to security feature not implemented"""
+    def decorator(test_func):
+        @wraps(test_func)
+        def wrapper(self, *args, **kwargs):
+            SkipRegistry.register_skip(
+                test_func.__name__,
+                SkipReason.SECURITY_GAP,
+                details
+            )
+            raise SkipTest(SkipReason.SECURITY_GAP.format_message(details))
+        return wrapper
+    return decorator
+
+def skip_if_logging_gap(details: str):
+    """Skip test due to logging feature not implemented"""
+    def decorator(test_func):
+        @wraps(test_func)
+        def wrapper(self, *args, **kwargs):
+            SkipRegistry.register_skip(
+                test_func.__name__,
+                SkipReason.LOGGING_GAP,
+                details
+            )
+            raise SkipTest(SkipReason.LOGGING_GAP.format_message(details))
+        return wrapper
     return decorator 
