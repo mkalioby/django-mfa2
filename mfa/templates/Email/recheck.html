@@ -1,70 +1,74 @@
-<div class="row">
-
- <div class="card panel panel-default mx-auto mt-5 auth-card" >
-      <div class="panel-heading card-header">
-	      <strong> Email One Time Password </strong>
-      </div>
-      <div class="panel-body card-body">
-
-      <form method="post" action="{% url 'email_auth' %}" >
-
-
-      {% csrf_token %}
-          {%  if invalid %}
-          <div class="alert alert-danger">
-              Sorry, The provided token is not valid.
-          </div>
-          {% endif %}
-      {% if quota %}
-          <div class="alert alert-warning">
-              {{ quota }}
-          </div>
-      {% endif %}
-      <fieldset>
-      {% if mode == "auth" %}
-      <div class="row">
-      <div class="offset-md-1 col-offset-md-1 col-md-10" align="center" >
-               Welcome back  {{ request.session.base_username }}<br/>
-                <a href="{% url 'mfa_reset_cookie' %}">Not me</a>
-                <br/>
-      </div>
-      </div>
-      {% endif %}
-      <div class="row">
-      <div class="col-sm-12 col-md-10 offset-md-1 col-offset-md-1 ">
-        <p>Enter the code sent to your email.</p>
-      </div>
-      </div>
-
-      <div class="row">
-	  <div class="col-sm-12 col-md-10 offset-md-1 col-offset-md-1">
-	    <div class="form-group">
-	      <div class="input-group mb-3">
-		<span class="input-group-addon input-group-text">
-		<i class="fa fa-lock"></i>
-		</span>
-		<input class="form-control" size="6" MaxLength="6"  autocomplete="one-time-code"  placeholder="e.g 55552"
-               name="otp" inputmode="numeric" pattern="\d{6}" type="text" id="otp" autofocus>
-
-
-	      </div>
-	    </div>
-
-          <div class="form-group d-grid gap-2">
-
-              <button type="{% if mode == "auth" %}submit{% elif mode == 'recheck'  %}button{% endif %}" {% if mode == "recheck" %}onclick="send_totp()" {% endif %} class="btn btn-lg btn-success btn-block" > Verify</button>
-	      </div>
-      </div>
-      </fieldset>
-      </form>
-      </div>
-        <div class="row">
-        <div class="col-md-12 mb-3" style="padding-left: 25px">
-            {% if request.session.mfa_methods|length > 1 %}
-                <a href="{%  url 'mfa_methods_list' %}">Select Another Method</a>
-            {% endif %}
+{% load static %}
+{% block head %}
+    <link href="{% static 'mfa/css/mfa.css' %}" rel="stylesheet">
+    {{ mode|json_script:"mode" }}
+    <script type="application/javascript" src="{% static 'mfa/js/Email/recheck.js' %}"></script>
+{% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="card panel panel-default mx-auto mt-5 auth-card">
+            <div class="panel-heading card-header">
+                <strong> Email One Time Password </strong>
+            </div>
+            <div class="panel-body card-body">
+                <form method="post" action="{% url 'email_auth' %}">
+                    {% csrf_token %}
+                    {% if invalid %}
+                        <div class="alert alert-danger">
+                            Sorry, The provided token is not valid.
+                        </div>
+                    {% endif %}
+                    {% if quota %}
+                        <div class="alert alert-warning">
+                            {{ quota }}
+                        </div>
+                    {% endif %}
+                    <fieldset>
+                        {% if mode == "auth" %}
+                            <div class="row">
+                                <div class="offset-md-1 col-offset-md-1 col-md-10 text-center">
+                                    Welcome back {{ request.session.base_username }}<br/>
+                                    <a href="{% url 'mfa_reset_cookie' %}">Not me</a>
+                                    <br/>
+                                </div>
+                            </div>
+                        {% endif %}
+                        <div class="row">
+                            <div class="col-sm-12 col-md-10 offset-md-1 col-offset-md-1 ">
+                                <p>Enter the code sent to your email.</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12 col-md-10 offset-md-1 col-offset-md-1">
+                                <div class="form-group">
+                                    <div class="input-group mb-3">
+                                        <span class="input-group-addon input-group-text">
+                                            <i class="fa fa-lock"></i>
+                                        </span>
+                                        <input class="form-control" size="6" MaxLength="6" autocomplete="one-time-code"
+                                               placeholder="e.g 55552"
+                                               name="otp" inputmode="numeric" pattern="\d{6}" type="text" id="otp"
+                                               autofocus>
+                                    </div>
+                                </div>
+                                <div class="form-group d-grid gap-2">
+                                    <button type="{% if mode == "auth" %}submit{% elif mode == 'recheck' %}button{% endif %}"
+                                            {% if mode == "recheck" %}id="send_totp" {% endif %}
+                                            class="btn btn-lg btn-success btn-block"> Verify
+                                    </button>
+                                </div>
+                            </div>
+                    </fieldset>
+                </form>
+            </div>
+            <div class="row">
+                <div class="col-md-12 mb-3 padding-left-25">
+                    {% if request.session.mfa_methods|length > 1 %}
+                        <a href="{% url 'mfa_methods_list' %}">Select Another Method</a>
+                    {% endif %}
+                </div>
+            </div>
         </div>
-        </div>
-	      </div>
-              </div>
+    </div>
+{% endblock %}
 

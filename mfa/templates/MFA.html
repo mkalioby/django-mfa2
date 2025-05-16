@@ -1,126 +1,106 @@
 {% extends "mfa_base.html" %}
 {% load static %}
 {% block head %}
-{{block.super}}
-    <script type="text/javascript">
-    function confirmDel(id) {
-        $.ajax({
-            url:"{% url 'mfa_delKey' %}",
-            method: "POST",
-            data:{"id":id,"csrfmiddlewaretoken":"{{ csrf_token }}"},
-            success:function (data) {
-                alert(data)
-                window.location.reload();
-            }
-        })
-    }
-    function deleteKey(id,name)
-    {
-        $("#modal-title").html("Confirm Delete")
-        $("#modal-body").html("Are you sure you want to delete '"+name+"'? you may lose access to your system if this your only 2FA.");
-        $("#actionBtn").remove()
-        $("#modal-footer").prepend("<button id='actionBtn' class='btn btn-danger' onclick='confirmDel("+id+")'>Confirm Deletion</button>")
-        $("#popUpModal").modal('show')
-    }
-
-    function toggleKey(id) {
-        $.ajax({
-            url:"{% url 'toggle_key' %}?id="+id,
-            success:function (data) {
-                if (data == "Error")
-                    $("#toggle_"+id).toggle()
-
-            },
-            error:function (data) {
-                $("#toggle_"+id).toggle()
-            }
-        })
-    }
-    </script>
-    <link href="{% static  'mfa/css/bootstrap-toggle.min.css' %}" rel="stylesheet">
-    <script src="{% static 'mfa/js/bootstrap-toggle.min.js'%}"></script>
+    {{ block.super }}
+    <link href="{% static 'mfa/css/mfa.css' %}" rel="stylesheet">
+    {% url 'mfa_delKey' as mfa_delKey %}
+    {{ mfa_delKey|json_script:"mfa_delKey" }}
+    {{ csrf_token|stringformat:"s"|json_script:"csrf_token" }}
+    {% url 'toggle_key' as toggle_key %}
+    {{ toggle_key|json_script:"toggle_key" }}
+    <script type="application/javascript" src="{% static 'mfa/js/mfa.js' %}"></script>
+    <link href="{% static 'mfa/css/bootstrap-toggle.min.css' %}" rel="stylesheet">
+    <script src="{% static 'mfa/js/bootstrap-toggle.min.js' %}"></script>
 {% endblock %}
 {% block content %}
-{{block.super}}
+    {{ block.super }}
     <br/>
     <br/>
     <div class="container">
-    <div class="row">
-        <div class="offset-5 col-2" style="text-align: center">
-            <div class="btn-group">
-            <button class="btn btn-success dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown">
-                Add Method&nbsp;<span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu">
-                {% if not 'TOTP' in UNALLOWED_AUTHEN_METHODS %}
-                    <li><a class="dropdown-item" href="{% url 'start_new_otop' %}">{% if 'TOTP' in RENAME_METHODS.keys %}{{ RENAME_METHODS.TOTP }}{% else %}Authenticator app{% endif %}</a></li>
-                {% endif %}
-                {% if not 'Email' in UNALLOWED_AUTHEN_METHODS %}
-                    <li><a class="dropdown-item" href="{% url 'start_email' %}">{% if 'Email' in RENAME_METHODS.keys %}{{ RENAME_METHODS.Email }}{% else %}Email Token{% endif %}</a></li>
-                {% endif %}
-                {% if not 'U2F' in UNALLOWED_AUTHEN_METHODS %}
-                    <li><a class="dropdown-item" href="{% url 'start_u2f' %}">{% if 'U2F' in RENAME_METHODS.keys %}{{ RENAME_METHODS.U2F }}{% else %}Security Key{% endif %}</a></li>
-                {% endif %}
-                {% if not 'FIDO2' in UNALLOWED_AUTHEN_METHODS %}
-                    <li><a class="dropdown-item" href="{% url 'start_fido2' %}">{% if 'FIDO2' in RENAME_METHODS.keys %}{{ RENAME_METHODS.FIDO2 }}{% else %}FIDO2 Security Key{% endif %}</a></li>
-                {% endif %}
-                {% if not 'Trusted_Devices' in UNALLOWED_AUTHEN_METHODS %}
-                    <li><a class="dropdown-item" href="{% url 'start_td' %}">{% if 'Trusted_Devices' in  RENAME_METHODS.keys %}{{ RENAME_METHODS.Trusted_Devices }}{% else %}Trusted Device{% endif %}</a></li>
-                {% endif %}
-            </ul>
+        <div class="row">
+            <div class="offset-5 col-2 text-center">
+                <div class="btn-group">
+                    <button class="btn btn-success dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown">
+                        Add Method&nbsp;<span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        {% if not 'TOTP' in UNALLOWED_AUTHEN_METHODS %}
+                            <li><a class="dropdown-item" href="{% url 'start_new_otop' %}">{% if 'TOTP' in RENAME_METHODS.keys %}{{ RENAME_METHODS.TOTP }}{% else %}Authenticator app{% endif %}</a></li>
+                        {% endif %}
+                        {% if not 'Email' in UNALLOWED_AUTHEN_METHODS %}
+                            <li><a class="dropdown-item" href="{% url 'start_email' %}">{% if 'Email' in RENAME_METHODS.keys %}{{ RENAME_METHODS.Email }}{% else %}Email Token{% endif %}</a></li>
+                        {% endif %}
+                        {% if not 'U2F' in UNALLOWED_AUTHEN_METHODS %}
+                            <li><a class="dropdown-item" href="{% url 'start_u2f' %}">{% if 'U2F' in RENAME_METHODS.keys %}{{ RENAME_METHODS.U2F }}{% else %}Security Key{% endif %}</a></li>
+                        {% endif %}
+                        {% if not 'FIDO2' in UNALLOWED_AUTHEN_METHODS %}
+                            <li><a class="dropdown-item" href="{% url 'start_fido2' %}">{% if 'FIDO2' in RENAME_METHODS.keys %}{{ RENAME_METHODS.FIDO2 }}{% else %}FIDO2 Security Key{% endif %}</a></li>
+                        {% endif %}
+                        {% if not 'Trusted_Devices' in UNALLOWED_AUTHEN_METHODS %}
+                            <li><a class="dropdown-item" href="{% url 'start_td' %}">{% if 'Trusted_Devices' in  RENAME_METHODS.keys %}{{ RENAME_METHODS.Trusted_Devices }}{% else %}Trusted Device{% endif %}</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
             </div>
         </div>
-    </div>
-    <br/>
-       <table class="table table-striped">
-           <tr>
-
-               <th>Type</th>
-               <th>Date Added</th>
-               <th>Expires On</th>
-               <th>Device</th>
-               <th>Last Used</th>
-               <th>Status</th>
-               <th>Delete</th>
-           </tr>
-        {% if keys %}
-            {% for key in keys %}
+        <br/>
+        <table class="table table-striped">
             <tr>
-
-                <td>{{ key.name }}</td>
-                <td>{{ key.added_on }}</td>
-                <td>{% if key.expires %}{{ key.expires }}{% else %}N/A{% endif %}</td>
-                <td>{% if key.device %}{{ key.device }}{% endif %}</td>
-                <td>{% if key.last_used %}{{ key.last_used }}{% else %}Never{% endif %}</td>
-                    {% if key.key_type in HIDE_DISABLE %}
-                        <td>{% if key.enabled %}On{% else %} Off{% endif %}</td>
-                    {% else %}
-                        <td><input type="checkbox" id="toggle_{{ key.id }}" {% if key.enabled %}checked{% endif %} data-onstyle="success" data-offstyle="danger"  onchange="toggleKey({{ key.id }})" data-toggle="toggle" class="status_chk"></td>
-                    {% endif %}
-                <td>{% if key.key_type in HIDE_DISABLE %}
-                    ----
-                    {% else %}
-                        <a href="javascript:void(0)" onclick="deleteKey({{ key.id }},'{{ key.key_type }}')"> <span class="fa fa-trash fa-solid fa-trash-can bi bi-trash-fill"></span></a></td>
+                <th>Type</th>
+                <th>Date Added</th>
+                <th>Expires On</th>
+                <th>Device</th>
+                <th>Last Used</th>
+                <th>Status</th>
+                <th>Delete</th>
+            </tr>
+            {% if keys %}
+                {% for key in keys %}
+                    <tr class="mfa_key" data-key-id="{{ key.id }}" data-key-type="{{ key.key_type }}">
+                        <td>{{ key.name }}</td>
+                        <td>{{ key.added_on }}</td>
+                        <td>{% if key.expires %}{{ key.expires }}{% else %}N/A{% endif %}</td>
+                        <td>{% if key.device %}{{ key.device }}{% endif %}</td>
+                        <td>{% if key.last_used %}{{ key.last_used }}{% else %}Never{% endif %}</td>
+                        {% if key.key_type in HIDE_DISABLE %}
+                            <td>{% if key.enabled %}On{% else %} Off{% endif %}</td>
+                        {% else %}
+                            <td><input type="checkbox" id="toggle_{{ key.id }}" {% if key.enabled %}checked{% endif %}
+                                       data-onstyle="success" data-offstyle="danger"
+                                       data-toggle="toggle" class="status_chk"></td>
                         {% endif %}
-            </tr>
-            {% endfor %}
-            {% if "RECOVERY" not in UNALLOWED_AUTHEN_METHODS and recovery %}
-            <tr>
-
-                <td>{{ recovery.name }}</td>
-                <td>{{ recovery.added_on }}</td>
-                <td>N/A</td>
-                <td>N/A</td>
-                <td>{% if recovery.last_used %}{{ recovery.last_used }}{% else %}Never{% endif %}</td>
-                <td>On</td>
-                <td><a href="{% url 'manage_recovery_codes' %}"> <span class="fa fa-wrench fa-solid fa-wrench bi bi-wrench-fill"></span></a></td>
-            </tr>
+                        {% if key.key_type in HIDE_DISABLE %}
+                            <td>----</td>
+                        {% else %}
+                            <td>
+                                <a href="#" id="delete_{{ key.id}}">
+                                    <span class="fa fa-trash fa-solid fa-trash-can bi bi-trash-fill"></span>
+                                </a>
+                            </td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+                {% if "RECOVERY" not in UNALLOWED_AUTHEN_METHODS and recovery %}
+                    <tr>
+                        <td>{{ recovery.name }}</td>
+                        <td>{{ recovery.added_on }}</td>
+                        <td>N/A</td>
+                        <td>N/A</td>
+                        <td>{% if recovery.last_used %}{{ recovery.last_used }}{% else %}Never{% endif %}</td>
+                        <td>On</td>
+                        <td>
+                            <a href="{% url 'manage_recovery_codes' %}">
+                                <span class="fa fa-wrench fa-solid fa-wrench bi bi-wrench-fill"></span>
+                            </a>
+                        </td>
+                    </tr>
+                {% endif %}
+            {% else %}
+                <tr>
+                    <td colspan="7" class="text-center">You didn't have any keys yet.</td>
+                </tr>
             {% endif %}
-        {% else %}
-           <tr><td colspan="7" align="center">You didn't have any keys yet.</td> </tr>
-       {% endif %}
         </table>
-    </div>
     </div>
     {% include "modal.html" %}
 {% endblock %}

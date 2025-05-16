@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "mfa",
+    'csp',
     "sslserver",
 ]
 
@@ -49,6 +50,7 @@ MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
+    "csp.middleware.CSPMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -168,3 +170,13 @@ FIDO_SERVER_ID = (
     "localhost"  # Server rp id for FIDO2, it the full domain of your project
 )
 FIDO_SERVER_NAME = "TestApp"
+
+
+CSP = ("'self'", f'*.localhost')
+CSP_DEFAULT_SRC = CSP
+CSP_IMG_SRC = CSP + ('data:', 'blob:')
+CSP_FONT_SRC = CSP + ('data:',)
+CSP_SCRIPT_SRC = CSP
+CSP_STYLE_SRC = CSP
+CSP_CONNECT_SRC = CSP
+CSP_FORM_ACTION = CSP

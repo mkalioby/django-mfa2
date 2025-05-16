@@ -1,85 +1,71 @@
-<script type="application/javascript">
-    $(document).ready(function showWarningLastBackup() {
-        {% if lastBackup %}
-        $("#modal-title").html("Last backup code used !")
-        $("#modal-body").html("Don't forget to regenerate new backup code after login !")
-        $('#modal-footer').html(`<FORM METHOD="GET" ACTION="{% url 'recovery_auth' %}" Id="confirmLogin" onSubmit="" name="recoveryLastBackupConfirm">
-        <input type='submit'class='btn btn-lg btn-success btn-block' value='Continue'>`)
-        $("#popUpModal").modal('show')
-        {% endif %}
-        return
-    });
-    function send_recovery() {
-        $.ajax({"url":"{% url 'recovery_recheck' %}", method:"POST",dataType:"JSON",
-            data:{"csrfmiddlewaretoken":"{{ csrf_token }}","recovery":$("#recovery").val()},
-         success:function (data) {
-                            if (data["recheck"])
-                                mfa_success_function();
-                            else {
-                                mfa_failed_function();
-                            }
-                        }
-        })
-    }
-</script>
-<div class="row">
-<div class="col-sm-10 col-sm-offset-1 col-xs-12 col-md-10 col-md-offset-1 col-lg-10 col-lg-offset-1">
-<div class="panel panel-default card">
-      <div class="panel-heading card-header">
-	      <strong> Recovery code</strong>
-      </div>
-      <div class="panel-body card-body">
-
-      <FORM METHOD="POST" ACTION="{% url 'recovery_auth' %}" Id="formLogin" onSubmit="" name="FrontPage_Form1">
-
-
-      {% csrf_token %}
-          {%  if invalid %}
-          <div class="alert alert-danger">
-              Sorry, The provided code is not valid, or has already been used.
-          </div>
-          {% endif %}
-      {% if quota %}
-          <div class="alert alert-warning">
-              {{ quota }}
-          </div>
-      {% endif %}
-      <fieldset>
-      <div class="row">
-      <div class="col-sm-12 col-md-12">
-        <p>Enter the 11-digits on your authenticator. Or input a recovery code</p>
-      </div>
-      </div>
-
-      <div class="row">
-	  <div class="col-sm-12 col-md-12">
-	    <div class="form-group">
-	      <div class="input-group mb-3">
-		<span class="input-group-addon input-group-text">
-		<i class="glyphicon glyphicon-lock bi bi-lock"></i>
-		</span>
-		<input class="form-control" size="11" MaxLength="11" value="" placeholder="e.g abcde-fghij" name="recovery" type="text" id="recovery" autofocus>
-
-	      </div>
-	    </div>
-
-          <div class="form-group d-grid gap-2">
-
-            <input type="{% if mode == "auth" %}submit{% elif mode == 'recheck'  %}button{% endif %}" {% if mode == "recheck" %}onclick="send_recovery()" {% endif %} class="btn btn-lg btn-success btn-block" value="Sign in">
-	      </div>
-      </div>
-      </fieldset>
-      </FORM>
-      </div>
-        <div class="row">
-        <div class="col-md-12 mb-3" style="padding-left: 25px">
-            {% if request.session.mfa_methods|length > 1 %}
-                <a href="{%  url 'mfa_methods_list' %}">Select Another Method</a>
-            {% endif %}
+{% load static %}
+{% block head %}
+    <link href="{% static 'mfa/css/mfa.css' %}" rel="stylesheet">
+    {{ lastBackup|json_script:"lastBackup" }}
+    {{ csrf_token|stringformat:"s"|json_script:"csrf_token" }}
+    {% url 'recovery_recheck' as recovery_recheck %}
+    {{ recovery_recheck|json_script:"recovery_recheck" }}
+    {% url 'recovery_auth' as recovery_auth %}
+    {{ recovery_auth|json_script:"recovery_auth" }}
+    {{ mode|json_script:"mode" }}
+    <script type="application/javascript" src="{% static 'mfa/js/RECOVERY/recheck.js' %}"></script>
+{% endblock %}
+{% block content %}
+    <div class="row margin-left-15">
+        <div class="col-sm-10 col-sm-offset-1 col-xs-12 col-md-10 col-md-offset-1 col-lg-10 col-lg-offset-1">
+            <div class="panel panel-default card">
+                <div class="panel-heading card-header">
+                    <strong> Recovery code</strong>
+                </div>
+                <div class="panel-body card-body">
+                    <FORM METHOD="POST" ACTION="{% url 'recovery_auth' %}" Id="formLogin" name="FrontPage_Form1">
+                        {% csrf_token %}
+                        {% if invalid %}
+                            <div class="alert alert-danger">
+                                Sorry, The provided code is not valid, or has already been used.
+                            </div>
+                        {% endif %}
+                        {% if quota %}
+                            <div class="alert alert-warning">
+                                {{ quota }}
+                            </div>
+                        {% endif %}
+                        <fieldset>
+                            <div class="row margin-left-15">
+                                <div class="col-sm-12 col-md-12">
+                                    <p>Enter the 11-digits on your authenticator. Or input a recovery code</p>
+                                </div>
+                            </div>
+                            <div class="row margin-left-15">
+                                <div class="col-sm-12 col-md-12">
+                                    <div class="form-group">
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-addon input-group-text">
+                                            <i class="glyphicon glyphicon-lock bi bi-lock"></i>
+                                            </span>
+                                            <input class="form-control" size="11" MaxLength="11" value=""
+                                                   placeholder="e.g abcde-fghij" name="recovery" type="text" id="recovery"
+                                                   autofocus>
+                                        </div>
+                                    </div>
+                                    <div class="form-group d-grid gap-2">
+                                        <input type="{% if mode == "auth" %}submit{% elif mode == 'recheck' %}button{% endif %}"
+                                               {% if mode == "recheck" %}id="send_recovery" {% endif %}
+                                               class="btn btn-lg btn-success btn-block" value="Sign in">
+                                    </div>
+                                </div>
+                        </fieldset>
+                    </FORM>
+                </div>
+                <div class="row margin-left-15">
+                    <div class="col-md-12 mb-3 padding-left-25">
+                        {% if request.session.mfa_methods|length > 1 %}
+                            <a href="{% url 'mfa_methods_list' %}">Select Another Method</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
         </div>
-        </div>
-	      </div>
-              </div>
-</div>
-</div>
-{% include "modal.html" %}
+    </div>
+    {% include "modal.html" %}
+{% endblock %}
