@@ -1,134 +1,104 @@
 # MFA Testing Framework
 
-This directory contains the test suite for the Django MFA application. The testing framework is built around the `MFATestCase` base class, which provides a comprehensive set of utilities and helpers for testing MFA functionality.
+This directory contains a partial test suite built around the `MFATestCase` base class.
 
-## Testing Philosophy
+Currently, only infrastructure and totp prototype tests exist. Once the style of tests is agreed, the rest of the suite will be written.
 
-The testing framework follows these key principles:
+## Quick Start
 
-1. **Setup**: Each test starts with a well-defined state including:
-   - A test user with known credentials
-   - Cleared cache
-   - Controlled session state
-   - Preserved and restorable settings
+```python
+from .base import MFATestCase
 
-2. **Isolation**: Tests are designed to be independent and self-contained:
-   - Each test resets to a known state
-   - Original settings are restored after each test
-   - Cache and session data are cleared
-   - All MFA keys are removed between tests
+class TestYourFeature(MFATestCase):
+    def test_your_functionality(self):
+        # Create test keys
+        key = self.create_totp_key(enabled=True)
+        
+        # Setup session
+        self.setup_mfa_session(method="TOTP", verified=True, id=key.id)
+        
+        # Test your functionality
+        response = self.client.get(self.get_mfa_url("mfa_home"))
+        self.assertEqual(response.status_code, 200)
+```
 
-3. **Flexibility**: The framework supports testing of:
-   - Multiple MFA methods (TOTP, Recovery codes, etc.)
-   - Both enabled and disabled states
-   - Various session configurations
-   - Different URL patterns (namespaced and non-namespaced)
-
-## MFATestCase Features
-
-The `MFATestCase` class provides several key features:
-
-### User and Authentication Management
-- Automatic test user creation
-- Session management helpers
-- MFA key creation utilities for different methods
-
-### MFA State Verification
-- Session state verification
-- Key state checking
-- Settings validation
-- URL resolution testing
+## Key Features
 
 ### Helper Methods
 ```python
-# Create MFA keys
+# MFA Key Creation
 create_totp_key(enabled=True)
 create_recovery_key(enabled=True)
+create_email_key(enabled=True)
 
-# Session management
+# Session Management
 setup_mfa_session(method="TOTP", verified=True, id=1)
-verify_mfa_session_state(expected_verified, expected_method, expected_id)
+assertMfaSessionVerified(method="TOTP", id=1)
+assertMfaSessionUnverified()
 
-# TOTP testing
+# TOTP Testing
 get_valid_totp_token()
 get_invalid_totp_token()
 
-# URL handling
-get_mfa_url(url_name, *args, **kwargs)
-verify_url_requires_mfa(url, method="get", data=None)
+# URL Handling
+get_mfa_url("mfa_home")  # Handles namespaced/non-namespaced URLs
 ```
 
-## Writing New Tests
+### Test Session Management
+```python
+@override_settings(MFA_LOGIN_CALLBACK="mfa.tests.create_session")
+def test_with_login_callback(self):
+    # Test code here
+```
 
-When writing new tests:
+### Logout URL Handling
+The test framework includes a dummy logout URL to handle template rendering:
+- **Purpose**: Templates may reference `{% url 'logout' %}` which doesn't exist in the MFA app
+- **Solution**: `dummy_logout` view in `base.py` provides a placeholder response
+- **Usage**: Automatically appended to test URL configurations (`test_base.py`, `test_urls.py`)
+- **No action required**: Tests work transparently without template errors
 
-1. **Inherit from MFATestCase**:
-   ```python
-   from .base import MFATestCase
+## MFA Key Type System
 
-   class TestYourFeature(MFATestCase):
-       def test_your_functionality(self):
-           # Your test code here
-   ```
+### Database Storage Format (for creating keys)
+- `"TOTP"` - Time-based One-Time Password
+- `"Email"` - Email token authentication  
+- `"U2F"` - Universal 2nd Factor security key
+- `"FIDO2"` - FIDO2 security key/biometric
+- `"Trusted Device"` - Device-based authentication (note the space)
+- `"RECOVERY"` - Recovery codes
 
-2. **Use the provided helpers**:
-   - Use `create_totp_key()` or `create_recovery_key()` for key setup
-   - Use `setup_mfa_session()` to configure the session state
-   - Use verification methods to assert expected states
+### Configuration Format (for settings)
+- `"TOTP"`, `"Email"`, `"U2F"`, `"FIDO2"`, `"RECOVERY"`
+- `"Trusted_Devices"` (note the underscore, different from storage)
 
-3. **Clean up properly**:
-   - The base class handles most cleanup automatically
-   - Add any additional cleanup in `tearDown()` if needed
+### Example Usage
+```python
+# Creating keys - use database format
+key = User_Keys.objects.create(key_type="Trusted Device", ...)
 
-4. **Test edge cases**:
-   - Test both successful and failure scenarios
-   - Verify behavior with different settings configurations
-   - Test with various session states
+# Testing settings - use configuration format  
+with override_settings(MFA_RENAME_METHODS={"Trusted_Devices": "Custom Name"}):
+    ...
+```
 
-## Configuration
+## Test Isolation
 
-The test framework supports various settings that can be overridden using `@override_settings`:
+Each test automatically:
+- Creates a fresh test user
+- Clears cache and session data
+- Removes all MFA keys
+- Restores original settings after completion
+
+## Configuration Override
 
 ```python
 @override_settings(
     MFA_REQUIRED=True,
-    MFA_UNALLOWED_METHODS=(),
-    MFA_HIDE_DISABLE=(),
-    # ... other settings
+    MFA_UNALLOWED_METHODS=("TOTP",),
+    MFA_HIDE_DISABLE=("RECOVERY",),
+    MFA_RENAME_METHODS={"TOTP": "Authenticator App"}
 )
-def test_your_feature(self):
+def test_with_custom_settings(self):
     # Test code
 ```
-
-## Test Session Management
-
-The testing framework includes a standalone `create_session()` function that simulates the MFA login process:
-
-```python
-def create_session(request, username):
-    """Create a test session for MFA authentication."""
-```
-
-This function serves as a test implementation of the `MFA_LOGIN_CALLBACK` setting. It:
-- Retrieves the user by username
-- Sets up the authentication backend
-- Logs the user in using Django's login system
-- Redirects to the MFA home page
-
-### Usage
-
-1. **In Settings Override**:
-   ```python
-   @override_settings(
-       MFA_LOGIN_CALLBACK='mfa.tests.base.create_session'
-   )
-   def test_your_feature(self):
-       # Test code
-   ```
-
-2. **Purpose**:
-   - Simulates the real-world login process in tests
-   - Provides a reference implementation for custom login callbacks
-   - Ensures consistent session creation across tests
-
-This implementation mirrors the example from `example.auth.create_session`
