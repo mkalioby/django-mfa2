@@ -1,6 +1,7 @@
 import string
 import random
 from datetime import datetime, timedelta
+from django.conf import settings
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.template.context_processors import csrf
