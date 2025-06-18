@@ -1,6 +1,6 @@
 from django.urls import resolve, reverse, path, include
 from django.test import override_settings
-from .base import MFATestCase
+from .base import MFATestCase, dummy_logout
 from mfa.urls import urlpatterns as mfa_urlpatterns
 from mfa import views, totp, U2F, TrustedDevice, helpers, FIDO2, Email, recovery
 from django.contrib import admin
@@ -9,6 +9,10 @@ from django.contrib import admin
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("mfa/", include(mfa_urlpatterns)),  # Include without namespace
+]
+
+urlpatterns += [
+    path("auth/logout/", dummy_logout, name="logout"),  # <-- Added dummy logout path
 ]
 
 

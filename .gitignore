@@ -5,6 +5,8 @@ example/venv
 __pycache__/
 *.py[cod]
 *$py.class
+CLAUDE.md
+ruff.txt
 
 # C extensions
 *.so
