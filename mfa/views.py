@@ -93,12 +93,12 @@ def login(request, username=None):
 
 @login_required
 def delKey(request):
-    key = User_Keys.objects.get(id=request.GET["id"])
+    key = User_Keys.objects.get(id=request.POST["id"])
     if key.username == request.user.username:
         key.delete()
         return HttpResponse("Deleted Successfully")
     else:
-        return HttpResponse("Error: You own this token so you can't delete it")
+        return HttpResponse("Error: This key doesn't exist")
 
 
 def __get_callable_function__(func_path):

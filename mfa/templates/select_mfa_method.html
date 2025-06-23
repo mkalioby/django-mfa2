@@ -1,25 +1,24 @@
 {% extends "mfa_auth_base.html" %}
 {% block content %}
-
-<div class="panel panel-default card auth-card mt-5 mx-auto">
-      <div class="panel-heading card-header">
-	      <strong> Select Second Factor Verification Method</strong>
-      </div>
-      <div class="panel-body card-body">
-          <ul>
-              {% for method in request.session.mfa_methods %}
-
-              <li><a href="{% url "mfa_goto" method %}">
-                  {% if method == "TOTP" %}{% if 'TOTP' in RENAME_METHODS %}{{ RENAME_METHODS.TOTP }}{% else %}Authenticator App{% endif %}
-                  {% elif method == "Email" %}{% if 'Email' in RENAME_METHODS %}{{ RENAME_METHODS.Email }}{% else %}Send OTP by Email{% endif %}
-                  {% elif method == "U2F" %}{% if 'U2F' in RENAME_METHODS %}{{ RENAME_METHODS.U2F }}{% else %}Secure Key{% endif %}
-                  {% elif method == "FIDO2" %}{% if 'FIDO2' in RENAME_METHODS %}{{ RENAME_METHODS.FIDO2 }}{% else %}FIDO2 Secure Key{% endif %}
-                  {% elif method == "RECOVERY" %}{% if 'RECOVERY' in RENAME_METHODS %}{{ RENAME_METHODS.RECOVERY }}{% else %}Recovery Code{% endif %}
-                  {% endif %}
-              </a> </li>
-              {% endfor %}
-          </ul>
-      </div>
-</div>
-
+    <div class="panel panel-default card auth-card mt-5 mx-auto">
+          <div class="panel-heading card-header">
+              <strong> Select Second Factor Verification Method</strong>
+          </div>
+          <div class="panel-body card-body">
+              <ul>
+                  {% for method in request.session.mfa_methods %}
+                  <li>
+                      <a href="{% url "mfa_goto" method %}">
+                          {% if method == "TOTP" %}{% if 'TOTP' in RENAME_METHODS %}{{ RENAME_METHODS.TOTP }}{% else %}Authenticator App{% endif %}
+                          {% elif method == "Email" %}{% if 'Email' in RENAME_METHODS %}{{ RENAME_METHODS.Email }}{% else %}Send OTP by Email{% endif %}
+                          {% elif method == "U2F" %}{% if 'U2F' in RENAME_METHODS %}{{ RENAME_METHODS.U2F }}{% else %}Secure Key{% endif %}
+                          {% elif method == "FIDO2" %}{% if 'FIDO2' in RENAME_METHODS %}{{ RENAME_METHODS.FIDO2 }}{% else %}FIDO2 Secure Key{% endif %}
+                          {% elif method == "RECOVERY" %}{% if 'RECOVERY' in RENAME_METHODS %}{{ RENAME_METHODS.RECOVERY }}{% else %}Recovery Code{% endif %}
+                          {% endif %}
+                      </a>
+                  </li>
+                  {% endfor %}
+              </ul>
+          </div>
+    </div>
 {% endblock %}

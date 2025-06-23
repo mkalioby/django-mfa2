@@ -1,48 +1,48 @@
-{%  load static %}
-<div class="row">
-
-
-<div class="panel panel-default card mx-auto mt-5 auth-card">
-      <div class="panel-heading card-header">
-	      <strong> PassKey</strong>
-      </div>
-      <div class="panel-body card-body">
-
-              <div class="row">
-            <div style="padding-left: 15px" class="col-md-10 col-md-offset-1 offset-md-1" id="main_paragraph" align="center">
-                {% if mode == "auth" %}
-                   Welcome back {% comment %}<img src="{% url 'getUserImage' request.session.base_username  %}" title="{{ request.session.base_username }}" style="padding: 3px;height: 50px" class="img-circle"/>{% endcomment %} {{ request.session.base_username }}<br/>
-                    <a href="{% url 'mfa_reset_cookie' %}">Not me</a>
-                    <br/>
-
-            {% endif %}
-                <div id="res">
-                    <p style="color: green">please press the button on your security key to prove it is you.</p>
+{% load static %}
+{% block head %}
+    <link href="{% static 'mfa/css/mfa.css' %}" rel="stylesheet">
+{% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="panel panel-default card mx-auto mt-5 auth-card">
+            <div class="panel-heading card-header">
+                <strong> PassKey</strong>
+            </div>
+            <div class="panel-body card-body">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1 offset-md-1 padding-left-15 text-center" id="main_paragraph">
+                        {% if mode == "auth" %}
+                            Welcome back
+                            {% comment %}<img src="{% url 'getUserImage' request.session.base_username  %}" title="{{ request.session.base_username }}" class="img-circle"/>{% endcomment %}
+                            {{ request.session.base_username }}<br/>
+                            <a href="{% url 'mfa_reset_cookie' %}">Not me</a>
+                            <br/>
+                        {% endif %}
+                        <div id="res">
+                            <p class="success-message">please press the button on your security key to prove it is you.</p>
+                        </div>
+                        <div id="msgdiv"></div>
+                        {% if mode == "auth" %}
+                            <form id="fido2_login" action="{% url 'fido2_complete_auth' %}" method="post" enctype="multipart/form-data">
+                        {% elif mode == "recheck" %}
+                            <form id="fido2_login" action="{% url 'fido2_recheck' %}" method="post" enctype="multipart/form-data">
+                        {% endif %}
+                        {% csrf_token %}
+                        <input type="hidden" name="response" id="response" value=""/>
+                        </form>
+                    </div>
                 </div>
-                <div id="msgdiv"></div>
-                {% if mode == "auth" %}
-                    <form id="fido2_login" action="{% url 'fido2_complete_auth' %}" method="post" enctype="multipart/form-data">
-                {% elif mode == "recheck" %}
-                    <form id="fido2_login" action="{% url 'fido2_recheck' %}" method="post" enctype="multipart/form-data">
-                {% endif %}
-              {% csrf_token %}
-              <input type="hidden" name="response" id="response" value=""/>
-          </form>
-      </div>
-                  </div>
-          </div>
+            </div>
 
-          <div class="row">
-          <div class="col-md-12 mb-3" style="padding-left: 25px">
-
-            {% if request.session.mfa_methods|length > 1 %}
-               <a href="{%  url 'mfa_methods_list' %}">Select Another Method</a>
-            {% endif %}
-          </div>
+            <div class="row">
+                <div class="col-md-12 mb-3 padding-left-25">
+                    {% if request.session.mfa_methods|length > 1 %}
+                        <a href="{% url 'mfa_methods_list' %}">Select Another Method</a>
+                    {% endif %}
+                </div>
+            </div>
         </div>
-      </div>
-</div>
-</div>
-</div>
+    </div>
 
     {% include 'FIDO2/Auth_JS.html' %}
+{% endblock %}

@@ -1,61 +1,33 @@
 {% extends "base.html" %}
 {% load static %}
 {% block head %}
-    <style>
-    #two-factor-steps {
-	border: 1px solid #ccc;
-	border-radius: 3px;
-	padding: 15px;
-}
-    .row{
-        margin: 0px;
-    }
-    </style>
+    <link href="{% static 'mfa/css/mfa.css' %}" rel="stylesheet">
     <script src="{% static 'mfa/js/u2f-api.js' %}" type="text/javascript"></script>
-    <script type="text/javascript">
-    function addToken() {
-                data=JSON.parse('{{ token|safe }}')
-                console.log(data)
-                u2f.register(data.appId,data.registerRequests,data.registeredKeys,function (response) {
-                    $.ajax({
-                        "url":"{% url 'bind_u2f' %}",method:"POST",
-                        data:{"csrfmiddlewaretoken":"{{ csrf_token }}","response":JSON.stringify(response)},
-                        success:function (data) {
-                        if (data =='OK')
-                            $("#res").html("<div class='alert alert-success'>Your device is registered successfully, <a href='{{redirect_html}}'> {{reg_success_msg}}</a></div>")
-                        else if (data == "RECOVERY")
-                        {
-                            setTimeout(function (){location.href="{% url 'manage_recovery_codes' %}"},2500)
-                            $("#res").html("<div class='alert alert-success'>Your device is registered successfully, but <a href='{% url 'manage_recovery_codes' %}'>redirecting to {{ RECOVERY_METHOD }} method</a></div>")
-                        }
-                        else
-                            $("#res").html("<div class='alert alert-danger'>Registration failed, please <a href='javascript:void(0)' onclick='addToken()'>try again</a> or <a href='{% url 'mfa_home' %}'> Go to Security Home</a></div>")
-                    },
-                        error: function (data)
-                        {
-                             $("#res").html("<div class='alert alert-danger'>Registration failed, please <a href='javascript:void(0)' onclick='addToken()'>try again</a> or <a href='{% url 'mfa_home' %}'> Go to Security Home</a></div>")
-                        }
-                    })
-                },5000)
-            }
-    $(document).ready(addToken())
-
-    </script>
+    {{ token|json_script:"token" }}
+    {% url 'bind_u2f' as bind_u2f %}
+    {{ bind_u2f|json_script:"bind_u2f" }}
+    {{ csrf_token|stringformat:"s"|json_script:"csrf_token" }}
+    {{ redirect_html|json_script:"redirect_html" }}
+    {{ reg_success_msg|json_script:"reg_success_msg" }}
+    {% url 'manage_recovery_codes' as manage_recovery_codes %}
+    {{ manage_recovery_codes|json_script:"manage_recovery_codes" }}
+    {{ RECOVERY_METHOD|json_script:"RECOVERY_METHOD" }}
+    {% url 'mfa_home' as mfa_home %}
+    {{ mfa_home|json_script:"mfa_home" }}
+    <script type="application/javascript" src="{% static 'mfa/js/U2F/add.js' %}"></script>
 {% endblock %}
 {% block content %}
-      <br/>
+    <br/>
     <br/>
     <div class="container">
-
         <div class="col-md-6 col-md-offset-3" id="two-factor-steps">
             <div id="res"></div>
-            <div class="row" align="center">
-                <h4>Adding {{ method.name}}</h4>
+            <div class="row text-center">
+                <h4>Adding {{ method.name }}</h4>
             </div>
-    <div class="row">
-    <p style="color: green">Your secure Key should be flashing now, please press on button.</p>
-
-    </div>
+            <div class="row">
+                <p class="success-message">Your secure Key should be flashing now, please press on button.</p>
+            </div>
         </div>
     </div>
     {% include "modal.html" %}

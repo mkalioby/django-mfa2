@@ -1,5 +1,16 @@
 # Change Log
 
+## 3.1
+
+* Upgraded to fido==1.2.0
+* Added: CSP Compliance (optional), thanks to @lvanbuiten, to under CSP refer to [van Buiten](https://github.com/mkalioby/django-mfa2/pull/93#issuecomment-2847112870)
+* Fix: issue when finding the user based on credential id.
+* Fix: Move key delete to be POST call. Thanks to @AndreasDickow
+
+## 3.0.1
+
+* Fix: Issue with some usernames that crashes FIDO2 registration.
+
 ## 3.0
 
 This is a major cleanup and CSS adjustments so please test before deployment.
