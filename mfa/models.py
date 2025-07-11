@@ -4,10 +4,10 @@ from django.conf import settings
 
 try:
     from django.db.models import JSONField
-except ModuleNotFoundError:
+except ImportError:
     try:
         from jsonfield import JSONField  # pyre-ignore[21]
-    except ModuleNotFoundError as exc:
+    except ImportError as exc:
         raise ModuleNotFoundError(
             "Can't find a JSONField implementation, please install jsonfield if django < 4.0"
         )
@@ -24,9 +24,7 @@ class User_Keys(models.Model):
     owned_by_enterprise = models.BooleanField(default=None, null=True, blank=True)
     user_handle = models.CharField(default=None, null=True, blank=True, max_length=255)
 
-    def save(
-        self, force_insert=False, force_update=False, using=None, update_fields=None
-    ):
+    def save(self, *args, **kwargs):
         if (
             self.key_type == "Trusted Device"
             and self.properties.get("signature", "") == ""
@@ -35,12 +33,7 @@ class User_Keys(models.Model):
                 {"username": self.username, "key": self.properties["key"]},
                 settings.SECRET_KEY,
             )
-        super(User_Keys, self).save(
-            force_insert=force_insert,
-            force_update=force_update,
-            using=using,
-            update_fields=update_fields,
-        )
+        super(User_Keys, self).save(*args, **kwargs)
 
     def __unicode__(self):
         return "%s -- %s" % (self.username, self.key_type)
