@@ -224,7 +224,7 @@ function some_func() {
 * [ezrajrice](https://github.com/ezrajrice)
 * [Spitfireap](https://github.com/Spitfireap)
 * [peterthomassen](https://github.com/peterthomassen)
-* [mdewhirst](https://github.com/mdewhirst)
+* [lvanbuiten](https://github.com/lvanbuiten)
 
 
  # Security contact information
