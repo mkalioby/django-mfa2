@@ -69,8 +69,7 @@ class MFATestCase(TestCase):
         "MFA_REDIRECT_AFTER_REGISTRATION": "mfa_home",
         # Email settings
         "EMAIL_BACKEND": "django.core.mail.backends.console.EmailBackend",
-        "MFA_EMAIL_SUBJECT": "Your verification code",
-        "MFA_EMAIL_FROM": "security@example.com",
+        "EMAIL_FROM": "security@example.com",
         # FIDO2 settings
         "FIDO_SERVER_ID": "example.com",
         "FIDO_SERVER_NAME": "Test Server",
