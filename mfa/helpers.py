@@ -31,10 +31,10 @@ def recheck(request):
         return JsonResponse({"res": TrustedDevice.verify(request)})
 
     elif method == "U2F":
-        return JsonResponse({"html": U2F.recheck(request).content})
+        return JsonResponse({"html": U2F.recheck(request).content.decode()})
 
     elif method == "FIDO2":
-        return JsonResponse({"html": FIDO2.recheck(request).content})
+        return JsonResponse({"html": FIDO2.recheck(request).content.decode()})
 
     elif method == "TOTP":
-        return JsonResponse({"html": totp.recheck(request).content})
+        return JsonResponse({"html": totp.recheck(request).content.decode()})
