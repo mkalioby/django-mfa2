@@ -1,4 +1,5 @@
 import json
+import time
 from base64 import urlsafe_b64encode
 
 from fido2.server import Fido2Server, PublicKeyCredentialRpEntity
@@ -232,7 +233,7 @@ def authenticate_complete(request):
                         "message": "Wrong challenge received, make sure that this is your security and try again.",
                     },
                     status=400,
-                ),
+                )
         except Exception as excep:
             return JsonResponse({"status": "ERR", "message": str(excep)}, status=500)
 
