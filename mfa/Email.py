@@ -20,7 +20,7 @@ def sendEmail(request, username, secret):
     user = User.objects.get(**kwargs)
     res = render(
         request,
-        "mfa_email_token_template.html",
+        "Email/mfa_email_token_template.html",
         {"request": request, "user": user, "otp": secret},
     )
     subject = getattr(settings, "MFA_OTP_EMAIL_SUBJECT", "OTP")
@@ -37,7 +37,8 @@ def start(request):
     """Start adding email as a 2nd factor"""
     context = csrf(request)
     if request.method == "POST":
-        if request.session["email_secret"] == request.POST["otp"]:  # if successful
+        otp = request.POST.get("otp", "").strip()
+        if request.session["email_secret"] == otp:  # if successful
             uk = User_Keys()
             User, USERNAME_FIELD = get_username_field()
             uk.username = USERNAME_FIELD
@@ -85,7 +86,8 @@ def auth(request):
     if request.method == "POST":
         username = request.session["base_username"]
 
-        if request.session["email_secret"] == request.POST["otp"].strip():
+        otp = request.POST.get("otp", "").strip()
+        if request.session["email_secret"] == otp:
             email_keys = User_Keys.objects.filter(username=username, key_type="Email")
             if email_keys.exists():
                 uk = email_keys.first()
