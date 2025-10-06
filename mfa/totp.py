@@ -15,7 +15,11 @@ from .models import User_Keys
 
 
 def verify_login(request, username, token):
-    for key in User_Keys.objects.filter(username=username, key_type="TOTP"):
+    for key in User_Keys.objects.filter(
+        username=username,
+        key_type="TOTP",
+        enabled=True,
+    ):
         totp = pyotp.TOTP(key.properties["secret_key"])
         if totp.verify(token, valid_window=30):
             key.last_used = timezone.now()
