@@ -66,8 +66,8 @@ def verify_login(request, username, token):
         secret_keys = key.properties["secret_keys"]
         salt = key.properties["salt"]
         hashedToken = make_password(token, salt, "pbkdf2_sha256_custom")
-        for i, token in enumerate(secret_keys):
-            if hashedToken == token:
+        for i, storedhash in enumerate(secret_keys):
+            if hashedToken == storedhash:
                 secret_keys.pop(i)
                 key.properties["secret_keys"] = secret_keys
                 key.last_used = timezone.now()
@@ -88,10 +88,12 @@ def recheck(request):
     context = csrf(request)
     context["mode"] = "recheck"
     if request.method == "POST":
-        if verify_login(request, request.user.username, token=request.POST["recovery"])[
+        if verify_login(request, request.session["base_username"], token=request.POST["recovery"])[
             0
         ]:
             request.session["mfa"]["rechecked_at"] = time.time()
+            # Django doesn't auto-save nested dictionary modifications
+            request.session.save()
             return JsonResponse({"recheck": True})
 
         else:
