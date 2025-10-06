@@ -1,6 +1,7 @@
 import string
 import random
 from datetime import datetime, timedelta
+from django.conf import settings
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.template.context_processors import csrf
@@ -126,7 +127,7 @@ def start(request):
             "url": request.scheme
             + "://"
             + request.get_host()
-            + reverse("add_trusted_device"),
+            + reverse("add_td"),
         }
     except:
         del request.session["td_id"]
@@ -135,7 +136,7 @@ def start(request):
 
 
 def send_email(request):
-    body = render(request, "TrustedDevices/email.html", {}).content
+    body = render(request, "TrustedDevices/email.html", {}).content.decode()
     from .Common import send
 
     e = request.user.email
@@ -158,7 +159,7 @@ def verify(request):
         if json["username"].lower() == request.session["base_username"].lower():
             try:
                 uk = User_Keys.objects.get(
-                    username=request.POST["username"].lower(),
+                    username=json["username"].lower(),
                     properties__icontains='"key": "%s"' % json["key"],
                 )
                 if uk.enabled and uk.properties["status"] == "trusted":
