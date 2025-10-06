@@ -20,7 +20,7 @@ from mfa import TrustedDevice
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("mfa2/", include("mfa.urls")),
+    path("mfa/", include("mfa.urls")),
     path("auth/login", auth.loginView, name="login"),
     path("auth/logout", auth.logoutView, name="logout"),
     path("devices/add/", TrustedDevice.add, name="add_trusted_device"),
