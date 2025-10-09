@@ -3261,7 +3261,7 @@ class MFATestCaseTests(TestCase):
         self.assertTrue(hasattr(request, "GET"))
 
         # Verify user is set correctly
-        self.assertEqual(request.user.username, self.mfa_test.username)
+        self.assertEqual(request.user.get_username(), self.mfa_test.username)
 
     def test_create_mock_request_custom_username(self):
         """Verifies mock request creation with custom username.
@@ -3285,7 +3285,7 @@ class MFATestCaseTests(TestCase):
         self.assertTrue(hasattr(request, "user"))
 
         # Verify custom username is used
-        self.assertEqual(request.user.username, custom_username)
+        self.assertEqual(request.user.get_username(), custom_username)
 
     def test_create_http_request_mock(self):
         """Verifies HTTP request mock creation.
@@ -3312,7 +3312,7 @@ class MFATestCaseTests(TestCase):
         self.assertTrue(hasattr(request, "META"))
 
         # Verify user is set correctly
-        self.assertEqual(request.user.username, self.mfa_test.username)
+        self.assertEqual(request.user.get_username(), self.mfa_test.username)
 
     def test_create_http_request_mock_custom_username(self):
         """Verifies HTTP request mock creation with custom username.
@@ -3336,7 +3336,7 @@ class MFATestCaseTests(TestCase):
         self.assertTrue(hasattr(request, "user"))
 
         # Verify custom username is used
-        self.assertEqual(request.user.username, custom_username)
+        self.assertEqual(request.user.get_username(), custom_username)
 
     def test_get_redirect_url_default(self):
         """Verifies redirect URL retrieval with default value.

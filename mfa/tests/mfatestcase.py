@@ -996,7 +996,7 @@ class MFATestCase(_BaseTestCase):
     def create_mock_request(self, username=None):
         """Create a mock request object for testing functions that expect request.user.
 
-        Some recovery functions like delTokens and getTokenLeft expect request.user.username
+        Some recovery functions like delTokens and getTokenLeft expect request.user.get_username()
         but the test client's request object doesn't have a user attribute.
 
         Args:
@@ -1010,7 +1010,16 @@ class MFATestCase(_BaseTestCase):
 
         class MockRequest:
             def __init__(self, username):
-                self.user = type("User", (), {"username": username})()
+                # Get the actual USERNAME_FIELD from the User model
+                from django.contrib.auth import get_user_model
+                User = get_user_model()
+                username_field = getattr(User, 'USERNAME_FIELD', 'username')
+                
+                # Create mock user with the correct field
+                mock_user_attrs = {username_field: username}
+                mock_user_attrs['get_username'] = lambda self: getattr(self, username_field)
+                
+                self.user = type("User", (), mock_user_attrs)()
                 self.session = {}
                 self.method = "POST"
                 self.POST = {}
@@ -1056,7 +1065,16 @@ class MFATestCase(_BaseTestCase):
         # Create a user with the specified username if different from default
         if username != self.username:
             # Create a mock user with the custom username
-            request.user = type("User", (), {"username": username})()
+            # Get the actual USERNAME_FIELD from the User model
+            from django.contrib.auth import get_user_model
+            User = get_user_model()
+            username_field = getattr(User, 'USERNAME_FIELD', 'username')
+            
+            # Create mock user with the correct field
+            mock_user_attrs = {username_field: username}
+            mock_user_attrs['get_username'] = lambda self: getattr(self, username_field)
+            
+            request.user = type("User", (), mock_user_attrs)()
         else:
             request.user = self.get_authenticated_user()
         request.method = "POST"

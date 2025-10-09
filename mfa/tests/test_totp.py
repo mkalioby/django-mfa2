@@ -629,7 +629,7 @@ class TOTPModuleTests(MFATestCase):
 
             # Should create a User_Keys record
             key = User_Keys.objects.filter(
-                username=request.user.username, key_type="TOTP"
+                username=request.user.get_username(), key_type="TOTP"
             ).first()
             self.assertIsNotNone(key)
             self.assertEqual(key.properties["secret_key"], secret_key)
@@ -658,7 +658,7 @@ class TOTPModuleTests(MFATestCase):
         # Should not create a User_Keys record
         self.assertFalse(
             User_Keys.objects.filter(
-                username=request.user.username, key_type="TOTP"
+                username=request.user.get_username(), key_type="TOTP"
             ).exists()
         )
 
@@ -692,7 +692,7 @@ class TOTPModuleTests(MFATestCase):
             from mfa.models import User_Keys
 
             key = User_Keys.objects.filter(
-                username=request.user.username, key_type="TOTP"
+                username=request.user.get_username(), key_type="TOTP"
             ).first()
             self.assertIsNotNone(key)
             self.assertEqual(key.properties["secret_key"], secret_key)
@@ -829,7 +829,7 @@ class TOTPModuleTests(MFATestCase):
             from mfa.models import User_Keys
 
             key = User_Keys.objects.filter(
-                username=request.user.username, key_type="TOTP"
+                username=request.user.get_username(), key_type="TOTP"
             ).first()
             self.assertIsNotNone(key)
             self.assertEqual(key.properties["secret_key"], secret_key)
