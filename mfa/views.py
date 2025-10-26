@@ -11,7 +11,7 @@ except:
 from django.contrib.auth.decorators import login_required
 def login(request, username=None):
     """
-    Handles user login by validating credentials and initiating the authentication process.
+    Handles user login after validating the credentials and initiating the authentication process.
 
     Args:
         request (HttpRequest): The HTTP request object containing user credentials.
@@ -75,7 +75,7 @@ def index(request):
 
 def verify(request, username):
     """
-    Verifies the available MFA methods for a user and redirects appropriately.
+    Checks the available MFA methods for a user and redirects appropriately.
 
     Args:
         request (HttpRequest): The HTTP request object.
@@ -141,15 +141,6 @@ def reset_cookie(request):
     return response
 
 
-def login(request, username=None):
-    from django.conf import settings
-
-    callable_func = __get_callable_function__(settings.MFA_LOGIN_CALLBACK)
-    if not username:
-        username = request.session["base_username"]
-    return callable_func(request, username=username)
-
-
 @login_required
 def delKey(request):
     """
@@ -171,6 +162,14 @@ def delKey(request):
 
 
 def __get_callable_function__(func_path):
+    """Assisting function to load a function out of the string
+    Args:
+        func_path (string): the full path of a function.
+
+    Returns:
+        function which can be called.
+    
+    """
     if not "." in func_path:
         raise Exception("class Name should include modulename.classname")
 
@@ -210,4 +209,14 @@ def toggleKey(request):
 
 
 def goto(request, method):
+    """
+    Redirect to the proper method view
+    Args:
+        request (HttpRequest): The HTTP request object.
+        method (String): the name of the 2nd factor method to call.
+
+    Returns:
+        HttpResponse: Success or error message.
+    
+    """
     return HttpResponseRedirect(reverse(method.lower() + "_auth"))
