@@ -120,9 +120,8 @@ class U2FRegistrationTests(MFATestCase):
         # Step 3: Mock external functions and test device binding
         with (
             # Mock external U2F library to isolate MFA project device binding
-            patch(
-                "mfa.U2F.complete_registration"
-            ) as mock_complete_reg,  # Mock MFA project function to provide reasonable input for bind function
+            # Mock MFA project function to provide reasonable input for bind function
+            patch("mfa.U2F.complete_registration") as mock_complete_reg,
             # Mock external cryptography library to isolate MFA project certificate processing
             patch("cryptography.x509.load_der_x509_certificate") as mock_load_cert,
             # Mock external hashlib to isolate MFA project certificate hash generation
@@ -229,15 +228,12 @@ class U2FRegistrationTests(MFATestCase):
 
         # Step 4: Mock external functions to return duplicate certificate hash
         with (
-            patch(
-                "mfa.U2F.complete_registration"
-            ) as mock_complete_reg,  # Mock MFA project function to provide reasonable input for bind function
-            patch(
-                "cryptography.x509.load_der_x509_certificate"
-            ) as mock_load_cert,  # Mock external cryptography library to isolate MFA project certificate processing
-            patch(
-                "hashlib.md5"
-            ) as mock_md5,  # Mock external hashlib to isolate MFA project certificate hash generation
+            # Mock MFA project function to provide reasonable input for bind function
+            patch("mfa.U2F.complete_registration") as mock_complete_reg,
+            # Mock external cryptography library to isolate MFA project certificate processing
+            patch("cryptography.x509.load_der_x509_certificate") as mock_load_cert,
+            # Mock external hashlib to isolate MFA project certificate hash generation
+            patch("hashlib.md5") as mock_md5,
         ):
             # Configure mocks to return same certificate hash as existing device
             mock_complete_reg.return_value = (mock_device, mock_cert)
@@ -397,12 +393,10 @@ class U2FRegistrationTests(MFATestCase):
 
         # Step 4: Mock external functions and test device binding with recovery enforcement
         with (
-            patch(
-                "mfa.U2F.complete_registration"
-            ) as mock_complete_reg,  # Mock MFA project function to provide reasonable input for bind function
-            patch(
-                "cryptography.x509.load_der_x509_certificate"
-            ) as mock_load_cert,  # Mock external cryptography library to isolate MFA project certificate processing
+            # Mock MFA project function to provide reasonable input for bind function
+            patch("mfa.U2F.complete_registration") as mock_complete_reg,
+            # Mock external cryptography library to isolate MFA project certificate processing
+            patch("cryptography.x509.load_der_x509_certificate") as mock_load_cert,
             patch("hashlib.md5") as mock_md5,
         ):
             # Configure mocks

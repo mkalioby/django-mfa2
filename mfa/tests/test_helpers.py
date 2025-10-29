@@ -487,7 +487,6 @@ class HelpersTests(MFATestCase):
 
         self.assertIn("argument of type 'NoneType' is not iterable", str(cm.exception))
 
-
     '''
     def test_recheck_u2f_with_valid_config(self):
         """Handles U2F method using valid configuration.
