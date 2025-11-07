@@ -1,5 +1,5 @@
 import json
-
+import warnings
 from u2flib_server.u2f import (
     begin_registration,
     begin_authentication,
@@ -22,6 +22,10 @@ from django.utils import timezone
 
 
 def recheck(request):
+    warnings.warn(
+        "U2F.auth is deprecated and will be removed in a future release. Please use FIDO2 instead.",
+        DeprecationWarning,
+    )
     context = csrf(request)
     context["mode"] = "recheck"
     s = sign(request.user.username)
@@ -32,6 +36,10 @@ def recheck(request):
 
 
 def process_recheck(request):
+    warnings.warn(
+        "U2F.auth is deprecated and will be removed in a future release. Please use FIDO2 instead.",
+        DeprecationWarning,
+    )
     x = validate(request, request.user.username)
     if x is True:
         import time
@@ -42,6 +50,10 @@ def process_recheck(request):
 
 
 def check_errors(request, data):
+    warnings.warn(
+        "U2F.auth is deprecated and will be removed in a future release. Please use FIDO2 instead.",
+        DeprecationWarning,
+    )
     if "errorCode" in data:
         if data["errorCode"] == 0:
             return True
@@ -53,6 +65,10 @@ def check_errors(request, data):
 
 
 def validate(request, username):
+    warnings.warn(
+        "U2F.auth is deprecated and will be removed in a future release. Please use FIDO2 instead.",
+        DeprecationWarning,
+    )
     import datetime, random
 
     data = json.loads(request.POST["response"])
@@ -89,6 +105,10 @@ def validate(request, username):
 
 
 def auth(request):
+    warnings.warn(
+        "U2F.auth is deprecated and will be removed in a future release. Please use FIDO2 instead.",
+        DeprecationWarning,
+    )
     context = csrf(request)
     s = sign(request.session["base_username"])
     request.session["_u2f_challenge_"] = s[0]
@@ -102,6 +122,10 @@ def auth(request):
 
 
 def start(request):
+    warnings.warn(
+        "U2F.auth is deprecated and will be removed in a future release. Please use FIDO2 instead.",
+        DeprecationWarning,
+    )
     enroll = begin_registration(settings.U2F_APPID, [])
     request.session["_u2f_enroll_"] = enroll.json
     context = csrf(request)
@@ -119,6 +143,10 @@ def start(request):
 
 
 def bind(request):
+    warnings.warn(
+        "U2F.auth is deprecated and will be removed in a future release. Please use FIDO2 instead.",
+        DeprecationWarning,
+    )
     import hashlib
 
     enroll = request.session["_u2f_enroll_"]
@@ -155,6 +183,10 @@ def bind(request):
 
 
 def sign(username):
+    warnings.warn(
+        "U2F.auth is deprecated and will be removed in a future release. Please use FIDO2 instead.",
+        DeprecationWarning,
+    )
     u2f_devices = [
         d.properties["device"]
         for d in User_Keys.objects.filter(username=username, key_type="U2F")
@@ -164,6 +196,10 @@ def sign(username):
 
 
 def verify(request):
+    warnings.warn(
+        "U2F.auth is deprecated and will be removed in a future release. Please use FIDO2 instead.",
+        DeprecationWarning,
+    )
     x = validate(request, request.session["base_username"])
     if x == True:
         return login(request)

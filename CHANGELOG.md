@@ -1,5 +1,9 @@
 # Change Log
 
+## 3.2b1
+* Add deprecation warning for U2F
+* Added 95% test coverage thanks to @mdewhirst
+
 ## 3.1.1
 * Fix: Issue #100, Issue related to error message when jsonfield isn't installed on django < 3.1.
 

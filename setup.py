@@ -27,8 +27,8 @@ setup(
     include_package_data=True,
     zip_safe=False,  # because we're including static files
     classifiers=[
-        "Development Status :: 5 - Production/Stable",
-        # "Development Status :: 4 - Beta",
+        # "Development Status :: 5 - Production/Stable",
+        "Development Status :: 4 - Beta",
         "Environment :: Web Environment",
         "Framework :: Django",
         "Framework :: Django :: 2.0",
