@@ -9,3 +9,4 @@ fido2 >= 1.1.0,<1.2.0
 jsonLookup
 raven
 pyre-check
+django-csp>=4.0
