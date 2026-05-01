@@ -25,5 +25,6 @@ urlpatterns = [
     path("auth/logout", auth.logoutView, name="logout"),
     path("devices/add/", TrustedDevice.add, name="add_trusted_device"),
     re_path("^$", views.home, name="home"),
+    re_path("index.html", views.home, name="home"),
     path("registered/", views.registered, name="registered"),
 ]
