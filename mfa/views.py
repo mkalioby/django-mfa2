@@ -9,6 +9,25 @@ try:
 except:
     from django.core.urlresolvers import reverse  # pyre-ignore[21]
 from django.contrib.auth.decorators import login_required
+def login(request, username=None):
+    """
+    Handles user login after validating the credentials and initiating the authentication process.
+
+    Args:
+        request (HttpRequest): The HTTP request object containing user credentials.
+        username (str, optional): Username to login. Defaults to None.
+
+    Returns:
+        HttpResponse: A response indicating the success or failure of the login attempt.
+    """
+
+    from django.conf import settings
+
+    callable_func = __get_callable_function__(settings.MFA_LOGIN_CALLBACK)
+    if not username:
+        username = request.session["base_username"]
+    return callable_func(request, username=username)
+
 from django.conf import settings
 from user_agents import parse
 from . import TrustedDevice
@@ -17,6 +36,16 @@ from .models import User_Keys
 
 @login_required
 def index(request):
+    """
+    Displays the list of multi-factor authentication keys for the logged-in user.
+
+    Args:
+        request (HttpRequest): The HTTP request object from the logged-in user.
+
+    Returns:
+        HttpResponse: Renders the MFA.html template with the user's keys and settings.
+    """
+
     keys = []
     context = {
         "keys": User_Keys.objects.filter(username=request.user.username),
@@ -45,7 +74,17 @@ def index(request):
 
 
 def verify(request, username):
-    request.session["base_username"] = username
+    """
+    Checks the available MFA methods for a user and redirects appropriately.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        username (str): The username of the user being verified.
+
+    Returns:
+        HttpResponse or HttpResponseRedirect: Redirects to the next MFA step or shows method selection.
+    """
+
     # request.session["base_password"] = password
     keys = User_Keys.objects.filter(username=username, enabled=1)
     methods = list(set([k.key_type for k in keys]))
@@ -69,6 +108,16 @@ def verify(request, username):
 
 
 def show_methods(request):
+    """
+    Renders a page to let the user select an MFA method if multiple are available.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: Renders the select_mfa_method.html template.
+    """
+
     return render(
         request,
         "select_mfa_method.html",
@@ -77,22 +126,33 @@ def show_methods(request):
 
 
 def reset_cookie(request):
+    """
+    Deletes the base_username cookie and redirects the user to the login page.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponseRedirect: Redirects to the LOGIN_URL after deleting the cookie.
+    """
+
     response = HttpResponseRedirect(settings.LOGIN_URL)
     response.delete_cookie("base_username")
     return response
 
 
-def login(request, username=None):
-    from django.conf import settings
-
-    callable_func = __get_callable_function__(settings.MFA_LOGIN_CALLBACK)
-    if not username:
-        username = request.session["base_username"]
-    return callable_func(request, username=username)
-
-
 @login_required
 def delKey(request):
+    """
+    Deletes a user's MFA key if it belongs to the logged-in user.
+
+    Args:
+        request (HttpRequest): The HTTP request object containing the key ID.
+
+    Returns:
+        HttpResponse: Success or error message.
+    """
+
     key = User_Keys.objects.get(id=request.POST["id"])
     if key.username == request.user.username:
         key.delete()
@@ -102,6 +162,14 @@ def delKey(request):
 
 
 def __get_callable_function__(func_path):
+    """Assisting function to load a function out of the string
+    Args:
+        func_path (string): the full path of a function.
+
+    Returns:
+        function which can be called.
+    
+    """
     if not "." in func_path:
         raise Exception("class Name should include modulename.classname")
 
@@ -116,6 +184,16 @@ def __get_callable_function__(func_path):
 
 @login_required
 def toggleKey(request):
+    """
+    Enables or disables an MFA key for the logged-in user.
+
+    Args:
+        request (HttpRequest): The HTTP request object containing the key ID.
+
+    Returns:
+        HttpResponse: Confirmation message or error message.
+    """
+
     id = request.GET["id"]
     q = User_Keys.objects.filter(username=request.user.username, id=id)
     if q.count() == 1:
@@ -131,4 +209,14 @@ def toggleKey(request):
 
 
 def goto(request, method):
+    """
+    Redirect to the proper method view
+    Args:
+        request (HttpRequest): The HTTP request object.
+        method (String): the name of the 2nd factor method to call.
+
+    Returns:
+        HttpResponse: Success or error message.
+    
+    """
     return HttpResponseRedirect(reverse(method.lower() + "_auth"))
