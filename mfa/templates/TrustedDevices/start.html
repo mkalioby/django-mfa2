@@ -24,7 +24,7 @@
             </div>
             <div class="row">
                 {% if not_allowed %}
-                    <div class="alert alert-danger">You can't add any more devices, you need to remove previously
+                    <div class="alert alert-danger">You can't add any more devices at the moment, you need to remove previously
                         trusted devices first.
                     </div>
                 {% else %}
@@ -48,18 +48,18 @@
                         <div class="col-md-6">
                             <h5>Manual</h5>
                             <ol>
-                                <li>Using your mobile/table, open Chrome/Firefox.</li>
+                                <li>Using your mobile/tablet, open Chrome/Firefox.</li>
                                 <li>Go to <b>{{ url }}</b>&nbsp;&nbsp;</li>
-                                <li>Enter your username & following 6 digits<br/>
+                                <li>Enter your username & the following 6 digits<br/>
                                     <span class="td-digits">{{ key|slice:":3" }} - {{ key|slice:"3:" }}</span>
                                 </li>
-                                <li>Confirm the consent and submit form.</li>
+                                <li>Consent and confirm.</li>
                             </ol>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-8 offset-2">
-                            This window will ask to confirm the device.
+                            This tab will now ask you to confirm the device.
                         </div>
                     </div>
                 {% endif %}

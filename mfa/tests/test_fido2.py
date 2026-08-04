@@ -337,7 +337,7 @@ class FIDO2RegistrationTests(MFATestCase):
         )  # Template content with method name
         # Verify the template renders successfully (covers lines 147-157 in FIDO2.py)
         self.assertContains(
-            response, "Your browser should ask you to confirm you identity"
+            response, "Your browser should ask you to confirm your identity"
         )  # Template content
 
     @override_settings(MFA_RENAME_METHODS={"FIDO2": "PassKey"})
