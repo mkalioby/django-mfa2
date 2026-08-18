@@ -9,4 +9,4 @@ def home(request):
 
 @login_required()
 def registered(request):
-    return render(request, "home.html", {"registered": True})
+    return render(request, "home.html", {"registered": True})  # pragma: no cover

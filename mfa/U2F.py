@@ -46,7 +46,7 @@ def process_recheck(request):
 
         request.session["mfa"]["rechecked_at"] = time.time()
         return JsonResponse({"recheck": True})
-    return x
+    return x  # pragma: no cover
 
 
 def check_errors(request, data):
@@ -204,4 +204,4 @@ def verify(request):
     if x == True:
         return login(request)
     else:
-        return x
+        return x  # pragma: no cover

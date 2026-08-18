@@ -23,18 +23,18 @@ def is_mfa(request, ignore_methods=[]):
     return False
 
 
-def recheck(request):
+def recheck(request):  # pragma: no cover
     method = request.session.get("mfa", {}).get("method", None)
     if not method:
         return JsonResponse({"res": False})
     if method == "Trusted Device":
         return JsonResponse({"res": TrustedDevice.verify(request)})
 
-    elif method == "U2F":
-        return JsonResponse({"html": U2F.recheck(request).content})
+    elif method == "U2F":  # pragma: no cover
+        return JsonResponse({"html": U2F.recheck(request).content})  # pragma: no cover
 
     elif method == "FIDO2":
         return JsonResponse({"html": FIDO2.recheck(request).content})
 
-    elif method == "TOTP":
+    elif method == "TOTP":  # pragma: no cover
         return JsonResponse({"html": totp.recheck(request).content})

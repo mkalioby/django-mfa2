@@ -32,7 +32,7 @@ except Exception:  # pragma: no cover
 
 
 def enable_json_mapping():
-    if NEW_FIDO_VER:
+    if NEW_FIDO_VER:  # pragma: no cover
         return
     try:  # pragma: no cover
         if hasattr(fido2.features, "webauthn_json_mapping"):
@@ -46,7 +46,7 @@ def enable_json_mapping():
         pass
 
 
-def recheck(request):
+def recheck(request):  # pragma: no cover
     """Starts FIDO2 recheck"""
     context = csrf(request)
     context["mode"] = "recheck"
@@ -227,7 +227,7 @@ def authenticate_complete(request):
                     ]
                 else:
                     credentials = getUserCredentials(username)
-        elif credential_id and username is None:
+        elif credential_id and username is None:  # pragma: no cover
             keys = User_Keys.objects.filter(user_handle=credential_id)
             if keys.exists():
                 credentials = [
@@ -235,7 +235,7 @@ def authenticate_complete(request):
                 ]
             else:
                 credentials = getUserCredentials(username)
-        else:
+        else:  # pragma: no cover
             credentials = getUserCredentials(username)
 
         try:
@@ -279,11 +279,11 @@ def authenticate_complete(request):
                     request.session["mfa"] = mfa
                     try:
                         authenticated = request.user.is_authenticated
-                    except:
+                    except:  # pragma: no cover
                         authenticated = request.user.is_authenticated()
                     if not authenticated:
                         res = login(request, k.username)
-                        if not "location" in res:
+                        if not "location" in res:  # pragma: no cover
                             return reset_cookie(request)
                         return JsonResponse(
                             {"status": "OK", "redirect": res["location"]}

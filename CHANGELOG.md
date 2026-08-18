@@ -1,4 +1,7 @@
 # Change Log
+## 3.3
+
+* Declares the app's AutoField type AutoField, thanks to @BVengo
 
 ## 3.2
 * Add deprecation warning for U2F

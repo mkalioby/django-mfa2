@@ -4,11 +4,11 @@ from django.conf import settings
 
 try:
     from django.db.models import JSONField
-except ImportError:
-    try:
-        from jsonfield import JSONField  # pyre-ignore[21]
-    except ImportError as exc:
-        raise ModuleNotFoundError(
+except ImportError:  # pragma: no cover
+    try:  # pragma: no cover
+        from jsonfield import JSONField  # pyre-ignore[21] # pragma: no cover
+    except ImportError as exc:  # pragma: no cover
+        raise ModuleNotFoundError(  # pragma: no cover
             "Can't find a JSONField implementation, please install jsonfield if django < 4.0"
         )
 

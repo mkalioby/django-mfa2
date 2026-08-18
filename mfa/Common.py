@@ -7,8 +7,8 @@ from django.core.mail import EmailMessage
 
 try:
     from django.urls import reverse
-except ImportError:
-    from django.core.urlresolver import reverse  # pyre-ignore[21]
+except ImportError:  # pragma: no cover
+    from django.core.urlresolver import reverse  # pyre-ignore[21] # pragma: no cover
 
 
 def send(to, subject, body):

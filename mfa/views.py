@@ -6,8 +6,8 @@ from django.http import HttpResponse, HttpResponseRedirect
 
 try:
     from django.urls import reverse
-except:
-    from django.core.urlresolvers import reverse  # pyre-ignore[21]
+except:  # pragma: no cover
+    from django.core.urlresolvers import reverse  # pyre-ignore[21] # pragma: no cover
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from user_agents import parse

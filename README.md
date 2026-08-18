@@ -14,7 +14,7 @@ A Django app that handles MFA, it supports TOTP, U2F, FIDO2 U2F (Web Authn), Ema
 [![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/django-mfa2.svg)](https://anaconda.org/conda-forge/django-mfa2) 
 [![Conda Version](https://img.shields.io/conda/vn/conda-forge/django-mfa2.svg)](https://anaconda.org/conda-forge/django-mfa2) 
 
-Web Authencation API (WebAuthn) is state-of-the art techology that is expected to replace passwords.
+Web Authentication API (WebAuthn) is state-of-the art technology that is expected to replace passwords.
 
 ![Andriod Fingerprint](https://cdn-images-1.medium.com/max/800/1*1FWkRE8D7NTA2Kn1DrPjPA.png)
 
@@ -226,6 +226,7 @@ function some_func() {
 * [peterthomassen](https://github.com/peterthomassen)
 * [lvanbuiten](https://github.com/lvanbuiten)
 * [mdewhirst](https://github.com/mdewhirst)
+* [BVengo](https://github.com/BVengo)
 
 
  # Security contact information
