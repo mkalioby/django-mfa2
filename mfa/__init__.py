@@ -1,4 +1,6 @@
 __version__ = "3.0b1"
+default_app_config = "mfa.apps.myAppNameConfig"
+
 from fido2.webauthn import ResidentKeyRequirement as ResidentKey
 from fido2.webauthn import AuthenticatorAttachment as Attachment
 from fido2.webauthn import UserVerificationRequirement as UserVerification
