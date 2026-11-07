@@ -15,6 +15,7 @@ Scenarios: Code generation, authentication, token management, hashing, session h
 import json
 import time
 import unittest
+from unittest import mock
 from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
@@ -498,6 +499,19 @@ class RecoveryViewTests(MFATestCase):
         # Document the limitation
         # Hash class uses import-time iterations value (1), not override (1000)
         # This is because iterations = getattr(settings, 'RECOVERY_ITERATION', 1) is evaluated at import time
+
+    def test_recovery_code_verifies_after_iteration_change(self):
+        """Accepts a code hashed with an older iteration count.
+
+        Codes keep the iteration count they were hashed with, so raising
+        RECOVERY_ITERATION must not lock users out of their existing codes.
+        """
+        key, codes = self.create_recovery_key_with_real_codes(enabled=True, num_codes=2)
+        old_iterations = key.properties["secret_keys"][0].split("$")[1]
+
+        with mock.patch.object(Hash, "iterations", int(old_iterations) + 1):
+            self.assertTrue(verify_login(None, self.username, codes[0])[0])
+            self.assertFalse(verify_login(None, self.username, "wrong-token")[0])
 
     def test_recovery_last_used_timestamp_update(self):
         """Updates last_used timestamp when recovery codes are successfully used.

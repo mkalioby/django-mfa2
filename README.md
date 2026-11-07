@@ -95,7 +95,7 @@ Depends on
    MFA_OWNED_BY_ENTERPRISE = False   # Who owns security keys   
    PASSWORD_HASHERS = DEFAULT_PASSWORD_HASHERS # Comment if PASSWORD_HASHER already set in your settings.py
    PASSWORD_HASHERS += ['mfa.recovery.Hash'] 
-   RECOVERY_ITERATION = 350000 #Number of iteration for recovery code, higher is more secure, but uses more resources for generation and check...
+   RECOVERY_ITERATION = 350000 #Number of iteration for recovery code, higher is more secure, but uses more resources for generation and check... Defaults to Django's PBKDF2 iterations. Existing codes keep working after a change.
 
    TOKEN_ISSUER_NAME="PROJECT_NAME"      #TOTP Issuer name
 

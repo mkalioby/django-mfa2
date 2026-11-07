@@ -18,7 +18,9 @@ USER_FRIENDLY_NAME = "Recovery Codes"
 
 class Hash(PBKDF2PasswordHasher):
     algorithm = "pbkdf2_sha256_custom"
-    iterations = getattr(settings, "RECOVERY_ITERATION", 1)
+    iterations = getattr(
+        settings, "RECOVERY_ITERATION", PBKDF2PasswordHasher.iterations
+    )
 
 
 def delTokens(request):
@@ -62,10 +64,17 @@ def genTokens(request):
 
 
 def verify_login(request, username, token):
+    if token is None:
+        return [False]
     for key in User_Keys.objects.filter(username=username, key_type="RECOVERY"):
         secret_keys = key.properties["secret_keys"]
+        if not secret_keys:
+            continue
         salt = key.properties["salt"]
-        hashedToken = make_password(token, salt, "pbkdf2_sha256_custom")
+        # Hash with the stored iteration count, so codes generated before a
+        # RECOVERY_ITERATION change still work.
+        iterations = int(secret_keys[0].split("$")[1])
+        hashedToken = Hash().encode(token, salt, iterations)
         for i, storedhash in enumerate(secret_keys):
             if hashedToken == storedhash:
                 secret_keys.pop(i)

@@ -2,6 +2,7 @@
 ## 3.3
 
 * Declares the app's AutoField type AutoField, thanks to @BVengo
+* Fix: Issue #76, `RECOVERY_ITERATION` defaults to Django's PBKDF2 iterations instead of 1, and recovery codes hashed with an older iteration count still verify.
 
 ## 3.2
 * Add deprecation warning for U2F
