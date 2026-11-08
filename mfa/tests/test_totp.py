@@ -17,7 +17,7 @@ import pyotp
 from unittest.mock import patch, MagicMock
 from django.contrib.auth import get_user_model
 from django.http import HttpRequest
-from django.test import override_settings
+from django.test import Client, override_settings
 from django.urls import reverse
 from django.utils import timezone
 from ..models import User_Keys
@@ -193,6 +193,7 @@ class TOTPViewTests(MFATestCase):
         totp.py getToken function
         Generates valid base32 secret, creates provisioning URI, stores token in session
         """
+        self.login_user()
         response = self.client.get(self.get_mfa_url("get_new_otop"))
 
         self.assertEqual(response.status_code, 200)
@@ -203,13 +204,14 @@ class TOTPViewTests(MFATestCase):
         self.assertIn("secret_key", data)
 
         # Verify QR code contains correct data
-        self.assertIn("Secret", data["qr"])  # Account name is "Secret"
+        self.assertIn(self.username, data["qr"])
         self.assertIn(data["secret_key"], data["qr"])
         self.assertIn("Django%20MFA", data["qr"])  # URL-encoded issuer name
 
-        # Verify session contains answer
+        # Verify session contains the pending answer and secret
         session = self.client.session
         self.assertIsNotNone(session.get("new_mfa_answer"))
+        self.assertEqual(session.get("new_mfa_secret"), data["secret_key"])
 
     @override_settings(MFA_ENFORCE_RECOVERY_METHOD=False)
     def test_verify_with_valid_token_success(self):
@@ -231,8 +233,8 @@ class TOTPViewTests(MFATestCase):
         valid_token = totp.now()
 
         # Verify the token
-        response = self.client.get(
-            f"{self.get_mfa_url('verify_otop')}?key={secret_key}&answer={valid_token}"
+        response = self.client.post(
+            self.get_mfa_url("verify_otop"), {"answer": valid_token}
         )
 
         self.assertEqual(response.status_code, 200)
@@ -248,6 +250,8 @@ class TOTPViewTests(MFATestCase):
         totp.py verify function with failed registration
         Invalid token → returns "Error", no User_Keys created
         """
+        self.login_user()
+
         # First get a new token
         get_token_response = self.client.get(self.get_mfa_url("get_new_otop"))
         token_data = json.loads(get_token_response.content)
@@ -257,8 +261,8 @@ class TOTPViewTests(MFATestCase):
         invalid_token = "000000"
 
         # Try to verify
-        response = self.client.get(
-            f"{self.get_mfa_url('verify_otop')}?key={secret_key}&answer={invalid_token}"
+        response = self.client.post(
+            self.get_mfa_url("verify_otop"), {"answer": invalid_token}
         )
 
         self.assertEqual(response.status_code, 200)
@@ -267,6 +271,49 @@ class TOTPViewTests(MFATestCase):
         # Verify no key was created
         totp_keys = self.get_user_keys(key_type="TOTP")
         self.assertFalse(totp_keys.filter(properties__secret_key=secret_key).exists())
+
+    def test_verify_rejects_client_supplied_key_and_requires_csrf(self):
+        """Rejects the old GET flow, client-supplied secret, and missing CSRF."""
+        self.login_user()
+
+        attacker_secret = pyotp.random_base32()
+        attacker_token = pyotp.TOTP(attacker_secret).now()
+        verify_url = self.get_mfa_url("verify_otop")
+        get_token_url = self.get_mfa_url("get_new_otop")
+
+        csrf_client = Client(enforce_csrf_checks=True)
+        csrf_client.force_login(self.user)
+        csrf_client.cookies["csrftoken"] = "a" * 32
+        csrf_token = "a" * 32
+
+        # A client-supplied key is ignored; without getToken() there is no pending secret.
+        response = csrf_client.post(
+            verify_url,
+            {
+                "key": attacker_secret,
+                "answer": attacker_token,
+                "csrfmiddlewaretoken": csrf_token,
+            },
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(
+            User_Keys.objects.filter(properties__secret_key=attacker_secret).exists()
+        )
+
+        # The old GET enrollment flow is rejected.
+        response = csrf_client.get(
+            verify_url, {"key": attacker_secret, "answer": attacker_token}
+        )
+        self.assertEqual(response.status_code, 405)
+
+        # getToken() creates a pending secret, but the POST still needs CSRF.
+        response = csrf_client.get(get_token_url)
+        self.assertEqual(response.status_code, 200)
+        response = csrf_client.post(verify_url, {"answer": attacker_token})
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(
+            User_Keys.objects.filter(properties__secret_key=attacker_secret).exists()
+        )
 
     @override_settings(
         MFA_LOGIN_CALLBACK="mfa.tests.create_session",
@@ -295,8 +342,8 @@ class TOTPViewTests(MFATestCase):
         valid_token = totp.now()
 
         # Verify the token
-        response = self.client.get(
-            f"{self.get_mfa_url('verify_otop')}?key={secret_key}&answer={valid_token}"
+        response = self.client.post(
+            self.get_mfa_url("verify_otop"), {"answer": valid_token}
         )
 
         # Should return RECOVERY since no recovery key exists
@@ -310,9 +357,15 @@ class TOTPViewTests(MFATestCase):
         # Create a recovery key
         recovery_key = self.create_recovery_key()
 
+        # The successful first enrollment consumed the pending secret; start again.
+        get_token_response = self.client.get(self.get_mfa_url("get_new_otop"))
+        token_data = json.loads(get_token_response.content)
+        secret_key = token_data["secret_key"]
+        valid_token = pyotp.TOTP(secret_key).now()
+
         # Try verification again
-        response = self.client.get(
-            f"{self.get_mfa_url('verify_otop')}?key={secret_key}&answer={valid_token}"
+        response = self.client.post(
+            self.get_mfa_url("verify_otop"), {"answer": valid_token}
         )
 
         # Now should return Success
@@ -616,10 +669,11 @@ class TOTPModuleTests(MFATestCase):
         totp = pyotp.TOTP(secret_key)
         valid_token = totp.now()
 
-        # Create request with GET parameters
-        request = self.client.get(
-            f"{self.get_mfa_url('verify_otop')}?key={secret_key}&answer={valid_token}"
-        ).wsgi_request
+        # Create a POST request bound to the pending session secret
+        request = self.create_http_request_mock()
+        request._dont_enforce_csrf_checks = True
+        request.POST = {"answer": valid_token}
+        request.session["new_mfa_secret"] = secret_key
 
         with self.settings(MFA_ENFORCE_RECOVERY_METHOD=False):
             response = verify(request)
@@ -645,10 +699,11 @@ class TOTPModuleTests(MFATestCase):
         secret_key = pyotp.random_base32()
         invalid_token = "000000"  # Invalid token
 
-        # Create request with GET parameters
-        request = self.client.get(
-            f"{self.get_mfa_url('verify_otop')}?key={secret_key}&answer={invalid_token}"
-        ).wsgi_request
+        # Create a POST request bound to the pending session secret
+        request = self.create_http_request_mock()
+        request._dont_enforce_csrf_checks = True
+        request.POST = {"answer": invalid_token}
+        request.session["new_mfa_secret"] = secret_key
 
         response = verify(request)
 
@@ -673,10 +728,11 @@ class TOTPModuleTests(MFATestCase):
         totp = pyotp.TOTP(secret_key)
         valid_token = totp.now()
 
-        # Create request with GET parameters
-        request = self.client.get(
-            f"{self.get_mfa_url('verify_otop')}?key={secret_key}&answer={valid_token}"
-        ).wsgi_request
+        # Create a POST request bound to the pending session secret
+        request = self.create_http_request_mock()
+        request._dont_enforce_csrf_checks = True
+        request.POST = {"answer": valid_token}
+        request.session["new_mfa_secret"] = secret_key
 
         with self.settings(MFA_ENFORCE_RECOVERY_METHOD=True):
             response = verify(request)
@@ -705,6 +761,7 @@ class TOTPModuleTests(MFATestCase):
         Renders template with custom method names from MFA_RENAME_METHODS
         """
         # Create request with GET parameters
+        self.login_user()
         request = self.client.get(self.get_mfa_url("start_new_otop")).wsgi_request
 
         with self.settings(
@@ -809,12 +866,14 @@ class TOTPModuleTests(MFATestCase):
     def test_verify_with_custom_method_names(self):
         """Handles custom MFA_RENAME_METHODS during verification."""
         request = self.create_http_request_mock()
+        request._dont_enforce_csrf_checks = True
 
         # Create a real TOTP secret and generate a valid token
         secret_key = pyotp.random_base32()
         totp = pyotp.TOTP(secret_key)
         valid_token = totp.now()
-        request.GET = {"answer": valid_token, "key": secret_key}
+        request.POST = {"answer": valid_token}
+        request.session["new_mfa_secret"] = secret_key
 
         with self.settings(
             MFA_ENFORCE_RECOVERY_METHOD=True,

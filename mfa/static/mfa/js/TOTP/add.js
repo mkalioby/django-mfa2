@@ -45,9 +45,12 @@ function verify() {
     const manage_recovery_codes = JSON.parse(document.getElementById('manage_recovery_codes').textContent);
     const RECOVERY_METHOD = JSON.parse(document.getElementById('RECOVERY_METHOD').textContent);
     const mfa_home = JSON.parse(document.getElementById('mfa_home').textContent);
-    answer = $("#answer").val()
+    const csrf_token = JSON.parse(document.getElementById('csrf_token').textContent);
+    const answer = $("#answer").val()
     $.ajax({
-        "url": verify_otop + "?key=" + key + "&answer=" + answer,
+        "url": verify_otop,
+        "type": "POST",
+        "data": {"csrfmiddlewaretoken": csrf_token, "answer": answer},
         success: function (data) {
             if (data == 'Success')
                 $("#res").html("<div class='alert alert-success'>Your authenticator is registered successfully, <a href='"+redirect_html+"'> "+reg_success_msg+"</a></div>")
