@@ -5,6 +5,9 @@ import time
 import pyotp
 from django.shortcuts import render
 from django.views.decorators.cache import never_cache
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.http import require_POST
 from django.http import HttpResponse, JsonResponse
 from django.template.context_processors import csrf
 from django.conf import settings
@@ -61,10 +64,13 @@ def auth(request):
     return render(request, "TOTP/Auth.html", context)
 
 
+@login_required
+@never_cache
 def getToken(request):
     secret_key = pyotp.random_base32()
     totp = pyotp.TOTP(secret_key)
     request.session["new_mfa_answer"] = totp.now()
+    request.session["new_mfa_secret"] = secret_key
     qr = pyotp.totp.TOTP(secret_key).provisioning_uri(
         str(request.user.username), issuer_name=settings.TOKEN_ISSUER_NAME
     )
@@ -76,9 +82,15 @@ def getToken(request):
     )
 
 
+@login_required
+@require_POST
+@csrf_protect
+@never_cache
 def verify(request):
-    answer = request.GET["answer"]
-    secret_key = request.GET["key"]
+    answer = request.POST.get("answer", "")
+    secret_key = request.session.get("new_mfa_secret")
+    if not secret_key:
+        return HttpResponse("Error", status=400)
     totp = pyotp.TOTP(secret_key)
     if totp.verify(answer, valid_window=60):
         uk = User_Keys()
@@ -87,6 +99,8 @@ def verify(request):
         # uk.name="Authenticatior #%s"%User_Keys.objects.filter(username=user.username,type="TOTP")
         uk.key_type = "TOTP"
         uk.save()
+        request.session.pop("new_mfa_secret", None)
+        request.session.pop("new_mfa_answer", None)
         if (
             getattr(settings, "MFA_ENFORCE_RECOVERY_METHOD", False)
             and not User_Keys.objects.filter(
@@ -104,6 +118,7 @@ def verify(request):
         return HttpResponse("Error")
 
 
+@login_required
 @never_cache
 def start(request):
     """Start Adding Time One Time Password (TOTP)"""

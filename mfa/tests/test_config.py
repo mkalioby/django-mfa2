@@ -260,6 +260,7 @@ class ConfigTestCase(MFATestCase):
 
     def test_totp_configuration_behavior(self):
         """Verifies TOTP settings and redirect configuration."""
+        self.login_user()
         with override_settings(
             TOTP_TIME_WINDOW=60,
             TOTP_CODE_LENGTH=6,
@@ -338,8 +339,8 @@ class ConfigTestCase(MFATestCase):
             valid_token = totp.now()
 
             # Verify the token
-            response = self.client.get(
-                f"{self.get_mfa_url('verify_otop')}?key={secret_key}&answer={valid_token}"
+            response = self.client.post(
+                self.get_mfa_url("verify_otop"), {"answer": valid_token}
             )
 
             # Verify success message is displayed
