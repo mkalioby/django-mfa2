@@ -226,6 +226,7 @@ function some_func() {
 * [peterthomassen](https://github.com/peterthomassen)
 * [lvanbuiten](https://github.com/lvanbuiten)
 * [mdewhirst](https://github.com/mdewhirst)
+* [DicksonWu654](https://github.com/DicksonWu654)
 
 
  # Security contact information

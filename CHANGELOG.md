@@ -1,5 +1,19 @@
 # Change Log
 
+## 3.2.1
+* Fix: With a regression for CVE-2022-42731. Thanks for @DicksonWu654 for reporting.
+
+## 3.2
+* Add deprecation warning for U2F
+* Added 95% test coverage thanks to @mdewhirst
+* Added support to FIDO < 2.3.
+
+## 3.1.3
+* Fix: With a regression for CVE-2022-42731. Thanks for @DicksonWu654 for reporting.
+
+## 3.1.2
+* Fix: Issue while adding Email as 2FA.
+
 ## 3.1.1
 * Fix: Issue #100, Issue related to error message when jsonfield isn't installed on django < 3.1.
 
@@ -9,6 +23,10 @@
 * Added: CSP Compliance (optional), thanks to @lvanbuiten, to under CSP refer to [van Buiten](https://github.com/mkalioby/django-mfa2/pull/93#issuecomment-2847112870)
 * Fix: issue when finding the user based on credential id.
 * Fix: Move key delete to be POST call. Thanks to @AndreasDickow
+
+## 3.0.2
+
+* Fix: With a regression for CVE-2022-42731. Thanks for @DicksonWu654 for reporting.
 
 ## 3.0.1
 
